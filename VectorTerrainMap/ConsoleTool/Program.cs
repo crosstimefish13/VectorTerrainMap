@@ -17,7 +17,7 @@ namespace ConsoleTool
 
         private static void ShowTitle()
         {
-            // 显示标题、版本和版权信息
+            // show title, version and copyright
             var assembly = Assembly.GetExecutingAssembly();
 
             var titleAttribute = assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute));
