@@ -1,0 +1,20 @@
+/* DATA DESCRIPTION:
+Citation:	Hämmerle, Martin; Höfle, Bernhard; Fuchs, Johannes; Schröder-Ritzrau, Andrea; Vollweiler, Nicole; Frank, Norbert (2014): Point clouds of measurements in the Dechen Cave near Iserlohn, Germany. PANGAEA, https://doi.org/10.1594/PANGAEA.830567, 
+	Supplement to: Hämmerle, M et al. (2014): Comparison of kinect and terrestrial LiDAR capturing natural karst cave 3-D objects. IEEE Geoscience and Remote Sensing Letters, 11(11), 1896-1900, https://doi.org/10.1109/LGRS.2014.2313599
+Abstract:	Modeling natural phenomena from 3D information enhances our understanding of the environment. Dense 3D point clouds are increasingly used as highly detailed input datasets. In addition to the capturing techniques of point clouds with LiDAR, low-cost sensors have been released in the last few years providing access to new research fields and facilitating 3D data acquisition for a broader range of applications. This letter presents an analysis of different speleothem features using 3D point clouds acquired with the gaming device Microsoft® Kinect. We compare the Kinect sensor with terrestrial LiDAR reference measurements using the KinFu pipeline for capturing complete 3D objects (< 4m**3). The results demonstrate the suitability of the Kinect to capture flowstone walls and to derive morphometric parameters of cave features. Although the chosen capturing strategy (KinFu) reveals a high correlation (R2=0.92) of stalagmite morphometry along the vertical object axis, a systematic overestimation (22% for radii and 44% for volume) is found. The comparison of flowstone wall datasets predominantly shows low differences (mean of 1 mm with 7 mm standard deviation) of the order of the Kinect depth precision. For both objects the major differences occur at strongly varying and curved surface structures (e.g. with fine concave parts).
+Coverage:	LATITUDE: 51.365983 * LONGITUDE: 7.645507
+Event(s):	Dechen_Cave * LATITUDE: 51.365983 * LONGITUDE: 7.645507 * LOCATION: Dechen Cave, Iserlohn, Germany (URI: https://en.wikipedia.org/wiki/Dechen_Cave)
+Comment:	Object 1: A stalagmite resembling a palm tree trunk, thus called 'Palme', of about 2.6 meters height
+	Object 2: A flowstone wall
+	The objects were captured with a terrestrial laser scanner Riegl VZ-400 and a structured light camera Microsoft Kinect in combination with the KinFu app of the point cloud library (PCL).
+	The flowstone wall point clouds were not filtered, but coarsely registered in CloudCompare via corresponding point pairs and fine registered via ICP in CloudCompare.
+	Capturing was done on 2013-05-30 by the authors.
+License:	Creative Commons Attribution 3.0 Unported (CC-BY)
+Size:	4 datasets
+*/
+/* TABULAR SUMMARY OF DATASETS LISTED IN THIS COLLECTION: */
+Filename	Citation of child dataset
+FlowstoneWall_KinFu.tab	Hämmerle, Martin; Höfle, Bernhard; Fuchs, Johannes; Schröder-Ritzrau, Andrea; Vollweiler, Nicole; Frank, Norbert (2014): Point cloud of a flowstone wall measured with a structured light camera. https://doi.org/10.1594/PANGAEA.830561
+FlowstoneWall_TLS.tab	Hämmerle, Martin; Höfle, Bernhard; Fuchs, Johannes; Schröder-Ritzrau, Andrea; Vollweiler, Nicole; Frank, Norbert (2014): Point cloud of a flowstone wall measured with a terrestrial laser scanner. https://doi.org/10.1594/PANGAEA.830564
+Palme_KinFu.tab	Hämmerle, Martin; Höfle, Bernhard; Fuchs, Johannes; Schröder-Ritzrau, Andrea; Vollweiler, Nicole; Frank, Norbert (2014): Point cloud of a stalagmite measured with a structured light camera. https://doi.org/10.1594/PANGAEA.830565
+Palme_TLS.tab	Hämmerle, Martin; Höfle, Bernhard; Fuchs, Johannes; Schröder-Ritzrau, Andrea; Vollweiler, Nicole; Frank, Norbert (2014): Point cloud of a stalagmite measured with a terrestrial laser scanner. https://doi.org/10.1594/PANGAEA.830566
