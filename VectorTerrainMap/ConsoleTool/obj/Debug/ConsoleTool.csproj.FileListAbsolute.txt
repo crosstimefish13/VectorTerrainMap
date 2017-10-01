@@ -1,9 +1,0 @@
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\bin\Debug\ConsoleTool.exe.config
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\bin\Debug\ConsoleTool.exe
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\bin\Debug\ConsoleTool.pdb
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\bin\Debug\TerrainMapLibrary.dll
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\bin\Debug\TerrainMapLibrary.pdb
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\obj\Debug\ConsoleTool.csprojResolveAssemblyReference.cache
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\obj\Debug\ConsoleTool.csproj.CoreCompileInputs.cache
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\obj\Debug\ConsoleTool.exe
-C:\Users\legen\Desktop\VectorTerrainMap\ConsoleTool\obj\Debug\ConsoleTool.pdb

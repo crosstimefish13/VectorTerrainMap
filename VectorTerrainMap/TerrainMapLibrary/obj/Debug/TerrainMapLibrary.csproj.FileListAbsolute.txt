@@ -1,6 +1,0 @@
-C:\Users\legen\Desktop\VectorTerrainMap\TerrainMapLibrary\bin\Debug\TerrainMapLibrary.dll
-C:\Users\legen\Desktop\VectorTerrainMap\TerrainMapLibrary\bin\Debug\TerrainMapLibrary.pdb
-C:\Users\legen\Desktop\VectorTerrainMap\TerrainMapLibrary\obj\Debug\TerrainMapLibrary.csprojResolveAssemblyReference.cache
-C:\Users\legen\Desktop\VectorTerrainMap\TerrainMapLibrary\obj\Debug\TerrainMapLibrary.csproj.CoreCompileInputs.cache
-C:\Users\legen\Desktop\VectorTerrainMap\TerrainMapLibrary\obj\Debug\TerrainMapLibrary.dll
-C:\Users\legen\Desktop\VectorTerrainMap\TerrainMapLibrary\obj\Debug\TerrainMapLibrary.pdb
