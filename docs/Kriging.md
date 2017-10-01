@@ -6,5 +6,5 @@ Kriging 是一个高级地理统计过程，它通过一个离散点集合估算
 Kriging 假设样本点间的距离和方向反应了场景的空间相关性，该相关性描述了平面区域的变化方式。Kriging 算法尝试用一种数学方法计算每一个预测点的测量值，该方法需明确所有或某半径范围内的样本点数量。Kriging 由多个处理步骤组成：它包括对样本数据进行试探性（exploratory）统计分析；建立变差(variogram)模型；构造平面区域；并且（可选地）探测平面区域的变化。如果您认为样本点的距离和方向反应了空间相关性，那么 Kriging 是最合适的选择。Kriging 在土壤学和地理学上被广泛使用。
 # Kriging方程
 Kriging 与 IDW 类似，通过得到预测点周围各样本点的权重系数，来计算预测点的测量值。这两种插值算法的通用方程为样本点的权重系数求和：    
-![公式01](\content\kriging\img\kriging_img_01.gif)    
+![公式01](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_01.gif)    
 其中：
