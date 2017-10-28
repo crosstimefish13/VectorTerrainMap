@@ -21,33 +21,33 @@ Kriging 插值算法进行预测需要做两件事情：
 * 找到某类依赖规则
 * 进行预测
 
-为了实现这两件事，Kriging 使用如下两步处理：
+为了完成这两件事，Kriging 进行如下两步处理：
 * 建立变差函数估算空间依赖值（自相关性的量化），该函数依赖于空间自相关性模型（一种拟合模型）
 * 计算预测点的测量值（进行预测）
 
 由上述两步可知 Kriging 使用了样本数据两次：第一次用来估算数据的空间自相关性；第二次进行预测计算。
 # 变差分析（Variography）
-构建拟合模型（或空间模型）是一种带有分析的构建过程，称为变差分析。在样本点的空间模型构建过程中，您首先需要创建一张经验变差图（empirical semivariogram），使用如下公式建立样本点平面距离与测量值方差的关系：
+构建拟合模型（或空间模型）是一种带有分析的构建过程，称为变差分析。在样本点的空间模型构建过程中，您首先需要创建一张经验变差图（empirical semivariogram），使用如下公式建立样本点**平面距离**（下文使用距离）与**测量值方差**（下文使用方差）的关系：
 
 ![公式12](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_09.gif)
 
 其中：    
-* ![公式13](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_10.gif) = 样本点 ![公式14](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) 与 ![公式15](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_11.gif) 的平面距离
+* ![公式13](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_17.gif) = 样本点 ![公式14](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) 与 ![公式15](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_11.gif) 的距离
 * ![公式16](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_08.gif) = 样本点 ![公式17](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) 的测量值
 
-该公式计算了两点对测量值的方差。下图展示了某点（红色标记点）和它周围所有样本点的两两关系。需运用该公式计算完成所有两点对的。
+该公式构建了样本点 ![公式18](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) , ![公式19](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_11.gif) 的距离 ![公式20](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_17.gif) 与方差的关系 ![公式21](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_10.gif)。下图展示了某点（红色标记点）和它周围所有样本点的两两关系。需运用该公式计算完成所有样本点的两两关系。
 
 ![图片01](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_12.gif)    
-*Figure 01 计算两点对测量值的方差*
+*Figure 01 计算两点的方差*
 
-通常，每一个两点对有唯一的距离，然而却有很多两点对。为了在可控范围内绘制所有两点对结果，使用一个步长范围（lag bins）作为两点距离，而不是使用所有两点距离。比如，计算两点距离在 40 至 50 米间的所有两点对方差的平均值，公式如下：
+通常，每两点有唯一的距离，然而样本点数量庞大。为了在可控范围内绘制所有两点关系结果，使用一个步长范围（lag bins）作为两点距离，而不是直接使用所有两点距离。比如，计算两点距离在 40 至 50 米间的所有方差的平均值，公式如下：
 
-![公式18](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_14.gif)
+![公式22](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_14.gif)
 
 其中：
-* ![公式19](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_07.gif) = 需计算的两点对数量
-* ![公式20](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_15.gif) = 各两点对的方差计算结果
-* ![公式21](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_16.gif) = 方差平均值
+* ![公式23](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_07.gif) = 需计算的两点对数量
+* ![公式24](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_15.gif) = 各两点对的方差计算结果
+* ![公式25](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_16.gif) = 方差平均值
 
 经验变差图是一个坐标轴，y 轴为方差平均值，x 轴为两点对距离（或者步长），如下图所示。
 
@@ -66,3 +66,5 @@ Kriging 算法提供了下列函数用以为经验变差图建模：
 * 线性函数（Linear）
 
 选择不同模型将影响对未测量点的测量值预测，尤其是各函数曲线在接近坐标轴原点时的图形显著不同。曲线越接近原点越陡峭，则对预测结果的影响越大。就结果而言，构建的平面区域将不那么光滑。每个模型在不同场景下的拟合精确度各不相同。下文展示了两个常用函数模型以及两者的区别。
+# 球面函数模型
+该模型描述了空间自相关性随两点距离逐渐增加而降低（即方差值增大），直到某两点的空间自相关性为零（距离与方差值无限大）。该模型是最常用的模型之一。
