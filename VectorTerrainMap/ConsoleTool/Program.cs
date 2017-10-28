@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TerrainMapLibrary.Data;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,12 +13,13 @@ namespace ConsoleTool
         public static void Main(string[] args)
         {
             ShowTitle();
+            Kriging();
             Console.ReadKey(true);
         }
 
         private static void ShowTitle()
         {
-            // show title, version and copyright
+            // 显示标题，版本和版权信息
             var assembly = Assembly.GetExecutingAssembly();
 
             var titleAttribute = assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute));
@@ -31,6 +33,13 @@ namespace ConsoleTool
             Console.WriteLine($"{title} [版本 {version}]");
             Console.WriteLine($"{copyright}。保留所有权利");
             Console.WriteLine();
+        }
+
+        private static void Kriging()
+        {
+            CSVData inputData = new CSVData(@"..\..\..\SampleData\opendem\rostock\rostock.csv");
+            inputData.LoadIntoMemory();
+            var fields = inputData.Fields<double>();
         }
     }
 }
