@@ -27,7 +27,7 @@ Kriging 插值算法进行预测需要做两件事情：
 
 由上述两步可知 Kriging 使用了样本数据两次：第一次用来估算数据的空间自相关性；第二次进行预测计算。
 # 变差分析（Variography）
-构建拟合模型（或空间模型）是一种带有分析的构建过程，称为变差分析。在样本点的空间模型构建过程中，您首先需要创建一张经验变差图（empirical semivariogram），使用如下公式以两点对的距离进行计算：
+构建拟合模型（或空间模型）是一种带有分析的构建过程，称为变差分析。在样本点的空间模型构建过程中，您首先需要创建一张经验变差图（empirical semivariogram），使用如下公式建立样本点平面距离与测量值方差的关系：
 
 ![公式12](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_09.gif)
 
