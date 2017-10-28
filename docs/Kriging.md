@@ -21,7 +21,7 @@ Kriging 插值算法进行预测需要做两件事情：
 * 找到某类依赖规则
 * 进行预测
 
-为了实现这两件事，Kriging 使用如下两步处理：
+为了完成这两件事，Kriging 进行如下两步处理：
 * 建立变差函数估算空间依赖值（自相关性的量化），该函数依赖于空间自相关性模型（一种拟合模型）
 * 计算预测点的测量值（进行预测）
 
@@ -32,22 +32,22 @@ Kriging 插值算法进行预测需要做两件事情：
 ![公式12](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_09.gif)
 
 其中：    
-* ![公式13](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_10.gif) = 样本点 ![公式14](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) 与 ![公式15](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_11.gif) 的平面距离
+* ![公式13](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_17.gif) = 样本点 ![公式14](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) 与 ![公式15](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_11.gif) 的平面距离
 * ![公式16](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_08.gif) = 样本点 ![公式17](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) 的测量值
 
-该公式计算了两点对测量值的方差。下图展示了某点（红色标记点）和它周围所有样本点的两两关系。需运用该公式计算完成所有两点对的。
+该公式构建了样本点 ![公式18](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_02.gif) , ![公式19](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_11.gif) 的平面距离 ![公式20](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_17.gif) 与测量值方差的关系 ![公式21](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_10.gif)。下图展示了某点（红色标记点）和它周围所有样本点的两两关系。需运用该公式计算完成所有样本点的两两关系。
 
 ![图片01](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_12.gif)    
 *Figure 01 计算两点对测量值的方差*
 
-通常，每一个两点对有唯一的距离，然而却有很多两点对。为了在可控范围内绘制所有两点对结果，使用一个步长范围（lag bins）作为两点距离，而不是使用所有两点距离。比如，计算两点距离在 40 至 50 米间的所有两点对方差的平均值，公式如下：
+通常，每两点有唯一的平面距离，然而样本点数量庞大。为了在可控范围内绘制所有两点关系结果，使用一个步长范围（lag bins）作为两点平面距离，而不是使用所有两点平面距离。比如，计算两点平面距离在 40 至 50 米间的所有测量值方差的平均值，公式如下：
 
-![公式18](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_14.gif)
+![公式22](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_14.gif)
 
 其中：
-* ![公式19](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_07.gif) = 需计算的两点对数量
-* ![公式20](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_15.gif) = 各两点对的方差计算结果
-* ![公式21](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_16.gif) = 方差平均值
+* ![公式23](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_07.gif) = 需计算的两点对数量
+* ![公式24](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_15.gif) = 各两点对的测量值方差计算结果
+* ![公式25](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_16.gif) = 测量值方差平均值
 
 经验变差图是一个坐标轴，y 轴为方差平均值，x 轴为两点对距离（或者步长），如下图所示。
 
