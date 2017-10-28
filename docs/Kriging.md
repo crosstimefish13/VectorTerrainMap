@@ -86,7 +86,7 @@ Kriging 算法提供了下列函数用以为经验变差图建模：
 # 变差模型解析--Range, Sill 和 Nugget
 如前所述，变差图描述了样本点的空间自相关性。由基本的地理学概念（越接近的事物越相似）可知，两样本点越接近则方差值越小。在计算并绘制完所有的两点关系后，选取一个变差模型进行拟合。通常使用值域（range），阈值（sill）和块值（nugget）来描述这些变差模型。
 ## 值域和阈值
-观察变差模型的函数曲线，您会注意到某些距离使得函数曲线趋于水平。使得函数曲线开始变平的距离值被称为值域。值域范围内的样本点距离越接近，具有空间自相关性，而值域外的点不再具有空间自相关性。
+观察变差模型的函数曲线，您会注意到某些距离使得函数曲线趋于水平。使得函数曲线开始变平的距离值被称为值域。值域范围内的样本点距离越接近，越具有空间自相关性，而值域外的点不再具有空间自相关性。
 
 ![图片05](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_20.gif)    
 *Figure 05 值域，阈值和块值示例*
@@ -114,7 +114,7 @@ Kriging 是一个复杂的过程，您需要具有空间统计学的知识才能
 Kriging 基于区域化变量理论（regionalized variable theory），该理论中空间变化由空间场景中的 Z 值所描述，该理论假设空间变化在平面区域内具有统计均匀性（statistically homogeneous）（例如平面区域内所有可观测点的变化模式是相同的）。该统计均匀性假设是区域变化理论的基础。
 
 # 数学模型
-下面列出了几个数学模型的函数曲线和方程组，这些模型用来进行进行变差图的拟合。
+下面列出了几个数学模型的函数曲线和方程组，这些模型用来进行变差图的拟合。
 
 ![图片06](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_21.png)    
 *Figure 06 球面函数模型示例*
