@@ -1,3 +1,7 @@
+# 声明（Statement）
+本文翻译自 [ArcGis](http://www.esri.com/) 的技术文章 [How Kriging works](http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/how-kriging-works.htm)。如存在侵权，请联系[作者](https://github.com/crosstimefish13)删除。
+
+This topic was translated from topic named [How Kriging works](http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/how-kriging-works.htm) of [ArcGis](http://www.esri.com/). Please contact [author](https://github.com/crosstimefish13) to destroy this topic if it's an issue of infringement act.
 # Kriging 如何工作
 Kriging 是一个高级地理统计过程，它通过一个离散点集合估算一个平面区域（surface），该点集合中的每个点应带有测量值（z-value）。与其他插值工具集提供的插值算法不同，在您选择最好的估值算法去建立平面区域前，您需要知道使用 Kriging 算法将涉及到对一个特定空间场景（phenomenon）的交互式研究，该空间场景由测量值所描述。
 # Kriging 是什么
@@ -80,16 +84,16 @@ Kriging 算法提供了下列函数用以为经验变差图建模：
 
 选择使用何种模型应基于数据的空间自相关性以及对空间场景的预先了解。
 # 变差模型解析--Range, Sill 和 Nugget
-如前所述，变差图描述了样本点的空间自相关性。由基本的地理学概念（越接近的事物越相似）可知，两样本点越接近则方差值越小。在计算并绘制完所有的两点关系后，选取一个变差模型进行拟合。通常使用值域（Range），阈值（Sill）和块值（Nugget）来描述这些变差模型。
+如前所述，变差图描述了样本点的空间自相关性。由基本的地理学概念（越接近的事物越相似）可知，两样本点越接近则方差值越小。在计算并绘制完所有的两点关系后，选取一个变差模型进行拟合。通常使用值域（range），阈值（sill）和块值（nugget）来描述这些变差模型。
 ## 值域和阈值
 观察变差模型的函数曲线，您会注意到某些距离使得函数曲线趋于水平。使得函数曲线开始变平的距离值被称为值域。值域范围内的样本点距离越接近，具有空间自相关性，而值域外的点不再具有空间自相关性。
 
 ![图片05](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_20.gif)    
 *Figure 05 值域，阈值和块值示例*
 
-函数曲线中值域所对应的点（y 轴上的值）被称为阈值。偏阈值（Partial Sill）是阈值减去块值。有关块值的描述如下。
+函数曲线中值域所对应的点（y 轴上的值）被称为阈值。偏阈值（partial sill）是阈值减去块值。有关块值的描述如下。
 ## 块值
-理论上，距离为 0 （或者步长为 0）时函数曲线的方差值为 0。然而，在无限小的距离处，变差图通常展现出一种块效应，其方差值仍然大于 0。例如函数曲线与 y 轴的相交值为 2，则此时块值为 2。
+理论上，距离为 0 （或者步长为 0）时函数曲线的方差值为 0。然而，在无限小的距离处，变差图通常展现出一种块效应（nugget effect），其方差值仍然大于 0。例如函数曲线与 y 轴的相交值为 2，则此时块值为 2。
 
 块效应由测量误差或者空间数据源在小于采样间隔内的变异造成。测量误差由测量设备内的硬件误差造成。自然空间场景在尺度范围外仍具有空间变化，快效应部分来自于小于采样间隔的微小尺度上的变异。在采集数据前，获悉空间变异处的尺度是很重要的。
 # 进行预测
@@ -98,7 +102,7 @@ Kriging 算法提供了下列函数用以为经验变差图建模：
 您现在可以第二次使用数据进行预测。与 IDW 插值一样，Kriging 通过预测点周围样本点的测量值计算权重系数。在 IDW 插值中，样本点距离预测点越近，则对预测点的影响越大。然而，Kriging 中样本点权重系数的计算过程更复杂。IDW 使用基于距离的简单算法，但是 Kriging 中样本点的权重系数来自于经过数据处理后所得到的变差模型。为了构建连续的空间场景平面区域，预测点构成将构成一个平面区域网格，该网格基于变差模型且样本点分布在该网格中。
 
 # Kriging 计算
-通常有两种 Kriging 计算方法：标准法和通用法。
+通常有两种 Kriging 计算方法：标准法（ordinary）和通用法（universal）。
 
 标准法是被广泛使用的最常用的 Kriging 计算方法，它是默认方法。标准法假设物理常数未知，在具有科学的原因前这是一种合理的假设。
 
@@ -107,7 +111,35 @@ Kriging 算法提供了下列函数用以为经验变差图建模：
 # Kriging 理论
 Kriging 是一个复杂的过程，您需要具有空间统计学的知识才能理解本文。在使用 Kriging 前，您需要彻底了解 Kriging 的基本原理并且评估您的数据是否适用于 Kriging。如果您还未掌握该过程，强烈推荐您查阅本文末尾的参考文献。
 
-Kriging 基于区域化变量理论，该理论中空间变化由空间场景中的 Z 值所描述，该理论假设空间变化在平面区域内具有统计均匀性（例如平面区域内所有可观测点的变化模式是相同的）。该统计均匀性假设是区域变化理论的基础。
+Kriging 基于区域化变量理论（regionalized variable theory），该理论中空间变化由空间场景中的 Z 值所描述，该理论假设空间变化在平面区域内具有统计均匀性（statistically homogeneous）（例如平面区域内所有可观测点的变化模式是相同的）。该统计均匀性假设是区域变化理论的基础。
 
 # 数学模型
 下面列出了几个数学模型的函数曲线和方程组，这些模型用来进行进行变差图的拟合。
+
+![图片06](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_21.png)    
+*Figure 06 球面函数模型示例*
+
+![图片07](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_22.png)    
+*Figure 07 圆函数模型示例*
+
+![图片08](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_23.png)    
+*Figure 08 指数函数模型示例*
+
+![图片09](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_24.png)    
+*Figure 09 高斯函数模型示例*
+
+![图片10](https://github.com/crosstimefish13/VectorTerrainMap/blob/develop/docs/content/kriging/img/kriging_img_25.png)    
+*Figure 10 线性函数模型示例*
+
+# 参考文献
+Burrough, P. A. Principles of Geographical Information Systems for Land Resources Assessment. New York: Oxford University Press. 1986.
+
+Heine, G. W. "A Controlled Study of Some Two-Dimensional Interpolation Methods." COGS Computer Contributions 3 (no. 2): 60–72. 1986.
+
+McBratney, A. B., and R. Webster. "Choosing Functions for Semi-variograms of Soil Properties and Fitting Them to Sampling Estimates." Journal of Soil Science 37: 617–639. 1986.
+
+Oliver, M. A. "Kriging: A Method of Interpolation for Geographical Information Systems." International Journal of Geographic Information Systems 4: 313–332. 1990.
+
+Press, W. H., S. A. Teukolsky, W. T. Vetterling, and B. P. Flannery. Numerical Recipes in C: The Art of Scientific Computing. New York: Cambridge University Press. 1988.
+
+Royle, A. G., F. L. Clausen, and P. Frederiksen. "Practical Universal Kriging and Automatic Contouring." Geoprocessing 1: 377–394. 1981.
