@@ -1,7 +1,7 @@
 # 声明（Statement）
-本文翻译自 [ArcGis](http://www.esri.com/) 的技术文章 [How Kriging works](http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/how-kriging-works.htm)。如存在侵权，请联系[作者](https://github.com/crosstimefish13)删除。
+本文翻译并修改自 [ArcGis](http://www.esri.com/) 的技术文章 [How Kriging works](http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/how-kriging-works.htm)。如存在侵权，请联系[作者](https://github.com/crosstimefish13)删除。
 
-This topic was translated from topic named [How Kriging works](http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/how-kriging-works.htm) of [ArcGis](http://www.esri.com/). Please contact [author](https://github.com/crosstimefish13) to destroy this topic if it's an issue of infringement act.
+This topic was translated and fixed from topic named [How Kriging works](http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/how-kriging-works.htm) of [ArcGis](http://www.esri.com/). Please contact [author](https://github.com/crosstimefish13) to destroy this topic if it's an issue of infringement act.
 # Kriging 如何工作
 Kriging 是一个高级地理统计过程，它通过一个离散点集合估算一个平面区域（surface），该点集合中的每个点应带有测量值（z-value）。与其他插值工具集提供的插值算法不同，在您选择最好的估值算法去建立平面区域前，您需要知道使用 Kriging 算法将涉及到对一个特定空间场景（phenomenon）的交互式研究，该空间场景由测量值所描述。
 # Kriging 是什么
