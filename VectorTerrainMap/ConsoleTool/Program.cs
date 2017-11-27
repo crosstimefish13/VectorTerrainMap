@@ -37,6 +37,10 @@ namespace ConsoleTool
 
         private static void Kriging()
         {
+            var cc = new GeoNumber("-00000.23", int.MaxValue);
+            var bb = new GeoNumber("1.148000000000000000000000001", int.MaxValue);
+            var dd = cc + bb;
+
             CSVData inputData = new CSVData(@"..\..\..\SampleData\opendem\rostock\rostock.csv");
             inputData.LoadIntoMemory();
             var fields = inputData.Fields<double>();
