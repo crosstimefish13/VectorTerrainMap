@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TerrainMapLibrary.Localization;
 
 namespace TerrainMapLibrary.Data
 {
@@ -18,18 +19,18 @@ namespace TerrainMapLibrary.Data
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new Exception("it is a null value.");
+                throw new Exception(ExceptionMessage.NullValue);
             }
 
             if (precision < 0)
             {
-                throw new Exception("precision must be 0 or more.");
+                throw new Exception(ExceptionMessage.InvalidPrecision);
             }
 
             Regex regex = new Regex("^[+-]?\\d+(\\.\\d+)?$");
             if (!regex.IsMatch(value))
             {
-                throw new Exception($"{value} is not a number.");
+                throw new Exception($"{value} {ExceptionMessage.NotNumber}");
             }
 
             sign = true;
@@ -170,7 +171,7 @@ namespace TerrainMapLibrary.Data
         {
             if (precision < 0)
             {
-                throw new Exception($"precision must be 0 or more.");
+                throw new Exception(ExceptionMessage.InvalidPrecision);
             }
 
             this.sign = sign;
@@ -178,7 +179,7 @@ namespace TerrainMapLibrary.Data
 
             if (high == null)
             {
-                throw new Exception($"integer part is null.");
+                throw new Exception(ExceptionMessage.NullInteger);
             }
 
             this.high = new List<byte>();
@@ -189,7 +190,7 @@ namespace TerrainMapLibrary.Data
 
             if (low == null)
             {
-                throw new Exception($"decimal part is null.");
+                throw new Exception(ExceptionMessage.NullDecimal);
             }
 
             this.low = new List<byte>();
@@ -399,131 +400,5 @@ namespace TerrainMapLibrary.Data
             var result = new GeoNumber(true, high, low, alignedLeft.precision);
             return result;
         }
-
-        //public static GeoNumber operator +(GeoNumber left, GeoNumber right)
-        //{
-        //    if (left.multiple != right.multiple)
-        //    {
-        //        throw new Exception($"{left.ToString()} 与 {right.ToString()} 的精度不同。");
-        //    }
-
-        //    var result = new GeoNumber(left.GetPrecision(left.multiple));
-        //    if (left.signal == right.signal)
-        //    {
-        //        if (UInt64.MaxValue - left.basis < right.basis)
-        //        {
-        //            throw new Exception($"{left.ToString()} 与 {right.ToString()} 的计算结果超出了最大范围。");
-        //        }
-
-        //        result.basis = left.basis + right.basis;
-        //        result.signal = left.signal;
-        //    }
-        //    else if (left.basis > right.basis)
-        //    {
-        //        result.basis = left.basis - right.basis;
-        //        result.signal = left.signal;
-        //    }
-        //    else if (right.basis > left.basis)
-        //    {
-        //        result.basis = right.basis - left.basis;
-        //        result.signal = right.signal;
-        //    }
-        //    else
-        //    {
-        //        result.basis = 0;
-        //        result.signal = true;
-        //    }
-
-        //    return result;
-        //}
-
-        //public static GeoNumber operator +(GeoNumber left, Double right)
-        //{
-        //    var nRight = new GeoNumber(right, left.GetPrecision(left.multiple));
-        //    var result = left + nRight;
-        //    return result;
-        //}
-
-        //public static GeoNumber operator +(Double left, GeoNumber right)
-        //{
-        //    var nLeft = new GeoNumber(left, right.GetPrecision(right.multiple));
-        //    var result = nLeft + right;
-        //    return result;
-        //}
-
-        //public static GeoNumber operator -(GeoNumber left, GeoNumber right)
-        //{
-        //    if (left.multiple != right.multiple)
-        //    {
-        //        throw new Exception($"{left.ToString()} 与 {right.ToString()} 的精度不同。");
-        //    }
-
-        //    var result = new GeoNumber(left.GetPrecision(left.multiple));
-        //    if (left.signal != right.signal)
-        //    {
-        //        if (UInt64.MaxValue - left.basis < right.basis)
-        //        {
-        //            throw new Exception($"{left.ToString()} 与 {right.ToString()} 的计算结果超出了最大范围。");
-        //        }
-
-        //        result.basis = left.basis + right.basis;
-        //        result.signal = left.signal;
-        //    }
-        //    else if (left.basis > right.basis)
-        //    {
-        //        result.basis = left.basis - right.basis;
-        //        result.signal = left.signal;
-        //    }
-        //    else if (left.basis < right.basis)
-        //    {
-        //        result.basis = right.basis - left.basis;
-        //        result.signal = !left.signal;
-        //    }
-        //    else
-        //    {
-        //        result.basis = 0;
-        //        result.signal = true;
-        //    }
-
-        //    return result;
-        //}
-
-        //public static GeoNumber operator -(GeoNumber left, Double right)
-        //{
-        //    var nRight = new GeoNumber(right, left.GetPrecision(left.multiple));
-        //    var result = left - nRight;
-        //    return result;
-        //}
-
-        //public static GeoNumber operator -(Double left, GeoNumber right)
-        //{
-        //    var nLeft = new GeoNumber(left, right.GetPrecision(right.multiple));
-        //    var result = nLeft - right;
-        //    return result;
-        //}
-
-        //private UInt64 GetMutiple(Byte precision)
-        //{
-        //    UInt64 multiple = 1;
-        //    for (int i = 0; i < precision; i++)
-        //    {
-        //        if (UInt64.MaxValue / 10 < multiple)
-        //        {
-        //            throw new Exception($"精度 {precision} 超出了最大范围。");
-        //        }
-        //        multiple *= 10;
-        //    }
-        //    return multiple;
-        //}
-
-        //private Byte GetPrecision(UInt64 multiple)
-        //{
-        //    Byte precision = 0;
-        //    for (UInt64 i = 1; i < multiple; i *= 10)
-        //    {
-        //        precision += 1;
-        //    }
-        //    return precision;
-        //}
     }
 }

@@ -41,11 +41,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\CSVData.cs" />
+    <Compile Include="Data\EmbeddedCSVData.cs" />
     <Compile Include="Data\GeoNumber.cs" />
+    <Compile Include="Localization\ExceptionMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Vector\Kriging\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\Exception.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

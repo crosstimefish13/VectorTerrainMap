@@ -60,7 +60,7 @@ namespace TerrainMapLibraryTest.Data
             catch (Exception e)
             {
                 isThrow = true;
-                Assert.AreEqual(e.Message, "值是空的。");
+                Assert.AreEqual(e.Message, "it is a null value.");
             }
             finally
             {
@@ -75,7 +75,7 @@ namespace TerrainMapLibraryTest.Data
             catch (Exception e)
             {
                 isThrow = true;
-                Assert.AreEqual(e.Message, "值是空的。");
+                Assert.AreEqual(e.Message, "it is a null value.");
             }
             finally
             {
@@ -90,7 +90,7 @@ namespace TerrainMapLibraryTest.Data
             catch (Exception e)
             {
                 isThrow = true;
-                Assert.AreEqual(e.Message, "精度必须大于等于 0。");
+                Assert.AreEqual(e.Message, "precision must be 0 or more.");
             }
             finally
             {
@@ -106,7 +106,7 @@ namespace TerrainMapLibraryTest.Data
             catch (Exception e)
             {
                 isThrow = true;
-                Assert.AreEqual(e.Message, $"{value} 不是一个数字。");
+                Assert.AreEqual(e.Message, $"{value} is not a number.");
             }
             finally
             {

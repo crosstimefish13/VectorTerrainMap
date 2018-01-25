@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerrainMapLibrary.Localization;
 
 namespace TerrainMapLibrary.Data
 {
@@ -34,7 +35,7 @@ namespace TerrainMapLibrary.Data
             meta.Clear();
 
             // read to end, read each fields, these fields are splited with comma
-            var reader = new StreamReader(filePath);
+            var reader = new StreamReader(GetStream());
             while (reader.EndOfStream == false)
             {
                 string line = reader.ReadLine();
@@ -107,6 +108,13 @@ namespace TerrainMapLibrary.Data
         }
 
 
+        protected virtual Stream GetStream()
+        {
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return stream;
+        }
+
+
         private T GetField<T>(int row, int column)
         {
             // ensure row and column is valid
@@ -148,7 +156,7 @@ namespace TerrainMapLibrary.Data
             }
             else
             {
-                throw new Exception($"{t.FullName} is not a supported data type.");
+                throw new Exception($"{t.FullName} {ExceptionMessage.NotSupportDataType}");
             }
         }
     }
