@@ -19,7 +19,7 @@ namespace ConsoleTool
 
         private static void ShowTitle()
         {
-            // 显示标题，版本和版权信息
+            // display title version and copyright
             var assembly = Assembly.GetExecutingAssembly();
 
             var titleAttribute = assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute));
@@ -30,8 +30,8 @@ namespace ConsoleTool
             var copyrightAttribute = assembly.GetCustomAttribute(typeof(AssemblyCopyrightAttribute));
             var copyright = (copyrightAttribute as AssemblyCopyrightAttribute).Copyright;
 
-            Console.WriteLine($"{title} [版本 {version}]");
-            Console.WriteLine($"{copyright}。保留所有权利");
+            Console.WriteLine($"{title} [Version {version}]");
+            Console.WriteLine($"{copyright}. All rights reserved");
             Console.WriteLine();
         }
 

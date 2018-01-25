@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TerrainMapLibrary.Data
 {
@@ -35,6 +33,7 @@ namespace TerrainMapLibrary.Data
         {
             meta.Clear();
 
+            // read to end, read each fields, these fields are splited with comma
             var reader = new StreamReader(filePath);
             while (reader.EndOfStream == false)
             {
@@ -57,11 +56,13 @@ namespace TerrainMapLibrary.Data
 
         public List<T> Line<T>(int row)
         {
+            // ensure row is valid
             if (row >= meta.Count)
             {
                 return null;
             }
 
+            // get each fields belongs to this row
             var line = new List<T>();
             for (int column = 0; column < meta[row].Count; column++)
             {
@@ -73,11 +74,13 @@ namespace TerrainMapLibrary.Data
 
         public List<T> Column<T>(int column)
         {
+            // ensure column is valid
             if (column >= meta.First().Count)
             {
                 return null;
             }
 
+            // get each fields belongs to this column
             var col = new List<T>();
             for (int row = 0; row < meta.Count; row++)
             {
@@ -89,6 +92,7 @@ namespace TerrainMapLibrary.Data
 
         public List<List<T>> Fields<T>()
         {
+            // the first dimension is row, and the second dimension is column
             var fields = new List<List<T>>();
             for (int row = 0; row < meta.Count; row++)
             {
@@ -105,11 +109,13 @@ namespace TerrainMapLibrary.Data
 
         private T GetField<T>(int row, int column)
         {
+            // ensure row and column is valid
             if (row >= meta.Count || column >= meta[row].Count)
             {
                 return default(T);
             }
 
+            // support string and any numbers
             Type t = typeof(T);
             object field = meta[row][column];
             if (t == typeof(string))
@@ -142,7 +148,7 @@ namespace TerrainMapLibrary.Data
             }
             else
             {
-                throw new Exception($"{t.FullName} 是不支持的数据类型。");
+                throw new Exception($"{t.FullName} is not a supported data type.");
             }
         }
     }

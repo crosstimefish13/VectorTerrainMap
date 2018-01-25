@@ -18,18 +18,18 @@ namespace TerrainMapLibrary.Data
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new Exception($"值是空的。");
+                throw new Exception("it is a null value.");
             }
 
             if (precision < 0)
             {
-                throw new Exception($"精度必须大于等于 0。");
+                throw new Exception("precision must be 0 or more.");
             }
 
             Regex regex = new Regex("^[+-]?\\d+(\\.\\d+)?$");
             if (!regex.IsMatch(value))
             {
-                throw new Exception($"{value} 不是一个数字。");
+                throw new Exception($"{value} is not a number.");
             }
 
             sign = true;
@@ -131,11 +131,46 @@ namespace TerrainMapLibrary.Data
             return result;
         }
 
+        public static GeoNumber operator -(GeoNumber left, GeoNumber right)
+        {
+            GeoNumber result = null;
+
+            Align(left, right, out GeoNumber alignedLeft, out GeoNumber alignedRight);
+
+            if (left.sign != right.sign)
+            {
+                result = UnsignAdd(alignedLeft, alignedRight);
+                result.sign = left.sign;
+            }
+            else
+            {
+                int compareResult = UnsignCompare(alignedLeft, alignedRight);
+
+                if (compareResult > 0)
+                {
+                    result = UnsignSub(alignedLeft, alignedRight);
+                    result.sign = left.sign;
+                }
+                else if (compareResult < 0)
+                {
+                    result = UnsignSub(alignedRight, alignedLeft);
+                    result.sign = !left.sign;
+                }
+                else
+                {
+                    result = new GeoNumber(true, new List<byte>() { 0 }, new List<byte>(), alignedLeft.precision);
+                }
+            }
+
+            result.TrimZero();
+            return result;
+        }
+
         protected GeoNumber(bool sign, List<byte> high, List<byte> low, int precision)
         {
             if (precision < 0)
             {
-                throw new Exception($"精度必须大于等于 0。");
+                throw new Exception($"precision must be 0 or more.");
             }
 
             this.sign = sign;
@@ -143,7 +178,7 @@ namespace TerrainMapLibrary.Data
 
             if (high == null)
             {
-                throw new Exception($"整数值是空的。");
+                throw new Exception($"integer part is null.");
             }
 
             this.high = new List<byte>();
@@ -154,7 +189,7 @@ namespace TerrainMapLibrary.Data
 
             if (low == null)
             {
-                throw new Exception($"小数值是空的。");
+                throw new Exception($"decimal part is null.");
             }
 
             this.low = new List<byte>();
