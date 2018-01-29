@@ -10,41 +10,44 @@ namespace TerrainMapLibraryTest.Data
         [TestMethod]
         public void Initialize()
         {
-            var number = new GeoNumber("1", 0);
+            GeoNumber.Precision = 0;
+            var number = new GeoNumber("1");
             Assert.AreEqual(number.ToString(), "1");
 
-            number = new GeoNumber("-1", 0);
+            number = new GeoNumber("-1");
             Assert.AreEqual(number.ToString(), "-1");
 
-            number = new GeoNumber("1.1", 1);
+            GeoNumber.Precision = 1;
+            number = new GeoNumber("1.1");
             Assert.AreEqual(number.ToString(), "1.1");
 
-            number = new GeoNumber("-1.1", 1);
+            number = new GeoNumber("-1.1");
             Assert.AreEqual(number.ToString(), "-1.1");
 
-            number = new GeoNumber("1.11", 1);
+            number = new GeoNumber("1.11");
             Assert.AreEqual(number.ToString(), "1.1");
 
-            number = new GeoNumber("01.10", 2);
+            GeoNumber.Precision = 2;
+            number = new GeoNumber("01.10");
             Assert.AreEqual(number.ToString(), "1.1");
 
-
-            number = new GeoNumber("0", 5);
+            GeoNumber.Precision = 5;
+            number = new GeoNumber("0");
             Assert.AreEqual(number.ToString(), "0");
 
-            number = new GeoNumber("123", 5);
+            number = new GeoNumber("123");
             Assert.AreEqual(number.ToString(), "123");
 
-            number = new GeoNumber("+123.45", 5);
+            number = new GeoNumber("+123.45");
             Assert.AreEqual(number.ToString(), "123.45");
 
-            number = new GeoNumber("-123.0103", 5);
+            number = new GeoNumber("-123.0103");
             Assert.AreEqual(number.ToString(), "-123.0103");
 
-            number = new GeoNumber("000.01230", 5);
+            number = new GeoNumber("000.01230");
             Assert.AreEqual(number.ToString(), "0.0123");
 
-            number = new GeoNumber("12.1230456", 5);
+            number = new GeoNumber("12.1230456");
             Assert.AreEqual(number.ToString(), "12.12304");
         }
 
@@ -55,7 +58,8 @@ namespace TerrainMapLibraryTest.Data
             try
             {
                 isThrow = false;
-                var number = new GeoNumber(null, 0);
+                GeoNumber.Precision = 0;
+                var number = new GeoNumber(null);
             }
             catch (Exception e)
             {
@@ -70,7 +74,8 @@ namespace TerrainMapLibraryTest.Data
             try
             {
                 isThrow = false;
-                var number = new GeoNumber(string.Empty, 0);
+                GeoNumber.Precision = 0;
+                var number = new GeoNumber(string.Empty);
             }
             catch (Exception e)
             {
@@ -85,7 +90,7 @@ namespace TerrainMapLibraryTest.Data
             try
             {
                 isThrow = false;
-                var number = new GeoNumber("1", -1);
+                GeoNumber.Precision = -1;
             }
             catch (Exception e)
             {
@@ -101,7 +106,8 @@ namespace TerrainMapLibraryTest.Data
             try
             {
                 isThrow = false;
-                var number = new GeoNumber(value, 0);
+                GeoNumber.Precision = 0;
+                var number = new GeoNumber(value);
             }
             catch (Exception e)
             {
@@ -117,129 +123,192 @@ namespace TerrainMapLibraryTest.Data
         [TestMethod]
         public void Add()
         {
-            var number1 = new GeoNumber("0", 0);
-            var number2 = new GeoNumber("1", 0);
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("1");
             Assert.AreEqual((number1 + number2).ToString(), "1");
 
-            number1 = new GeoNumber("0", 0);
-            number2 = new GeoNumber("-1", 0);
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
             Assert.AreEqual((number1 + number2).ToString(), "-1");
 
-            number1 = new GeoNumber("1", 0);
-            number2 = new GeoNumber("1", 0);
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
             Assert.AreEqual((number1 + number2).ToString(), "2");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("-1", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
             Assert.AreEqual((number1 + number2).ToString(), "-2");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("1", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("1");
             Assert.AreEqual((number1 + number2).ToString(), "0");
 
-            number1 = new GeoNumber("1", 0);
-            number2 = new GeoNumber("-2", 0);
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("-2");
             Assert.AreEqual((number1 + number2).ToString(), "-1");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("2", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("2");
             Assert.AreEqual((number1 + number2).ToString(), "1");
 
-            number1 = new GeoNumber("1", 0);
-            number2 = new GeoNumber("9", 0);
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("9");
             Assert.AreEqual((number1 + number2).ToString(), "10");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("-9", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-9");
             Assert.AreEqual((number1 + number2).ToString(), "-10");
 
-            number1 = new GeoNumber("10", 0);
-            number2 = new GeoNumber("-9", 0);
+            number1 = new GeoNumber("10");
+            number2 = new GeoNumber("-9");
             Assert.AreEqual((number1 + number2).ToString(), "1");
 
-            number1 = new GeoNumber("-10", 0);
-            number2 = new GeoNumber("9", 0);
+            number1 = new GeoNumber("-10");
+            number2 = new GeoNumber("9");
             Assert.AreEqual((number1 + number2).ToString(), "-1");
 
-            number1 = new GeoNumber("0.1", 1);
-            number2 = new GeoNumber("1.01", 2);
+            number1 = new GeoNumber("0.1");
+            number2 = new GeoNumber("1.01");
             Assert.AreEqual((number1 + number2).ToString(), "1.11");
 
-            number1 = new GeoNumber("-0.1", 1);
-            number2 = new GeoNumber("1.01", 2);
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1.01");
             Assert.AreEqual((number1 + number2).ToString(), "0.91");
 
-            number1 = new GeoNumber("0.1001", 4);
-            number2 = new GeoNumber("1.8999", 4);
+            number1 = new GeoNumber("0.1001");
+            number2 = new GeoNumber("1.8999");
             Assert.AreEqual((number1 + number2).ToString(), "2");
 
-            number1 = new GeoNumber("0.001", 4);
-            number2 = new GeoNumber("-1.001", 4);
+            number1 = new GeoNumber("0.001");
+            number2 = new GeoNumber("-1.001");
             Assert.AreEqual((number1 + number2).ToString(), "-1");
         }
 
         [TestMethod]
         public void Sub()
         {
-            var number1 = new GeoNumber("0", 0);
-            var number2 = new GeoNumber("1", 0);
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("1");
             Assert.AreEqual((number1 - number2).ToString(), "-1");
 
-            number1 = new GeoNumber("0", 0);
-            number2 = new GeoNumber("-1", 0);
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
             Assert.AreEqual((number1 - number2).ToString(), "1");
 
-            number1 = new GeoNumber("1", 0);
-            number2 = new GeoNumber("1", 0);
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
             Assert.AreEqual((number1 - number2).ToString(), "0");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("-1", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
             Assert.AreEqual((number1 - number2).ToString(), "0");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("1", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("1");
             Assert.AreEqual((number1 - number2).ToString(), "-2");
 
-            number1 = new GeoNumber("1", 0);
-            number2 = new GeoNumber("-2", 0);
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("-2");
             Assert.AreEqual((number1 - number2).ToString(), "3");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("2", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("2");
             Assert.AreEqual((number1 - number2).ToString(), "-3");
 
-            number1 = new GeoNumber("1", 0);
-            number2 = new GeoNumber("9", 0);
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("9");
             Assert.AreEqual((number1 - number2).ToString(), "-8");
 
-            number1 = new GeoNumber("-1", 0);
-            number2 = new GeoNumber("-9", 0);
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-9");
             Assert.AreEqual((number1 - number2).ToString(), "8");
 
-            number1 = new GeoNumber("10", 0);
-            number2 = new GeoNumber("-9", 0);
+            number1 = new GeoNumber("10");
+            number2 = new GeoNumber("-9");
             Assert.AreEqual((number1 - number2).ToString(), "19");
 
-            number1 = new GeoNumber("-10", 0);
-            number2 = new GeoNumber("9", 0);
+            number1 = new GeoNumber("-10");
+            number2 = new GeoNumber("9");
             Assert.AreEqual((number1 - number2).ToString(), "-19");
 
-            number1 = new GeoNumber("0.1", 1);
-            number2 = new GeoNumber("1.01", 2);
+            number1 = new GeoNumber("0.1");
+            number2 = new GeoNumber("1.01");
             Assert.AreEqual((number1 - number2).ToString(), "-0.91");
 
-            number1 = new GeoNumber("-0.1", 1);
-            number2 = new GeoNumber("1.01", 2);
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1.01");
             Assert.AreEqual((number1 - number2).ToString(), "-1.11");
 
-            number1 = new GeoNumber("0.1001", 4);
-            number2 = new GeoNumber("1.8999", 4);
+            number1 = new GeoNumber("0.1001");
+            number2 = new GeoNumber("1.8999");
             Assert.AreEqual((number1 - number2).ToString(), "-1.7998");
 
-            number1 = new GeoNumber("0.001", 4);
-            number2 = new GeoNumber("-1.001", 4);
+            number1 = new GeoNumber("0.001");
+            number2 = new GeoNumber("-1.001");
             Assert.AreEqual((number1 - number2).ToString(), "1.002");
+        }
+
+        [TestMethod]
+        public void Multiple()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("1");
+            Assert.AreEqual((number1 * number2).ToString(), "0");
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual((number1 * number2).ToString(), "0");
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual((number1 * number2).ToString(), "1");
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual((number1 * number2).ToString(), "1");
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual((number1 * number2).ToString(), "-1");
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("-2");
+            Assert.AreEqual((number1 * number2).ToString(), "-2");
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-2");
+            Assert.AreEqual((number1 * number2).ToString(), "2");
+
+            number1 = new GeoNumber("10");
+            number2 = new GeoNumber("9");
+            Assert.AreEqual((number1 * number2).ToString(), "90");
+
+            number1 = new GeoNumber("-10");
+            number2 = new GeoNumber("9");
+            Assert.AreEqual((number1 * number2).ToString(), "-90");
+
+            number1 = new GeoNumber("101");
+            number2 = new GeoNumber("-10");
+            Assert.AreEqual((number1 * number2).ToString(), "-1010");
+
+            number1 = new GeoNumber("10");
+            number2 = new GeoNumber("101");
+            Assert.AreEqual((number1 * number2).ToString(), "1010");
+
+            number1 = new GeoNumber("0.1");
+            number2 = new GeoNumber("1.01");
+            Assert.AreEqual((number1 * number2).ToString(), "0.101");
+
+            number1 = new GeoNumber("9.9");
+            number2 = new GeoNumber("-8.88");
+            Assert.AreEqual((number1 * number2).ToString(), "-87.912");
+
+            number1 = new GeoNumber("12.34");
+            number2 = new GeoNumber("5678");
+            Assert.AreEqual((number1 * number2).ToString(), "70066.52");
         }
     }
 }

@@ -44,24 +44,6 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
-        public static string NullInteger
-        {
-            get
-            {
-                LoadIntoMemory();
-                return messages["NullInteger"];
-            }
-        }
-
-        public static string NullDecimal
-        {
-            get
-            {
-                LoadIntoMemory();
-                return messages["NullDecimal"];
-            }
-        }
-
 
         private static void LoadIntoMemory()
         {

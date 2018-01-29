@@ -40,9 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\CompareResult.cs" />
     <Compile Include="Data\CSVData.cs" />
     <Compile Include="Data\EmbeddedCSVData.cs" />
     <Compile Include="Data\GeoNumber.cs" />
+    <Compile Include="Data\GeoUNumber.cs" />
     <Compile Include="Localization\ExceptionMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

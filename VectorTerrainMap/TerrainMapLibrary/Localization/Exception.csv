@@ -2,5 +2,3 @@
 NullValue,              it is a null value.
 InvalidPrecision,       precision must be 0 or more.
 NotNumber,              is not a number.
-NullInteger,            integer part is null.
-NullDecimal,            decimal part is null.
