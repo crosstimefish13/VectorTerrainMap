@@ -8,6 +8,12 @@ namespace TerrainMapLibrary.Data
         private List<byte> digits;
 
 
+        public int Length
+        {
+            get { return digits.Count; }
+        }
+
+
         public GeoUNumber(List<byte> digits)
         {
             this.digits = new List<byte>();
@@ -177,7 +183,7 @@ namespace TerrainMapLibrary.Data
             }
         }
 
-        public void Multiple(GeoUNumber number)
+        public void Mul(GeoUNumber number)
         {
             var products = new List<GeoUNumber>();
             for (int i = 0; i < number.digits.Count; i++)
@@ -195,6 +201,44 @@ namespace TerrainMapLibrary.Data
                 // add each products to get result
                 Add(item);
             }
+        }
+
+        public GeoUNumber Mod(GeoUNumber number)
+        {
+            var divisors = GetDivisors(number);
+            var basis = new GeoUNumber(new List<byte>() { 0 });
+            var division = new List<byte>();
+
+            for (int i = digits.Count - 1; i >= 0; i--)
+            {
+                // try division each digits, the next basis is current basis * 10, then add current digit
+                basis.digits.Insert(0, GetDigit(i));
+                division.Insert(0, basis.DivisionDivisors(divisors));
+            }
+
+            // set the division as result value, then return basis as mod value
+            digits = division;
+            return basis;
+        }
+
+        public void Div(GeoUNumber number, int precision)
+        {
+            var divisors = GetDivisors(number);
+            var basis = new GeoUNumber(digits);
+            var division = new List<byte>();
+
+            for (int i = 0; i < precision; i++)
+            {
+                // try division until over the precision, the next basis is current basis * 10
+                basis.digits.Insert(0, 0);
+                division.Insert(0, basis.DivisionDivisors(divisors));
+
+                // break if mode is 0
+                if (basis.IsZero()) { break; }
+            }
+
+            // set the division as result value
+            digits = division;
         }
 
         public void ShiftLeft(int shift)
@@ -236,10 +280,44 @@ namespace TerrainMapLibrary.Data
             }
         }
 
+        private byte DivisionDivisors(List<GeoUNumber> divisors)
+        {
+            int digit = 0;
+            for (int i = 0; i < divisors.Count; i++)
+            {
+                // compare current value with each divisiors from 0 to 9
+                var compare = Compare(divisors[i]);
+                if (compare == CompareResult.Small)
+                {
+                    // it means the previous digit is the division, sub divisor to get mod
+                    digit = i - 1;
+                    Sub(divisors[i - 1]);
+                    break;
+                }
+                else if (compare == CompareResult.Equal)
+                {
+                    // it means mod is 0, division is current digit
+                    digit = i;
+                    digits.Clear();
+                    digits.Add(0);
+                    break;
+                }
+                else if (i == divisors.Count - 1)
+                {
+                    // it means division is 9, and sub divisor to get mod
+                    digit = i;
+                    Sub(divisors[i]);
+                    break;
+                }
+            }
+
+            return (byte)digit;
+        }
+
         private byte GetDigit(int position)
         {
             // return 0 if out of position
-            if (position >= digits.Count) { return 0; }
+            if (position >= digits.Count || position < 0) { return 0; }
             else { return digits[position]; }
         }
 
@@ -248,6 +326,20 @@ namespace TerrainMapLibrary.Data
             // add a new if equals the digits count
             if (position < digits.Count) { digits[position] = digit; }
             else if (position == digits.Count) { digits.Add(digit); }
+        }
+
+        private List<GeoUNumber> GetDivisors(GeoUNumber number)
+        {
+            // divisors from 0 to 9
+            var divisors = new List<GeoUNumber>();
+            var divisor = new GeoUNumber(new List<byte>() { 0 });
+            for (int i = 0; i < 10; i++)
+            {
+                divisors.Add(new GeoUNumber(divisor.digits));
+                divisor.Add(number);
+            }
+
+            return divisors;
         }
     }
 }

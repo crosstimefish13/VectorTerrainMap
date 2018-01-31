@@ -44,6 +44,15 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
+        public static string NotZeroDivisor
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["NotZeroDivisor"];
+            }
+        }
+
 
         private static void LoadIntoMemory()
         {

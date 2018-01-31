@@ -228,12 +228,48 @@ namespace TerrainMapLibrary.Data
             bool resSign = left.sign == right.sign;
             int resPoint = left.point + right.point;
 
-            dupL.number.Multiple(right.number);
+            dupL.number.Mul(right.number);
             var resNumber = dupL.number;
-            if (resNumber.IsZero()) { resSign = true; }
 
             // trim result
             resPoint = resNumber.Trim(resPoint);
+            if (resNumber.IsZero()) { resSign = true; }
+            var res = new GeoNumber(resSign, resNumber, resPoint);
+            return res;
+        }
+
+        public static GeoNumber operator /(GeoNumber left, GeoNumber right)
+        {
+            if (right.number.IsZero()) { throw new Exception(ExceptionMessage.NotZeroDivisor); }
+
+            // duplicate left and right
+            var dupL = left.Copy();
+            var dupR = right.Copy();
+            bool resSign = left.sign == right.sign;
+
+            // align left and right
+            if (dupL.point > dupR.point)
+            {
+                dupR.number.ShiftLeft(dupL.point - dupR.point);
+            }
+            else if (dupL.point < dupR.point)
+            {
+                dupL.number.ShiftLeft(dupR.point - dupL.point);
+            }
+
+            // mod for integer part, and division for decimal part
+            var mod = dupL.number.Mod(dupR.number);
+            if (!mod.IsZero()) { mod.Div(dupR.number, precision); }
+
+            // combine integer and decimal parts
+            int resPoint = mod.Length;
+            var resNumber = dupL.number;
+            resNumber.ShiftLeft(resPoint);
+            resNumber.Add(mod);
+
+            // trim result
+            resPoint = resNumber.Trim(resPoint);
+            if (resNumber.IsZero()) { resSign = true; }
             var res = new GeoNumber(resSign, resNumber, resPoint);
             return res;
         }
