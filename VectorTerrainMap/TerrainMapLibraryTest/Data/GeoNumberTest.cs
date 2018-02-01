@@ -121,6 +121,46 @@ namespace TerrainMapLibraryTest.Data
         }
 
         [TestMethod]
+        public void Positive()
+        {
+            GeoNumber.Precision = 4;
+            var number = new GeoNumber("0");
+            Assert.AreEqual((+number).ToString(), "0");
+
+            number = new GeoNumber("1");
+            Assert.AreEqual((+number).ToString(), "1");
+
+            number = new GeoNumber("-1");
+            Assert.AreEqual((+number).ToString(), "1");
+
+            number = new GeoNumber("0.123");
+            Assert.AreEqual((+number).ToString(), "0.123");
+
+            number = new GeoNumber("-1.23");
+            Assert.AreEqual((+number).ToString(), "1.23");
+        }
+
+        [TestMethod]
+        public void Negative()
+        {
+            GeoNumber.Precision = 4;
+            var number = new GeoNumber("0");
+            Assert.AreEqual((-number).ToString(), "0");
+
+            number = new GeoNumber("1");
+            Assert.AreEqual((-number).ToString(), "-1");
+
+            number = new GeoNumber("-1");
+            Assert.AreEqual((-number).ToString(), "1");
+
+            number = new GeoNumber("0.123");
+            Assert.AreEqual((-number).ToString(), "-0.123");
+
+            number = new GeoNumber("-1.23");
+            Assert.AreEqual((-number).ToString(), "1.23");
+        }
+
+        [TestMethod]
         public void Add()
         {
             GeoNumber.Precision = 4;
@@ -388,6 +428,117 @@ namespace TerrainMapLibraryTest.Data
             number1 = new GeoNumber("12.34");
             number2 = new GeoNumber("5678");
             Assert.AreEqual((number1 / number2).ToString(), "0.0021");
+        }
+
+        [TestMethod]
+        public void Mod()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("1.1");
+            var number2 = new GeoNumber("1");
+            bool isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number1 % number2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, $"{number1} must be positive integer number.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("1");
+            isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number1 % number2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, $"{number1} must be positive integer number.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1.1");
+            isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number1 % number2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, $"{number2} must be positive integer number.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("-1.1");
+            isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number1 % number2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, $"{number2} must be positive integer number.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("0");
+            isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number1 % number2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, $"divisor should not be 0.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual((number1 % number2).ToString(), "0");
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual((number1 % number2).ToString(), "0");
+
+            number1 = new GeoNumber("10");
+            number2 = new GeoNumber("4");
+            Assert.AreEqual((number1 % number2).ToString(), "2");
+
+            number1 = new GeoNumber("10");
+            number2 = new GeoNumber("12");
+            Assert.AreEqual((number1 % number2).ToString(), "10");
         }
     }
 }

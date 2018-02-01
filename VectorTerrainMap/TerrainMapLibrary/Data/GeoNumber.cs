@@ -97,6 +97,24 @@ namespace TerrainMapLibrary.Data
             return dup;
         }
 
+        public static GeoNumber operator +(GeoNumber right)
+        {
+            var resNumber = right.Copy();
+            resNumber.sign = true;
+            return resNumber;
+        }
+
+        public static GeoNumber operator -(GeoNumber right)
+        {
+            var resNumber = right.Copy();
+            if (!resNumber.number.IsZero())
+            {
+                if (right.sign == false) { resNumber.sign = true; }
+                else { resNumber.sign = false; }
+            }
+            return resNumber;
+        }
+
         public static GeoNumber operator +(GeoNumber left, GeoNumber right)
         {
             // duplicate left and right
@@ -274,6 +292,31 @@ namespace TerrainMapLibrary.Data
             return res;
         }
 
+        public static GeoNumber operator %(GeoNumber left, GeoNumber right)
+        {
+            // ensure left and right both are positive integer
+            if (left.sign == false || left.point > 0)
+            {
+                throw new Exception($"{left.ToString()} {ExceptionMessage.NotPositiveInteger}");
+            }
+
+            if (right.sign == false || right.point > 0)
+            {
+                throw new Exception($"{right.ToString()} {ExceptionMessage.NotPositiveInteger}");
+            }
+
+            // ensure right is not 0
+            if (right.number.IsZero()) { throw new Exception(ExceptionMessage.NotZeroDivisor); }
+
+            // duplicate left and right
+            var dupL = left.Copy();
+            var dupR = right.Copy();
+            var mod = dupL.number.Mod(dupR.number);
+
+            var resPoint = mod.Trim(0);
+            var res = new GeoNumber(true, mod, resPoint);
+            return res;
+        }
 
         private GeoNumber(bool sign, GeoUNumber number, int point)
         {

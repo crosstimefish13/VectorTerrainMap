@@ -53,6 +53,15 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
+        public static string NotPositiveInteger
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["NotPositiveInteger"];
+            }
+        }
+
 
         private static void LoadIntoMemory()
         {
