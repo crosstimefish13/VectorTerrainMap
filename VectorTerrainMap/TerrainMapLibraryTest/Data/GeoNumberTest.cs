@@ -540,5 +540,355 @@ namespace TerrainMapLibraryTest.Data
             number2 = new GeoNumber("12");
             Assert.AreEqual((number1 % number2).ToString(), "10");
         }
+
+        [TestMethod]
+        public void Equal()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 == number2, true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 == number2, true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 == number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.1");
+            Assert.AreEqual(number1 == number2, true);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 == number2, true);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 == number2, false);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 == number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 == number2, false);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 == number2, false);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 == number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.2");
+            Assert.AreEqual(number1 == number2, false);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("-1.2");
+            Assert.AreEqual(number1 == number2, false);
+        }
+
+        [TestMethod]
+        public void NotEqual()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 != number2, false);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 != number2, false);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 != number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.1");
+            Assert.AreEqual(number1 != number2, false);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 != number2, false);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 != number2, true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 != number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 != number2, true);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 != number2, true);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 != number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.2");
+            Assert.AreEqual(number1 != number2, true);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("-1.2");
+            Assert.AreEqual(number1 != number2, true);
+        }
+
+        [TestMethod]
+        public void Greater()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.1");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 > number2, true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 > number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 > number2, true);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.2");
+            Assert.AreEqual(number1 > number2, false);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("-1.2");
+            Assert.AreEqual(number1 > number2, true);
+        }
+
+        [TestMethod]
+        public void Less()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.1");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 < number2, true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 < number2, true);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 < number2, false);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 < number2, true);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 < number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.2");
+            Assert.AreEqual(number1 < number2, true);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("-1.2");
+            Assert.AreEqual(number1 < number2, false);
+        }
+
+        [TestMethod]
+        public void GreaterEqual()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.1");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 >= number2, false);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 >= number2, false);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 >= number2, true);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 >= number2, false);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 >= number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.2");
+            Assert.AreEqual(number1 >= number2, false);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("-1.2");
+            Assert.AreEqual(number1 >= number2, true);
+        }
+
+        [TestMethod]
+        public void LessEqual()
+        {
+            GeoNumber.Precision = 4;
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.1");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 <= number2, false);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("0");
+            number2 = new GeoNumber("-1");
+            Assert.AreEqual(number1 <= number2, false);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("-0.1");
+            Assert.AreEqual(number1 <= number2, false);
+
+            number1 = new GeoNumber("-0.1");
+            number2 = new GeoNumber("1");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("1.1");
+            number2 = new GeoNumber("1.2");
+            Assert.AreEqual(number1 <= number2, true);
+
+            number1 = new GeoNumber("-1.1");
+            number2 = new GeoNumber("-1.2");
+            Assert.AreEqual(number1 <= number2, false);
+        }
     }
 }

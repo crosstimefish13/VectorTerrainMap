@@ -318,6 +318,42 @@ namespace TerrainMapLibrary.Data
             return res;
         }
 
+        public static bool operator ==(GeoNumber left, GeoNumber right)
+        {
+            var res = left - right;
+            return res.number.IsZero();
+        }
+
+        public static bool operator !=(GeoNumber left, GeoNumber right)
+        {
+            var res = left - right;
+            return !res.number.IsZero();
+        }
+
+        public static bool operator >(GeoNumber left, GeoNumber right)
+        {
+            var res = left - right;
+            return res.sign == true && !res.number.IsZero();
+        }
+
+        public static bool operator <(GeoNumber left, GeoNumber right)
+        {
+            var res = left - right;
+            return res.sign == false && !res.number.IsZero();
+        }
+
+        public static bool operator >=(GeoNumber left, GeoNumber right)
+        {
+            var res = left - right;
+            return res.sign;
+        }
+
+        public static bool operator <=(GeoNumber left, GeoNumber right)
+        {
+            var res = left - right;
+            return res.number.IsZero() || !res.sign;
+        }
+
         private GeoNumber(bool sign, GeoUNumber number, int point)
         {
             this.sign = sign;
