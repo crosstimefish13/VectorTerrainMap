@@ -890,5 +890,13 @@ namespace TerrainMapLibraryTest.Data
             number2 = new GeoNumber("-1.2");
             Assert.AreEqual(number1 <= number2, false);
         }
+
+        [TestMethod]
+        public void E()
+        {
+            GeoNumber.Precision = 4;
+            GeoNumber.Iterations = 10;
+            Assert.AreEqual(GeoNumber.E.ToString().Equals("1"), true);
+        }
     }
 }

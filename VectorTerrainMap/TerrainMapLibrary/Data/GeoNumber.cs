@@ -12,8 +12,23 @@ namespace TerrainMapLibrary.Data
         private GeoUNumber number;
         private int point;
 
+        private static GeoNumber e;
         private static int precision = 100;
+        private static int iterations = 10;
 
+
+        public static GeoNumber E
+        {
+            get
+            {
+                if (e == null)
+                {
+                    e = GetE();
+                }
+
+                return e;
+            }
+        }
 
         public static int Precision
         {
@@ -28,7 +43,38 @@ namespace TerrainMapLibrary.Data
                 {
                     throw new Exception(ExceptionMessage.InvalidPrecision);
                 }
+
+                // need to reset constant
+                if (precision != value)
+                {
+                    e = null;
+                }
+
                 precision = value;
+            }
+        }
+
+        public static int Iterations
+        {
+            get
+            {
+                return iterations;
+            }
+            set
+            {
+                // ensure iterations is valid
+                if (value < 1)
+                {
+                    throw new Exception(ExceptionMessage.InvalidIterations);
+                }
+
+                // need to reset constant
+                if (iterations != value)
+                {
+                    e = null;
+                }
+
+                iterations = value;
             }
         }
 
@@ -320,8 +366,16 @@ namespace TerrainMapLibrary.Data
 
         public static bool operator ==(GeoNumber left, GeoNumber right)
         {
-            var res = left - right;
-            return res.number.IsZero();
+            var isLeftNull = ReferenceEquals(left, null);
+            var isRightNull = ReferenceEquals(right, null);
+
+            if (isLeftNull && isRightNull) { return true; }
+            else if (!isLeftNull || !isRightNull) { return false; }
+            else
+            {
+                var res = left - right;
+                return res.number.IsZero();
+            }
         }
 
         public static bool operator !=(GeoNumber left, GeoNumber right)
@@ -354,11 +408,35 @@ namespace TerrainMapLibrary.Data
             return res.number.IsZero() || !res.sign;
         }
 
+
         private GeoNumber(bool sign, GeoUNumber number, int point)
         {
             this.sign = sign;
             this.number = number;
             this.point = point;
+        }
+
+        private static GeoNumber GetE()
+        {
+            var e = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
+            var items = new List<GeoNumber>() { new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0) };
+
+            for (int i = 0; i < iterations; i++)
+            {
+                // calucluate 1 / n!
+                var item = items[0];
+                for (int j = 1; j < items.Count; j++)
+                {
+                    item = item * items[j];
+                }
+
+                item = items[0] / item;
+                e = e + item;
+
+                items.Add(items[items.Count - 1] + items[0]);
+            }
+
+            return e;
         }
     }
 }

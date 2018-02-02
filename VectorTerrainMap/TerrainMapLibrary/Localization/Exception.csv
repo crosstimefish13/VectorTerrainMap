@@ -4,3 +4,4 @@ InvalidPrecision,       precision must be 0 or more.
 NotNumber,              is not a number.
 NotZeroDivisor,         divisor should not be 0.
 NotPositiveInteger,     must be positive integer number.
+InvalidIterations,      iterations must be 1 or more.

@@ -62,6 +62,15 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
+        public static string InvalidIterations
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidIterations"];
+            }
+        }
+
 
         private static void LoadIntoMemory()
         {
