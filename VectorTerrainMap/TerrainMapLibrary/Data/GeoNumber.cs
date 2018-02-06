@@ -14,8 +14,6 @@ namespace TerrainMapLibrary.Data
 
         private static GeoNumber e;
         private static int precision = 100;
-        private static int iterations = 10;
-
 
         public static GeoNumber E
         {
@@ -23,7 +21,7 @@ namespace TerrainMapLibrary.Data
             {
                 if (e == null)
                 {
-                    e = GetE();
+                    e = GetE(precision + 3);
                 }
 
                 return e;
@@ -51,30 +49,6 @@ namespace TerrainMapLibrary.Data
                 }
 
                 precision = value;
-            }
-        }
-
-        public static int Iterations
-        {
-            get
-            {
-                return iterations;
-            }
-            set
-            {
-                // ensure iterations is valid
-                if (value < 1)
-                {
-                    throw new Exception(ExceptionMessage.InvalidIterations);
-                }
-
-                // need to reset constant
-                if (iterations != value)
-                {
-                    e = null;
-                }
-
-                iterations = value;
             }
         }
 
@@ -113,7 +87,7 @@ namespace TerrainMapLibrary.Data
 
             if (point > precision) { point = precision; }
             number = new GeoUNumber(digits);
-            point = number.Trim(point);
+            Trim();
         }
 
         public override string ToString()
@@ -172,12 +146,12 @@ namespace TerrainMapLibrary.Data
             if (dupL.point > dupR.point)
             {
                 resPoint = dupL.point;
-                dupR.number.ShiftLeft(dupL.point - dupR.point);
+                dupR.number.Enlarge10(dupL.point - dupR.point);
             }
             else if (dupL.point < dupR.point)
             {
                 resPoint = dupR.point;
-                dupL.number.ShiftLeft(dupR.point - dupL.point);
+                dupL.number.Enlarge10(dupR.point - dupL.point);
             }
 
             bool resSign = dupL.sign;
@@ -217,8 +191,8 @@ namespace TerrainMapLibrary.Data
             }
 
             // trim result
-            resPoint = resNumber.Trim(resPoint);
             var res = new GeoNumber(resSign, resNumber, resPoint);
+            res.Trim();
             return res;
         }
 
@@ -233,12 +207,12 @@ namespace TerrainMapLibrary.Data
             if (dupL.point > dupR.point)
             {
                 resPoint = dupL.point;
-                dupR.number.ShiftLeft(dupL.point - dupR.point);
+                dupR.number.Enlarge10(dupL.point - dupR.point);
             }
             else if (dupL.point < dupR.point)
             {
                 resPoint = dupR.point;
-                dupL.number.ShiftLeft(dupR.point - dupL.point);
+                dupL.number.Enlarge10(dupR.point - dupL.point);
             }
 
             bool resSign = dupL.sign;
@@ -278,8 +252,8 @@ namespace TerrainMapLibrary.Data
             }
 
             // trim result
-            resPoint = resNumber.Trim(resPoint);
             var res = new GeoNumber(resSign, resNumber, resPoint);
+            res.Trim();
             return res;
         }
 
@@ -296,9 +270,8 @@ namespace TerrainMapLibrary.Data
             var resNumber = dupL.number;
 
             // trim result
-            resPoint = resNumber.Trim(resPoint);
-            if (resNumber.IsZero()) { resSign = true; }
             var res = new GeoNumber(resSign, resNumber, resPoint);
+            res.Trim();
             return res;
         }
 
@@ -314,11 +287,11 @@ namespace TerrainMapLibrary.Data
             // align left and right
             if (dupL.point > dupR.point)
             {
-                dupR.number.ShiftLeft(dupL.point - dupR.point);
+                dupR.number.Enlarge10(dupL.point - dupR.point);
             }
             else if (dupL.point < dupR.point)
             {
-                dupL.number.ShiftLeft(dupR.point - dupL.point);
+                dupL.number.Enlarge10(dupR.point - dupL.point);
             }
 
             // mod for integer part, and division for decimal part
@@ -328,13 +301,12 @@ namespace TerrainMapLibrary.Data
             // combine integer and decimal parts
             int resPoint = mod.Length;
             var resNumber = dupL.number;
-            resNumber.ShiftLeft(resPoint);
+            resNumber.Enlarge10(resPoint);
             resNumber.Add(mod);
 
             // trim result
-            resPoint = resNumber.Trim(resPoint);
-            if (resNumber.IsZero()) { resSign = true; }
             var res = new GeoNumber(resSign, resNumber, resPoint);
+            res.Trim();
             return res;
         }
 
@@ -359,8 +331,8 @@ namespace TerrainMapLibrary.Data
             var dupR = right.Copy();
             var mod = dupL.number.Mod(dupR.number);
 
-            var resPoint = mod.Trim(0);
-            var res = new GeoNumber(true, mod, resPoint);
+            var res = new GeoNumber(true, mod, 0);
+            res.Trim();
             return res;
         }
 
@@ -370,7 +342,7 @@ namespace TerrainMapLibrary.Data
             var isRightNull = ReferenceEquals(right, null);
 
             if (isLeftNull && isRightNull) { return true; }
-            else if (!isLeftNull || !isRightNull) { return false; }
+            else if (isLeftNull || isRightNull) { return false; }
             else
             {
                 var res = left - right;
@@ -416,24 +388,47 @@ namespace TerrainMapLibrary.Data
             this.point = point;
         }
 
-        private static GeoNumber GetE()
+        private void Trim()
         {
-            var e = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
-            var items = new List<GeoNumber>() { new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0) };
+            if (number.IsZero()) { point = 0; }
 
-            for (int i = 0; i < iterations; i++)
+            // ensure integer part is at least 0
+            int firstLength = number.FirstUntilNotEqual(0, number.Length - point);
+            if (firstLength >= number.Length - point) { firstLength = number.Length - point - 1; }
+
+            // ensure decimal part less or equal then precision
+            int lastLength = number.LastUntilNotEqual(0, point);
+            if (point - lastLength > precision) { lastLength = point - precision; }
+
+            // trim number
+            point = point - lastLength;
+            number.Trim(firstLength, lastLength);
+            if (number.IsZero()) { sign = true; }
+        }
+
+        private static GeoNumber GetE(int iteration)
+        {
+            // e = 1/0! + 1/1! + 1/2! + ... + 1/n! (0!=1, n=iteration)
+            var e = new GeoNumber(true, new GeoUNumber(new List<byte>() { 0 }), 0);
+
+            // item2 = item2 + item1 => item3 = item3 * item2 => e = e + item1 / item3
+            var item1 = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
+            var item2 = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
+            var item3 = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
+
+            for (int i = 1; i <= iteration; i++)
             {
-                // calucluate 1 / n!
-                var item = items[0];
-                for (int j = 1; j < items.Count; j++)
+                // 1/0!=1, and 1/1!=1
+                if (i == 1 || i == 2)
                 {
-                    item = item * items[j];
+                    e = e + item3;
+                    continue;
                 }
 
-                item = items[0] / item;
-                e = e + item;
-
-                items.Add(items[items.Count - 1] + items[0]);
+                // n!=(n-1)!*n
+                item2 = item2 + item1;
+                item3 = item3 * item2;
+                e = e + item1 / item3;
             }
 
             return e;

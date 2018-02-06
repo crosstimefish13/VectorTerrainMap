@@ -894,9 +894,17 @@ namespace TerrainMapLibraryTest.Data
         [TestMethod]
         public void E()
         {
-            GeoNumber.Precision = 4;
-            GeoNumber.Iterations = 10;
-            Assert.AreEqual(GeoNumber.E.ToString().Equals("1"), true);
+            GeoNumber.Precision = 0;
+            Assert.AreEqual(GeoNumber.E.ToString().Equals("2"), true);
+
+            GeoNumber.Precision = 1;
+            Assert.AreEqual(GeoNumber.E.ToString().Equals("2.6"), true);
+
+            GeoNumber.Precision = 10;
+            Assert.AreEqual(GeoNumber.E.ToString().Equals("2.7182818276"), true);
+
+            GeoNumber.Precision = 20;
+            Assert.AreEqual(GeoNumber.E.ToString().Equals("2.71828182845904523526"), true);
         }
     }
 }

@@ -81,39 +81,55 @@ namespace TerrainMapLibrary.Data
             return result;
         }
 
-        public int Trim(int point)
+        public int FirstUntilNotEqual(byte value, int maxCheckLength = 0)
         {
-            if (point >= digits.Count) { return point; }
+            int count = 0;
+            int terminate = digits.Count - maxCheckLength;
+            if (terminate < 0) { terminate = 0; }
 
-            // trim decimal trail 0
-            var rightDigits = new List<byte>();
-            for (int i = 0; i < point; i++)
+            for (int i = digits.Count - 1; i >= terminate; i--)
             {
-                if (rightDigits.Count > 0 || digits[i] > 0) { rightDigits.Add(digits[i]); }
+                // match until not equal from first to last
+                if (digits[i] == value) { count += 1; }
+                else { break; }
             }
 
-            // trim integer leading 0
-            var leftDigits = new List<byte>();
-            for (int i = digits.Count - 1; i >= point; i--)
+            return count;
+        }
+
+        public int LastUntilNotEqual(byte value, int maxCheckLength = 0)
+        {
+            int count = 0;
+            int terminate = maxCheckLength;
+            if (terminate > digits.Count) { terminate = digits.Count; }
+
+            for (int i = 0; i < terminate; i++)
             {
-                if (leftDigits.Count > 0 || digits[i] > 0) { leftDigits.Insert(0, digits[i]); }
+                // match until not equal from last to first
+                if (digits[i] == value) { count += 1; }
+                else { break; }
             }
 
-            digits.Clear();
-            for (int i = 0; i < rightDigits.Count; i++)
+            return count;
+        }
+
+        public void Trim(int firstLength, int lastLength)
+        {
+            if (firstLength + lastLength >= digits.Count)
             {
-                digits.Add(rightDigits[i]);
+                // it's zero
+                digits = new List<byte>() { 0 };
+                return;
             }
 
-            // ensure integer is at least 0
-            if (leftDigits.Count <= 0) { leftDigits.Add(0); }
-            for (int i = 0; i < leftDigits.Count; i++)
+            // trim first and last
+            var newDigits = new List<byte>();
+            for (int i = lastLength; i < digits.Count - firstLength; i++)
             {
-                digits.Add(leftDigits[i]);
+                newDigits.Add(digits[i]);
             }
 
-            // need to adjust point location
-            return rightDigits.Count;
+            digits = newDigits;
         }
 
         public bool IsZero()
@@ -191,7 +207,7 @@ namespace TerrainMapLibrary.Data
                 // multiple each digits and shift the result products
                 var product = new GeoUNumber(digits);
                 product.MultipleDigit(number.digits[i]);
-                product.ShiftLeft(i);
+                product.Enlarge10(i);
                 products.Add(product);
             }
 
@@ -241,9 +257,9 @@ namespace TerrainMapLibrary.Data
             digits = division;
         }
 
-        public void ShiftLeft(int shift)
+        public void Enlarge10(int count)
         {
-            for (int i = 0; i < shift; i++)
+            for (int i = 0; i < count; i++)
             {
                 digits.Insert(0, 0);
             }
