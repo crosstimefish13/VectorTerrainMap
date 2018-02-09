@@ -11,9 +11,52 @@ namespace TerrainMapLibrary.Data
         private bool sign;
         private GeoUNumber number;
         private int point;
-
+        private static GeoNumber zero;
+        private static GeoNumber one;
+        private static GeoNumber two;
         private static GeoNumber e;
+        private static GeoNumber elog2;
         private static int precision = 100;
+
+
+        public static GeoNumber Zero
+        {
+            get
+            {
+                if (zero == null)
+                {
+                    zero = new GeoNumber(true, new GeoUNumber(new List<byte>() { 0 }), 0);
+                }
+
+                return zero;
+            }
+        }
+
+        public static GeoNumber One
+        {
+            get
+            {
+                if (one == null)
+                {
+                    one = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
+                }
+
+                return one;
+            }
+        }
+
+        public static GeoNumber Two
+        {
+            get
+            {
+                if (two == null)
+                {
+                    two = new GeoNumber(true, new GeoUNumber(new List<byte>() { 2 }), 0);
+                }
+
+                return two;
+            }
+        }
 
         public static GeoNumber E
         {
@@ -21,10 +64,23 @@ namespace TerrainMapLibrary.Data
             {
                 if (e == null)
                 {
-                    e = GetE(precision + 3);
+                    e = GetEPowReal(new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0), precision + 3);
                 }
 
                 return e;
+            }
+        }
+
+        public static GeoNumber ELog2
+        {
+            get
+            {
+                if (elog2 == null)
+                {
+                    elog2 = GetRealLog2(E, precision + 3);
+                }
+
+                return elog2;
             }
         }
 
@@ -46,6 +102,7 @@ namespace TerrainMapLibrary.Data
                 if (precision != value)
                 {
                     e = null;
+                    elog2 = null;
                 }
 
                 precision = value;
@@ -115,6 +172,64 @@ namespace TerrainMapLibrary.Data
         {
             var dup = new GeoNumber(sign, number.Copy(), point);
             return dup;
+        }
+
+        public GeoNumber Floor()
+        {
+            if (point == 0) { return Copy(); }
+
+            // trim the decimal part
+            var resNumber = number.Copy();
+            resNumber.Trim(0, point);
+            var res = new GeoNumber(sign, resNumber, 0);
+            res.Trim();
+            return res;
+        }
+
+        public GeoNumber Ceil()
+        {
+            if (point == 0) { return Copy(); }
+
+            // trim the decimal part
+            var resNumber = number.Copy();
+            resNumber.Trim(0, point);
+            var res = new GeoNumber(sign, resNumber, 0);
+            res.Trim();
+
+            // add or minus 1 if needed
+            if (res.sign == true) { res = res + One; }
+            else { res = res - One; }
+
+            return res;
+        }
+
+        public GeoNumber Pow(GeoNumber exponent)
+        {
+            // 0^n=0
+            if (this == Zero) { return Zero; }
+
+            // 1^n=1, and x^0=1
+            if (this == One || exponent == Zero) { return One; }
+
+            // (-1)^n=1 (n%2=0), and (-1)^n=-1 (n%2=1)
+            if (this == -One)
+            {
+                if (exponent % Two == Zero) { return One; }
+                else { return -One; }
+            }
+
+            // real pow integer
+            if (exponent.point == 0) { return GetRealPowInteger(this, exponent); }
+
+            // exponent it's not integer, check if sign is valid
+            if (sign == false && exponent.number.IsOdd()) { throw new Exception(ExceptionMessage.InvalidExponent); }
+
+            // x^p=(e^(ln(x)))^p=e^(p*ln(x))=e^(p*(log2(x)/log2(e)))
+            var dupBasis = Copy();
+            dupBasis.sign = true;
+            var item = exponent * GetRealLog2(dupBasis, precision + 3) / ELog2;
+            var res = GetEPowReal(item, precision + 3);
+            return res;
         }
 
         public static GeoNumber operator +(GeoNumber right)
@@ -406,32 +521,123 @@ namespace TerrainMapLibrary.Data
             if (number.IsZero()) { sign = true; }
         }
 
-        private static GeoNumber GetE(int iteration)
+        private static GeoNumber GetEPowReal(GeoNumber exponent, int iteration)
         {
-            // e = 1/0! + 1/1! + 1/2! + ... + 1/n! (0!=1, n=iteration)
-            var e = new GeoNumber(true, new GeoUNumber(new List<byte>() { 0 }), 0);
-
-            // item2 = item2 + item1 => item3 = item3 * item2 => e = e + item1 / item3
-            var item1 = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
-            var item2 = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
-            var item3 = new GeoNumber(true, new GeoUNumber(new List<byte>() { 1 }), 0);
+            // e^x = (x^0)/0! + (x^1)/1! + (x^2)/2! + ... + (x^n)/n! (0!=1, n=iteration)
+            var res = Zero.Copy();
+            var top = One.Copy();
+            var count = Zero.Copy();
+            var bottom = One.Copy();
 
             for (int i = 1; i <= iteration; i++)
             {
-                // 1/0!=1, and 1/1!=1
-                if (i == 1 || i == 2)
+                if (i == 1)
                 {
-                    e = e + item3;
+                    res = res + One;
                     continue;
                 }
 
+                // x^n=(x^(n-1))*x
+                top = top * exponent;
+
                 // n!=(n-1)!*n
-                item2 = item2 + item1;
-                item3 = item3 * item2;
-                e = e + item1 / item3;
+                count = count + One;
+                bottom = bottom * count;
+                res = res + top / bottom;
             }
 
-            return e;
+            return res;
+        }
+
+        private static GeoNumber GetRealPowInteger(GeoNumber basis, GeoNumber exponent)
+        {
+            // let exponent and basis to be positive number
+            var dupE = exponent.Copy();
+            dupE.sign = true;
+            var dupB = basis.Copy();
+            dupB.sign = true;
+
+            // iteration to get the result
+            var res = One.Copy();
+            while (dupE > One)
+            {
+                if (dupE % Two == One) { res = res * dupB; }
+                dupE = (dupE / Two).Floor();
+                dupB = dupB * dupB;
+            }
+
+            res = res * dupB;
+
+            // x^n=1/(x^(-n)) (n<0)
+            if (exponent < Zero) { res = One / res; }
+
+            // need to minus if basis < 0 and exponent is odd number
+            if (basis < Zero && exponent % Two == One) { res = -res; }
+
+            return res;
+        }
+
+        private static GeoNumber GetRealLog2(GeoNumber antilog, int iteration)
+        {
+            if (antilog == One)
+            {
+                // log2(1)=0
+                return Zero;
+            }
+            else if (antilog < One)
+            {
+                // log2(n)=m (0<n<1, m<0)
+                return GetFractionLog2(antilog, iteration);
+            }
+
+            // log2(antilog)=interger+log2(fractional) (fractional=(2^(-interger))*antilog, 1<=fractional<2)
+            var res = Zero.Copy();
+            var fractional = antilog;
+            while (fractional >= Two)
+            {
+                fractional = fractional / Two;
+                res += One;
+            }
+
+            // let y=x^(2^m) => log2(x)=(2^m)*log2(y) => log2(y)=log2(x)/(2^m) => log2(y)=(1+log2(x/2))/(2^m)
+            // => 2^(-m) + (2^(-m))*log2(x/2) where 1<=y<2, choose [m] to make [2<=x<4], then 1<=x/2<2, so 
+            // [y] is equivalent to [x/2], created the iteration
+            var resFractional = One.Copy();
+            
+            for (int i = 1; i <= iteration; i++)
+            {
+                if (fractional == Zero || fractional == One) { break; }
+                var count = Zero.Copy();
+                while (fractional < Two)
+                {
+                    count = count - One;
+                    fractional = fractional * fractional;
+                }
+
+                resFractional = resFractional * GetRealPowInteger(Two, count);
+                res = res + resFractional;
+                fractional = fractional / Two;
+            }
+
+            return res;
+        }
+
+        private static GeoNumber GetFractionLog2(GeoNumber antilog, int iteration)
+        {
+            // log2(x/y)=log2(x) - log2(y)
+            // log2(antilog)=log2(xAntilog)-log2(x10) (xAntilog=antilog*(10^xCount), xAntilog>=1, x10=10^xCount)
+            // get xCount to make sure xAntilog is greater or equal than 1
+            var xCount = antilog.point;
+            var xAntilog = new GeoNumber(true, antilog.number.Copy(), 0);
+
+            // enlarge 1 to get x10
+            var x10Number = new GeoUNumber(new List<byte>() { 1 });
+            x10Number.Enlarge10(xCount);
+            var x10 = new GeoNumber(true, x10Number, 0);
+
+            // get result
+            var result = GetRealLog2(xAntilog, iteration) - GetRealLog2(x10, iteration);
+            return result;
         }
     }
 }

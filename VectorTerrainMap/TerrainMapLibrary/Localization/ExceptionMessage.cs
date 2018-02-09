@@ -71,6 +71,15 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
+        public static string InvalidExponent
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidExponent"];
+            }
+        }
+
 
         private static void LoadIntoMemory()
         {

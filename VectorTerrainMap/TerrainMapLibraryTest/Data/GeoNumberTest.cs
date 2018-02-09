@@ -906,5 +906,14 @@ namespace TerrainMapLibraryTest.Data
             GeoNumber.Precision = 20;
             Assert.AreEqual(GeoNumber.E.ToString().Equals("2.71828182845904523526"), true);
         }
+
+        [TestMethod]
+        public void Pow()
+        {
+            GeoNumber.Precision = 100;
+            var number1 = new GeoNumber("2");
+            var number2 = new GeoNumber("3");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("8"), true);
+        }
     }
 }

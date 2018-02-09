@@ -147,6 +147,12 @@ namespace TerrainMapLibrary.Data
             return isZero;
         }
 
+        public bool IsOdd()
+        {
+            bool isOdd = digits[0] % 2 != 0;
+            return isOdd;
+        }
+
         public void Add(GeoUNumber number)
         {
             int length = digits.Count >= number.digits.Count ? digits.Count : number.digits.Count;
