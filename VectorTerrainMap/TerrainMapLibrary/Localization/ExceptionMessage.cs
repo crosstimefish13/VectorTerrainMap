@@ -80,6 +80,33 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
+        public static string InvalidAntilogarithm
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidAntilogarithm"];
+            }
+        }
+
+        public static string InvalidLogarithmBasis
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidLogarithmBasis"];
+            }
+        }
+
+        public static string InvalidReserve
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidReserve"];
+            }
+        }
+
 
         private static void LoadIntoMemory()
         {

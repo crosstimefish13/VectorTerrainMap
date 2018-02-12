@@ -908,12 +908,211 @@ namespace TerrainMapLibraryTest.Data
         }
 
         [TestMethod]
+        public void Floor()
+        {
+            GeoNumber.Precision = 10;
+            var number = new GeoNumber("0");
+            bool isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number.Floor(-1);
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "reserve must be 0 or more.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number = new GeoNumber("0");
+            Assert.AreEqual(number.Floor().ToString().Equals("0"), true);
+
+            number = new GeoNumber("0");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("0"), true);
+
+            number = new GeoNumber("0.1");
+            Assert.AreEqual(number.Floor().ToString().Equals("0"), true);
+
+            number = new GeoNumber("0.1");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("0.1"), true);
+
+            number = new GeoNumber("0.1");
+            Assert.AreEqual(number.Floor(2).ToString().Equals("0.1"), true);
+
+            number = new GeoNumber("-0.1");
+            Assert.AreEqual(number.Floor().ToString().Equals("-1"), true);
+
+            number = new GeoNumber("-0.1");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("-0.1"), true);
+
+            number = new GeoNumber("-0.1");
+            Assert.AreEqual(number.Floor(2).ToString().Equals("-0.1"), true);
+
+            number = new GeoNumber("1");
+            Assert.AreEqual(number.Floor().ToString().Equals("1"), true);
+
+            number = new GeoNumber("1");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("1"), true);
+
+            number = new GeoNumber("-1");
+            Assert.AreEqual(number.Floor().ToString().Equals("-1"), true);
+
+            number = new GeoNumber("-1");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("-1"), true);
+
+            number = new GeoNumber("1.1");
+            Assert.AreEqual(number.Floor().ToString().Equals("1"), true);
+
+            number = new GeoNumber("1.1");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("1.1"), true);
+
+            number = new GeoNumber("1.1");
+            Assert.AreEqual(number.Floor(2).ToString().Equals("1.1"), true);
+
+            number = new GeoNumber("-1.1");
+            Assert.AreEqual(number.Floor().ToString().Equals("-2"), true);
+
+            number = new GeoNumber("-1.1");
+            Assert.AreEqual(number.Floor(1).ToString().Equals("-1.1"), true);
+
+            number = new GeoNumber("-1.1");
+            Assert.AreEqual(number.Floor(2).ToString().Equals("-1.1"), true);
+
+            number = new GeoNumber("1.2395");
+            Assert.AreEqual(number.Floor().ToString().Equals("1"), true);
+
+            number = new GeoNumber("1.2305");
+            Assert.AreEqual(number.Floor(2).ToString().Equals("1.23"), true);
+
+            number = new GeoNumber("1.2305");
+            Assert.AreEqual(number.Floor(3).ToString().Equals("1.23"), true);
+
+            number = new GeoNumber("-1.2305");
+            Assert.AreEqual(number.Floor().ToString().Equals("-2"), true);
+
+            number = new GeoNumber("-1.2395");
+            Assert.AreEqual(number.Floor(2).ToString().Equals("-1.24"), true);
+
+            number = new GeoNumber("-1.2395");
+            Assert.AreEqual(number.Floor(3).ToString().Equals("-1.24"), true);
+        }
+
+        [TestMethod]
+        public void Ceiling()
+        {
+            GeoNumber.Precision = 10;
+            var number = new GeoNumber("0");
+            bool isThrow = false;
+            try
+            {
+                isThrow = false;
+                var res = number.Ceiling(-1);
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "reserve must be 0 or more.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number = new GeoNumber("0");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("0"), true);
+
+            number = new GeoNumber("0");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("0"), true);
+
+            number = new GeoNumber("0.1");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("1"), true);
+
+            number = new GeoNumber("0.1");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("0.1"), true);
+
+            number = new GeoNumber("0.1");
+            Assert.AreEqual(number.Ceiling(2).ToString().Equals("0.1"), true);
+
+            number = new GeoNumber("-0.1");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("0"), true);
+
+            number = new GeoNumber("-0.1");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("-0.1"), true);
+
+            number = new GeoNumber("-0.1");
+            Assert.AreEqual(number.Ceiling(2).ToString().Equals("-0.1"), true);
+
+            number = new GeoNumber("1");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("1"), true);
+
+            number = new GeoNumber("1");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("1"), true);
+
+            number = new GeoNumber("-1");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("-1"), true);
+
+            number = new GeoNumber("-1");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("-1"), true);
+
+            number = new GeoNumber("1.1");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("2"), true);
+
+            number = new GeoNumber("1.1");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("1.1"), true);
+
+            number = new GeoNumber("1.1");
+            Assert.AreEqual(number.Ceiling(2).ToString().Equals("1.1"), true);
+
+            number = new GeoNumber("-1.1");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("-1"), true);
+
+            number = new GeoNumber("-1.1");
+            Assert.AreEqual(number.Ceiling(1).ToString().Equals("-1.1"), true);
+
+            number = new GeoNumber("-1.1");
+            Assert.AreEqual(number.Ceiling(2).ToString().Equals("-1.1"), true);
+
+            number = new GeoNumber("1.2395");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("2"), true);
+
+            number = new GeoNumber("1.2395");
+            Assert.AreEqual(number.Ceiling(2).ToString().Equals("1.24"), true);
+
+            number = new GeoNumber("1.2395");
+            Assert.AreEqual(number.Ceiling(3).ToString().Equals("1.24"), true);
+
+            number = new GeoNumber("-1.2305");
+            Assert.AreEqual(number.Ceiling().ToString().Equals("-1"), true);
+
+            number = new GeoNumber("-1.2305");
+            Assert.AreEqual(number.Ceiling(2).ToString().Equals("-1.23"), true);
+
+            number = new GeoNumber("-1.2305");
+            Assert.AreEqual(number.Ceiling(3).ToString().Equals("-1.23"), true);
+        }
+
+        // TODO
+        [TestMethod]
         public void Pow()
         {
-            GeoNumber.Precision = 100;
-            var number1 = new GeoNumber("2");
-            var number2 = new GeoNumber("3");
+            GeoNumber.Precision = 15;
+            var number1 = new GeoNumber("16");
+            var number2 = new GeoNumber("5");
             Assert.AreEqual(number1.Pow(number2).ToString().Equals("8"), true);
+        }
+
+        // TODO
+        [TestMethod]
+        public void Log()
+        {
+            GeoNumber.Precision = 2;
+            var number1 = new GeoNumber("9");
+            var number2 = new GeoNumber("3");
+            Assert.AreEqual(number1.Log(number2).ToString().Equals("2"), true);
         }
     }
 }

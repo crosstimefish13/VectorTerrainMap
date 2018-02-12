@@ -6,7 +6,7 @@ using TerrainMapLibrary.Localization;
 
 namespace TerrainMapLibrary.Data
 {
-    public class GeoNumber
+    public sealed class GeoNumber
     {
         private bool sign;
         private GeoUNumber number;
@@ -19,7 +19,7 @@ namespace TerrainMapLibrary.Data
         private static int precision = 100;
 
 
-        public static GeoNumber Zero
+        private static GeoNumber Zero
         {
             get
             {
@@ -32,7 +32,7 @@ namespace TerrainMapLibrary.Data
             }
         }
 
-        public static GeoNumber One
+        private static GeoNumber One
         {
             get
             {
@@ -45,7 +45,7 @@ namespace TerrainMapLibrary.Data
             }
         }
 
-        public static GeoNumber Two
+        private static GeoNumber Two
         {
             get
             {
@@ -58,6 +58,20 @@ namespace TerrainMapLibrary.Data
             }
         }
 
+        private static GeoNumber ELog2
+        {
+            get
+            {
+                if (elog2 == null)
+                {
+                    elog2 = GetRealLog2(E, precision + 3);
+                }
+
+                return elog2;
+            }
+        }
+
+
         public static GeoNumber E
         {
             get
@@ -68,19 +82,6 @@ namespace TerrainMapLibrary.Data
                 }
 
                 return e;
-            }
-        }
-
-        public static GeoNumber ELog2
-        {
-            get
-            {
-                if (elog2 == null)
-                {
-                    elog2 = GetRealLog2(E, precision + 3);
-                }
-
-                return elog2;
             }
         }
 
@@ -174,32 +175,37 @@ namespace TerrainMapLibrary.Data
             return dup;
         }
 
-        public GeoNumber Floor()
+        public GeoNumber Floor(int reserve = 0)
         {
-            if (point == 0) { return Copy(); }
+            if (reserve < 0) { throw new Exception(ExceptionMessage.InvalidReserve); }
+            if (reserve >= point) { return Copy(); }
 
-            // trim the decimal part
             var resNumber = number.Copy();
-            resNumber.Trim(0, point);
-            var res = new GeoNumber(sign, resNumber, 0);
+            resNumber.Trim(0, point - reserve);
+            var res = new GeoNumber(sign, resNumber, reserve);
+
+            if (res.sign == false && res.point < point)
+            {
+                var digits = new List<byte>() { 1 };
+                for (int i = 0; i < res.point; i++)
+                {
+                    digits.Add(0);
+                }
+
+                var item = new GeoNumber(false, new GeoUNumber(digits), res.point);
+                res = res + item;
+            }
+
             res.Trim();
             return res;
         }
 
-        public GeoNumber Ceil()
+        public GeoNumber Ceiling(int reserve = 0)
         {
-            if (point == 0) { return Copy(); }
+            if (reserve < 0) { throw new Exception(ExceptionMessage.InvalidReserve); }
+            else if (reserve >= point || number.IsZero()) { return Copy(); }
 
-            // trim the decimal part
-            var resNumber = number.Copy();
-            resNumber.Trim(0, point);
-            var res = new GeoNumber(sign, resNumber, 0);
-            res.Trim();
-
-            // add or minus 1 if needed
-            if (res.sign == true) { res = res + One; }
-            else { res = res - One; }
-
+            var res = -(-this).Floor(reserve);
             return res;
         }
 
@@ -229,6 +235,19 @@ namespace TerrainMapLibrary.Data
             dupBasis.sign = true;
             var item = exponent * GetRealLog2(dupBasis, precision + 3) / ELog2;
             var res = GetEPowReal(item, precision + 3);
+            res.Trim();
+            return res;
+        }
+
+        public GeoNumber Log(GeoNumber basis)
+        {
+            if (this < Zero) { throw new Exception(ExceptionMessage.InvalidAntilogarithm); }
+
+            if (basis < Zero) { throw new Exception(ExceptionMessage.InvalidLogarithmBasis); }
+
+            // logx(y)=log2(y)/log2(x)
+            var res = GetRealLog2(this, precision + 3) / GetRealLog2(basis, precision + 3);
+            res.Trim();
             return res;
         }
 

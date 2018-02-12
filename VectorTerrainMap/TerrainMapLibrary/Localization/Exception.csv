@@ -6,3 +6,6 @@ NotZeroDivisor,         divisor should not be 0.
 NotPositiveInteger,     must be positive integer number.
 InvalidIterations,      iterations must be 1 or more.
 InvalidExponent,        fractional exponent is invalid with minus basis.
+InvalidAntilogarithm,   antilogarithm must be more than 0.
+InvalidLogarithmBasis,  logarithm basis must be more than 0.
+InvalidReserve,         reserve must be 0 or more.
