@@ -9,3 +9,11 @@ InvalidExponent,        fractional exponent is invalid with minus basis.
 InvalidAntilogarithm,   antilogarithm must be more than 0.
 InvalidLogarithmBasis,  logarithm basis must be more than 0.
 InvalidReserve,         reserve must be 0 or more.
+InvalidMatrixSize,      matrix size must be 1*1 or more.
+NullGeoNumber,          geo number must not be null.
+InvalidMatrixIndex,     matrix index must be more then 0*0 and less then matrix size.
+NotEqualMatrixSize,     the size of two matrix must be same with each other.
+NotMultipleMatrixSize,  the height of left matrix must be equal with the widht of right matrix.
+InvalidVectorSize,      the size of vectors must be equal with matrix size.
+NotSquareMatrix,        the matrix must be a square one.
+InvalidInverseMatrix,   the matrix cannot be inversed.

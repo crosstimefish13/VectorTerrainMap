@@ -107,6 +107,78 @@ namespace TerrainMapLibrary.Localization
             }
         }
 
+        public static string InvalidMatrixSize
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidMatrixSize"];
+            }
+        }
+
+        public static string NullGeoNumber
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["NullGeoNumber"];
+            }
+        }
+
+        public static string InvalidMatrixIndex
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidMatrixIndex"];
+            }
+        }
+
+        public static string NotEqualMatrixSize
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["NotEqualMatrixSize"];
+            }
+        }
+
+        public static string InvalidVectorSize
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidVectorSize"];
+            }
+        }
+
+        public static string NotMultipleMatrixSize
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["NotMultipleMatrixSize"];
+            }
+        }
+
+        public static string NotSquareMatrix
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["NotSquareMatrix"];
+            }
+        }
+
+        public static string InvalidInverseMatrix
+        {
+            get
+            {
+                LoadIntoMemory();
+                return messages["InvalidInverseMatrix"];
+            }
+        }
+
 
         private static void LoadIntoMemory()
         {
