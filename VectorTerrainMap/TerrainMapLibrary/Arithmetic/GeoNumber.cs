@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using TerrainMapLibrary.Localization;
 
-namespace TerrainMapLibrary.Data
+namespace TerrainMapLibrary.Arithmetic
 {
     public sealed class GeoNumber
     {
@@ -241,9 +241,9 @@ namespace TerrainMapLibrary.Data
 
         public GeoNumber Log(GeoNumber basis)
         {
-            if (this < Zero) { throw new Exception(ExceptionMessage.InvalidAntilogarithm); }
+            if (this <= Zero) { throw new Exception(ExceptionMessage.InvalidAntilogarithm); }
 
-            if (basis < Zero) { throw new Exception(ExceptionMessage.InvalidLogarithmBasis); }
+            if (basis <= Zero || basis == One) { throw new Exception(ExceptionMessage.InvalidLogarithmBasis); }
 
             // logx(y)=log2(y)/log2(x)
             var res = GetRealLog2(this, precision + 3) / GetRealLog2(basis, precision + 3);
@@ -591,7 +591,9 @@ namespace TerrainMapLibrary.Data
             if (exponent < Zero) { res = One / res; }
 
             // need to minus if basis < 0 and exponent is odd number
-            if (basis < Zero && exponent % Two == One) { res = -res; }
+            dupE = exponent.Copy();
+            dupE.sign = true;
+            if (basis < Zero && dupE % Two == One) { res = -res; }
 
             return res;
         }

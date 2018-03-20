@@ -1,4 +1,4 @@
-﻿namespace TerrainMapLibrary.Data
+﻿namespace TerrainMapLibrary.Arithmetic
 {
     internal enum CompareResult
     {

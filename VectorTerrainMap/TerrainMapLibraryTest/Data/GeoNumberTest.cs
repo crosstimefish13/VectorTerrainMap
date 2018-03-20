@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TerrainMapLibrary.Data;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using TerrainMapLibrary.Arithmetic;
 
-namespace TerrainMapLibraryTest.Data
+namespace TerrainMapLibraryTest.Arithmetic
 {
     [TestClass]
     public class GeoNumberTest
@@ -1095,24 +1095,167 @@ namespace TerrainMapLibraryTest.Data
             Assert.AreEqual(number.Ceiling(3).ToString().Equals("-1.23"), true);
         }
 
-        // TODO
         [TestMethod]
         public void Pow()
         {
             GeoNumber.Precision = 15;
-            var number1 = new GeoNumber("16");
-            var number2 = new GeoNumber("5");
+            var number1 = new GeoNumber("0");
+            var number2 = new GeoNumber("1");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("0"), true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("2");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("1"), true);
+
+            number1 = new GeoNumber("1");
+            number2 = new GeoNumber("0");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("1"), true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("2");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("1"), true);
+
+            number1 = new GeoNumber("-1");
+            number2 = new GeoNumber("3");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("-1"), true);
+
+            number1 = new GeoNumber("2");
+            number2 = new GeoNumber("3");
             Assert.AreEqual(number1.Pow(number2).ToString().Equals("8"), true);
+
+            number1 = new GeoNumber("2");
+            number2 = new GeoNumber("-3");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("0.125"), true);
+
+            number1 = new GeoNumber("-2");
+            number2 = new GeoNumber("-3");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("-0.125"), true);
+
+            bool isThrow = false;
+            try
+            {
+                isThrow = false;
+                number1 = new GeoNumber("-2");
+                number2 = new GeoNumber("2.5");
+                number1.Pow(number2);
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "fractional exponent is invalid with minus basis.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            number1 = new GeoNumber("2");
+            number2 = new GeoNumber("2.5");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("5.65685424953959"), true);
+
+            number1 = new GeoNumber("2");
+            number2 = new GeoNumber("-2.5");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("0.176776695292214"), true);
+
+            number1 = new GeoNumber("0.2");
+            number2 = new GeoNumber("2.5");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("0.017878712499764"), true);
+
+            number1 = new GeoNumber("0.2");
+            number2 = new GeoNumber("-2.5");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("55.901684352084428"), true);
+
+            number1 = new GeoNumber("-2");
+            number2 = new GeoNumber("2.6");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("6.062866266091078"), true);
+
+            number1 = new GeoNumber("-0.2");
+            number2 = new GeoNumber("-2.6");
+            Assert.AreEqual(number1.Pow(number2).ToString().Equals("65.66316422793127"), true);
         }
 
-        // TODO
         [TestMethod]
         public void Log()
         {
-            GeoNumber.Precision = 2;
-            var number1 = new GeoNumber("9");
-            var number2 = new GeoNumber("3");
-            Assert.AreEqual(number1.Log(number2).ToString().Equals("2"), true);
+            GeoNumber.Precision = 15;
+            var antilog = new GeoNumber("0");
+            var basis = new GeoNumber("1");
+
+            bool isThrow = false;
+            try
+            {
+                isThrow = false;
+                antilog.Log(basis);
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "antilogarithm must be more than 0.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            antilog = new GeoNumber("1");
+            basis = new GeoNumber("0");
+
+            try
+            {
+                isThrow = false;
+                antilog.Log(basis);
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "logarithm basis must be more than 0 and not equal 1.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            antilog = new GeoNumber("1");
+            basis = new GeoNumber("1");
+
+            try
+            {
+                isThrow = false;
+                antilog.Log(basis);
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "logarithm basis must be more than 0 and not equal 1.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            antilog = new GeoNumber("1");
+            basis = new GeoNumber("2");
+            Assert.AreEqual(antilog.Log(basis).ToString().Equals("0"), true);
+
+            antilog = new GeoNumber("0.1");
+            basis = new GeoNumber("2");
+            Assert.AreEqual(antilog.Log(basis).ToString().Equals("-3.321928094883326"), true);
+
+            antilog = new GeoNumber("1");
+            basis = new GeoNumber("0.2");
+            Assert.AreEqual(antilog.Log(basis).ToString().Equals("0"), true);
+
+            antilog = new GeoNumber("0.1");
+            basis = new GeoNumber("0.2");
+            Assert.AreEqual(antilog.Log(basis).ToString().Equals("1.430676558074141"), true);
+
+            antilog = new GeoNumber("2");
+            basis = new GeoNumber("3");
+            Assert.AreEqual(antilog.Log(basis).ToString().Equals("0.630929753572849"), true);
+
+            antilog = new GeoNumber("2.2");
+            basis = new GeoNumber("3.3");
+            Assert.AreEqual(antilog.Log(basis).ToString().Equals("0.660392430148585"), true);
         }
     }
 }

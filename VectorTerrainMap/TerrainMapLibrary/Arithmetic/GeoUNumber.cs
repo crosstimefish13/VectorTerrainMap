@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace TerrainMapLibrary.Data
+namespace TerrainMapLibrary.Arithmetic
 {
     internal class GeoUNumber
     {

@@ -41,12 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\CompareResult.cs" />
+    <Compile Include="Arithmetic\CompareResult.cs" />
     <Compile Include="Data\CSVData.cs" />
     <Compile Include="Data\EmbeddedCSVData.cs" />
-    <Compile Include="Data\GeoMatrix.cs" />
-    <Compile Include="Data\GeoNumber.cs" />
-    <Compile Include="Data\GeoUNumber.cs" />
+    <Compile Include="Arithmetic\GeoMatrix.cs" />
+    <Compile Include="Arithmetic\GeoNumber.cs" />
+    <Compile Include="Arithmetic\GeoUNumber.cs" />
     <Compile Include="Localization\ExceptionMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

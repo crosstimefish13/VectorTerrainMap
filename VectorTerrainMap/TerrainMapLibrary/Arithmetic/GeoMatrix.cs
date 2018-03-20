@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using TerrainMapLibrary.Localization;
 
-namespace TerrainMapLibrary.Data
+namespace TerrainMapLibrary.Arithmetic
 {
     // wenku.baidu.com/view/50acee72f7ec4afe04a1dfa2.html
     // baike.baidu.com/item/%E7%9F%A9%E9%98%B5%E5%8F%98%E6%8D%A2/8185976?fr=aladdin
