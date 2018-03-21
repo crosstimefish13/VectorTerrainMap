@@ -19,7 +19,7 @@ namespace TerrainMapLibrary.Arithmetic
         {
             get
             {
-                return arrays.Count;
+                return arrays[0].Count;
             }
         }
 
@@ -27,7 +27,7 @@ namespace TerrainMapLibrary.Arithmetic
         {
             get
             {
-                return arrays[0].Count;
+                return arrays.Count;
             }
         }
 
@@ -301,7 +301,7 @@ namespace TerrainMapLibrary.Arithmetic
 
         public static GeoMatrix operator /(GeoMatrix left, GeoMatrix right)
         {
-            // ensure both left is square matrix
+            // ensure left is square matrix
             if (left.Width != left.Height)
             {
                 throw new Exception(ExceptionMessage.NotSquareMatrix);
