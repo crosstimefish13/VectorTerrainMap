@@ -51,13 +51,9 @@
   <ItemGroup>
     <Compile Include="Arithmetic\GeoMatrixTest.cs" />
     <Compile Include="Arithmetic\GeoNumberTest.cs" />
-    <Compile Include="Data\CSVDataTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\TestData.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
