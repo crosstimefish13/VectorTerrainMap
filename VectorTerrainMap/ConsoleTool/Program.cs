@@ -6,6 +6,7 @@ using TerrainMapLibrary.Data;
 using TerrainMapLibrary.Arithmetic;
 using System.Text;
 using System.Threading.Tasks;
+using TerrainMapLibrary.Vector.Kriging;
 
 namespace ConsoleTool
 {
@@ -38,13 +39,13 @@ namespace ConsoleTool
 
         private static void Kriging()
         {
-            var cc = new GeoNumber("-00000.23");
-            var bb = new GeoNumber("1.148000000000000000000000001");
-            var dd = cc + bb;
-
-            CSVData inputData = new CSVData(@"..\..\..\SampleData\opendem\rostock\rostock.csv");
+            GeoNumber.Precision = 5;
+            VectorCSVData inputData = new VectorCSVData(@"..\..\..\SampleData\opendem\rostock\rostock.csv");
             inputData.LoadIntoMemory();
-            var fields = inputData.Fields<double>();
+            var vectors = inputData.GetValidVectors();
+
+            var ki = new KrigingInterpolator(vectors);
+            ki.GenerateSemivarianceMap(new GeoNumber("0"));
         }
     }
 }

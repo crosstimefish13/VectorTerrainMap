@@ -186,7 +186,7 @@ namespace TerrainMapLibrary.Localization
             {
                 var data = new EmbeddedCSVData("TerrainMapLibrary.Localization.Exception.csv");
                 data.LoadIntoMemory();
-                var fields = data.Fields<string>();
+                var fields = data.Fields();
 
                 messages = new Dictionary<string, string>();
                 foreach (var row in fields)

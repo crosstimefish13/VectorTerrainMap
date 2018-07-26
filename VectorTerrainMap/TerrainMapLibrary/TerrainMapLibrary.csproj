@@ -47,12 +47,14 @@
     <Compile Include="Arithmetic\GeoMatrix.cs" />
     <Compile Include="Arithmetic\GeoNumber.cs" />
     <Compile Include="Arithmetic\GeoUNumber.cs" />
+    <Compile Include="Data\Vector.cs" />
+    <Compile Include="Data\VectorCSVData.cs" />
     <Compile Include="Localization\ExceptionMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vector\Kriging\KrigingInterpolator.cs" />
+    <Compile Include="Vector\Kriging\KrigingSemivarianceMap.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Vector\Kriging\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Localization\Exception.csv" />
   </ItemGroup>
