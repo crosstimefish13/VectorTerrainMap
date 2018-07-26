@@ -42,15 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arithmetic\CompareResult.cs" />
-    <Compile Include="Data\CSVData.cs" />
-    <Compile Include="Data\EmbeddedCSVData.cs" />
+    <Compile Include="StreamData\CSVData.cs" />
+    <Compile Include="StreamData\EmbeddedCSVData.cs" />
     <Compile Include="Arithmetic\GeoMatrix.cs" />
     <Compile Include="Arithmetic\GeoNumber.cs" />
     <Compile Include="Arithmetic\GeoUNumber.cs" />
-    <Compile Include="Data\Vector.cs" />
-    <Compile Include="Data\VectorCSVData.cs" />
+    <Compile Include="Vector\Data\MapPoint.cs" />
     <Compile Include="Localization\ExceptionMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vector\Data\MapPointList.cs" />
     <Compile Include="Vector\Kriging\KrigingInterpolator.cs" />
     <Compile Include="Vector\Kriging\KrigingSemivarianceMap.cs" />
   </ItemGroup>

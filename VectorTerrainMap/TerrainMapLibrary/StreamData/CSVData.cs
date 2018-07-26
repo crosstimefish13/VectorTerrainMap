@@ -5,7 +5,7 @@ using System.Linq;
 using TerrainMapLibrary.Arithmetic;
 using TerrainMapLibrary.Localization;
 
-namespace TerrainMapLibrary.Data
+namespace TerrainMapLibrary.Vector.Data
 {
     public class CSVData
     {

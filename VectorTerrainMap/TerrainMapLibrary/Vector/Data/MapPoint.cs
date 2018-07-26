@@ -1,8 +1,8 @@
 ﻿using TerrainMapLibrary.Arithmetic;
 
-namespace TerrainMapLibrary.Data
+namespace TerrainMapLibrary.Vector.Data
 {
-    public class Vector
+    public class MapPoint
     {
         public GeoNumber X { get; set; }
 
@@ -10,15 +10,15 @@ namespace TerrainMapLibrary.Data
 
         public GeoNumber Z { get; set; }
 
-        public Vector()
+        public MapPoint()
             : this(new GeoNumber("0"), new GeoNumber("0"), new GeoNumber("0"))
         { }
 
-        public Vector(GeoNumber x, GeoNumber y)
+        public MapPoint(GeoNumber x, GeoNumber y)
             : this(x, y, new GeoNumber("0"))
         { }
 
-        public Vector(GeoNumber x, GeoNumber y, GeoNumber z)
+        public MapPoint(GeoNumber x, GeoNumber y, GeoNumber z)
         {
             X = x.Copy();
             Y = y.Copy();

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using TerrainMapLibrary.Data;
+using TerrainMapLibrary.Vector.Data;
 
 namespace TerrainMapLibrary.Localization
 {

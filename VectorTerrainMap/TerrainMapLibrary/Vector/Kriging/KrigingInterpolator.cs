@@ -9,9 +9,9 @@ namespace TerrainMapLibrary.Vector.Kriging
 {
     public class KrigingInterpolator
     {
-        private List<Data.Vector> data;
+        private List<Vector.Data.MapPoint> data;
 
-        public KrigingInterpolator(List<Data.Vector> data)
+        public KrigingInterpolator(List<Vector.Data.MapPoint> data)
         {
             this.data = data;
         }
@@ -20,12 +20,12 @@ namespace TerrainMapLibrary.Vector.Kriging
         {
             var map = new KrigingSemivarianceMap();
 
-            var allMap = new List<Data.Vector>();
+            var allMap = new List<Vector.Data.MapPoint>();
             for (int i = 0; i < data.Count; i++)
             {
                 for (int j = i + 1; j < data.Count; j++)
                 {
-                    var vector = new Data.Vector();
+                    var vector = new Vector.Data.MapPoint();
                     vector.X = GetEuclidDidstance(data[i], data[j]);
                     vector.Y = GetSemivariance(data[i], data[j]);
                     allMap.Add(vector);
@@ -35,14 +35,14 @@ namespace TerrainMapLibrary.Vector.Kriging
             return map;
         }
 
-        private GeoNumber GetEuclidDidstance(Data.Vector v1, Data.Vector v2)
+        private GeoNumber GetEuclidDidstance(Vector.Data.MapPoint v1, Vector.Data.MapPoint v2)
         {
             var vl = (v1.X - v2.X) * (v1.X - v2.X) + (v1.Y - v2.Y) * (v1.Y - v2.Y);
             var distance = vl.Pow(new GeoNumber("0.5"));
             return distance;
         }
 
-        private GeoNumber GetSemivariance(Data.Vector v1, Data.Vector v2)
+        private GeoNumber GetSemivariance(Vector.Data.MapPoint v1, Vector.Data.MapPoint v2)
         {
             var semivariance = (v1.Z - v2.Z) * (v1.Z - v2.Z) * new GeoNumber("0.5");
             return semivariance;

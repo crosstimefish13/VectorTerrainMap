@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerrainMapLibrary.Arithmetic;
-using TerrainMapLibrary.Data;
+using TerrainMapLibrary.Vector.Data;
 
 namespace TerrainMapLibrary.Vector.Kriging
 {
     public class KrigingSemivarianceMap
     {
-        private List<Data.Vector> vectors;
+        private List<Vector.Data.MapPoint> vectors;
 
         public KrigingSemivarianceMap()
         {
-            vectors = new List<Data.Vector>();
+            vectors = new List<Vector.Data.MapPoint>();
         }
 
-        public void AddVector(Data.Vector vector)
+        public void AddVector(Vector.Data.MapPoint vector)
         {
             vectors.Add(vector);
         }

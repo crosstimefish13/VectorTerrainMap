@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 
-namespace TerrainMapLibrary.Data
+namespace TerrainMapLibrary.Vector.Data
 {
     internal class EmbeddedCSVData : CSVData
     {
