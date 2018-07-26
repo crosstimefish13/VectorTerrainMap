@@ -161,7 +161,7 @@ namespace TerrainMapLibrary.Arithmetic
         {
             if (obj == null || !(obj is GeoNumber)) { return false; }
             var number = obj as GeoNumber;
-            return ToString() == number.ToString();
+            return this == number;
         }
 
         public override int GetHashCode()
@@ -472,8 +472,8 @@ namespace TerrainMapLibrary.Arithmetic
 
         public static bool operator ==(GeoNumber left, GeoNumber right)
         {
-            var isLeftNull = ReferenceEquals(left, null);
-            var isRightNull = ReferenceEquals(right, null);
+            var isLeftNull = left is null;
+            var isRightNull = right is null;
 
             if (isLeftNull && isRightNull) { return true; }
             else if (isLeftNull || isRightNull) { return false; }
@@ -486,8 +486,7 @@ namespace TerrainMapLibrary.Arithmetic
 
         public static bool operator !=(GeoNumber left, GeoNumber right)
         {
-            var res = left - right;
-            return !res.number.IsZero();
+            return !(left == right);
         }
 
         public static bool operator >(GeoNumber left, GeoNumber right)

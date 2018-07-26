@@ -256,6 +256,79 @@ namespace TerrainMapLibraryTest.Arithmetic
         }
 
         [TestMethod]
+        public void Inverse()
+        {
+            var matrix = new GeoMatrix(2, 2);
+            matrix.SetValue(0, 1, new GeoNumber("1"));
+            matrix.SetValue(1, 0, new GeoNumber("2"));
+            matrix.SetValue(1, 1, new GeoNumber("3"));
+            matrix = matrix.Inverse();
+            Assert.AreEqual(matrix.GetValue(0, 0), new GeoNumber("-1.5"));
+            Assert.AreEqual(matrix.GetValue(0, 1), new GeoNumber("0.5"));
+            Assert.AreEqual(matrix.GetValue(1, 0), new GeoNumber("1"));
+            Assert.AreEqual(matrix.GetValue(1, 1), new GeoNumber("0"));
+
+            GeoNumber.Precision = 3;
+            matrix = new GeoMatrix(3, 3);
+            matrix.SetValue(0, 0, new GeoNumber("2"));
+            matrix.SetValue(0, 1, new GeoNumber("2"));
+            matrix.SetValue(0, 2, new GeoNumber("3"));
+            matrix.SetValue(1, 0, new GeoNumber("4"));
+            matrix.SetValue(1, 1, new GeoNumber("5"));
+            matrix.SetValue(1, 2, new GeoNumber("6"));
+            matrix.SetValue(2, 0, new GeoNumber("7"));
+            matrix.SetValue(2, 1, new GeoNumber("8"));
+            matrix.SetValue(2, 2, new GeoNumber("9"));
+            matrix = matrix.Inverse();
+            Assert.AreEqual(matrix.GetValue(0, 0), new GeoNumber("1.002"));
+            Assert.AreEqual(matrix.GetValue(0, 1), new GeoNumber("-1.999"));
+            Assert.AreEqual(matrix.GetValue(0, 2), new GeoNumber("0.999"));
+            Assert.AreEqual(matrix.GetValue(1, 0), new GeoNumber("-2"));
+            Assert.AreEqual(matrix.GetValue(1, 1), new GeoNumber("1"));
+            Assert.AreEqual(matrix.GetValue(1, 2), new GeoNumber("0"));
+            Assert.AreEqual(matrix.GetValue(2, 0), new GeoNumber("0.999"));
+            Assert.AreEqual(matrix.GetValue(2, 1), new GeoNumber("0.666"));
+            Assert.AreEqual(matrix.GetValue(2, 2), new GeoNumber("-0.666"));
+
+            bool isThrow = false;
+
+            try
+            {
+                isThrow = false;
+                matrix = new GeoMatrix(2, 2);
+                matrix.SetValue(0, 1, new GeoNumber("0"));
+                matrix.SetValue(1, 0, new GeoNumber("2"));
+                matrix.SetValue(1, 1, new GeoNumber("3"));
+                matrix = matrix.Inverse();
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "the matrix cannot be inversed.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            try
+            {
+                isThrow = false;
+                matrix = new GeoMatrix(1, 2);
+                matrix = matrix.Inverse();
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "the matrix must be a square one.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+        }
+
+        [TestMethod]
         public void Add()
         {
             var matrix1 = new GeoMatrix(2, 2);
@@ -485,6 +558,90 @@ namespace TerrainMapLibraryTest.Arithmetic
             {
                 Assert.AreEqual(isThrow, true);
             }
+        }
+
+        [TestMethod]
+        public void Div()
+        {
+            var matrix1 = new GeoMatrix(2, 2);
+            matrix1.SetValue(0, 1, new GeoNumber("1"));
+            matrix1.SetValue(1, 0, new GeoNumber("2"));
+            matrix1.SetValue(1, 1, new GeoNumber("3"));
+            var matrix2 = new GeoMatrix(2, 2, new GeoNumber("1"));
+            matrix2.SetValue(0, 1, new GeoNumber("2"));
+            matrix2.SetValue(1, 0, new GeoNumber("3"));
+            matrix2.SetValue(1, 1, new GeoNumber("4"));
+            var matrix = matrix1 / matrix2;
+            Assert.AreEqual(matrix.GetValue(0, 0), new GeoNumber("0"));
+            Assert.AreEqual(matrix.GetValue(0, 1), new GeoNumber("-1"));
+            Assert.AreEqual(matrix.GetValue(1, 0), new GeoNumber("1"));
+            Assert.AreEqual(matrix.GetValue(1, 1), new GeoNumber("2"));
+
+            bool isThrow = false;
+
+            try
+            {
+                isThrow = false;
+                matrix1 = new GeoMatrix(1, 2);
+                matrix = matrix1 / matrix2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "the matrix must be a square one.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+
+            try
+            {
+                isThrow = false;
+                matrix1 = new GeoMatrix(3, 3);
+                matrix = matrix1 / matrix2;
+            }
+            catch (Exception e)
+            {
+                isThrow = true;
+                Assert.AreEqual(e.Message, "the height of left matrix must be equal with the widht of right matrix.");
+            }
+            finally
+            {
+                Assert.AreEqual(isThrow, true);
+            }
+        }
+
+        [TestMethod]
+        public void Equal()
+        {
+            var matrix1 = new GeoMatrix(2, 2);
+            var matrix2 = new GeoMatrix(2, 2);
+            Assert.AreEqual(matrix1 == matrix2, true);
+
+            matrix1 = new GeoMatrix(2, 2, new GeoNumber("1"));
+            matrix2 = new GeoMatrix(2, 2);
+            Assert.AreEqual(matrix1 == matrix2, false);
+
+            matrix1 = new GeoMatrix(2, 1);
+            matrix2 = new GeoMatrix(2, 2);
+            Assert.AreEqual(matrix1 == matrix2, false);
+        }
+
+        [TestMethod]
+        public void NotEqual()
+        {
+            var matrix1 = new GeoMatrix(2, 2);
+            var matrix2 = new GeoMatrix(2, 2);
+            Assert.AreEqual(matrix1 != matrix2, false);
+
+            matrix1 = new GeoMatrix(2, 2, new GeoNumber("1"));
+            matrix2 = new GeoMatrix(2, 2);
+            Assert.AreEqual(matrix1 != matrix2, true);
+
+            matrix1 = new GeoMatrix(2, 1);
+            matrix2 = new GeoMatrix(2, 2);
+            Assert.AreEqual(matrix1 != matrix2, true);
         }
     }
 }

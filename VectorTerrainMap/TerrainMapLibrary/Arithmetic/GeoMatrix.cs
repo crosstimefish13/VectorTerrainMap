@@ -64,6 +64,23 @@ namespace TerrainMapLibrary.Arithmetic
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is GeoMatrix)) { return false; }
+            var matrix = obj as GeoMatrix;
+            return this == matrix;
+        }
+
+        public override int GetHashCode()
+        {
+            return arrays.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{Width} * {Height}";
+        }
+
         public GeoNumber GetValue(int row, int column)
         {
             // ensure index is valid
@@ -218,8 +235,9 @@ namespace TerrainMapLibrary.Arithmetic
                 // because matrix[row][column = row] is 1 now, so let target item to sub itself
                 for (int otherRow = row + 1; otherRow < Height; otherRow++)
                 {
-                    matrix1.RowAdd(otherRow, row, -matrix1.arrays[otherRow][column]);
-                    matrix2.RowAdd(otherRow, row, -matrix1.arrays[otherRow][column]);
+                    value = -matrix1.arrays[otherRow][column];
+                    matrix1.RowAdd(otherRow, row, value);
+                    matrix2.RowAdd(otherRow, row, value);
                 }
             }
 
@@ -233,8 +251,9 @@ namespace TerrainMapLibrary.Arithmetic
                 var column = row;
                 for (int otherRow = row - 1; otherRow >= 0; otherRow--)
                 {
-                    matrix1.RowAdd(otherRow, row, -matrix1.arrays[otherRow][column]);
-                    matrix2.RowAdd(otherRow, row, -matrix1.arrays[otherRow][column]);
+                    var value = -matrix1.arrays[otherRow][column];
+                    matrix1.RowAdd(otherRow, row, value);
+                    matrix2.RowAdd(otherRow, row, value);
                 }
             }
 
@@ -242,6 +261,16 @@ namespace TerrainMapLibrary.Arithmetic
             // so matrix2 now is transformed to a new matrix, this new matrix is the inversed matrix with original 
             // matrix1
             return matrix2;
+        }
+
+        public static GeoMatrix operator +(GeoMatrix right)
+        {
+            return right.Multiply(new GeoNumber("2"));
+        }
+
+        public static GeoMatrix operator -(GeoMatrix right)
+        {
+            return new GeoMatrix(right.Width, right.Height, new GeoNumber("0"));
         }
 
         public static GeoMatrix operator +(GeoMatrix left, GeoMatrix right)
@@ -316,6 +345,32 @@ namespace TerrainMapLibrary.Arithmetic
             // get the inversed matrix of left, so left/right=inverse(left)*right, because left*inverse(left)=unit
             var result = left.Inverse() * right;
             return result;
+        }
+
+        public static bool operator ==(GeoMatrix left, GeoMatrix right)
+        {
+            var isLeftNull = left is null;
+            var isRightNull = right is null;
+
+            if (isLeftNull && isRightNull) { return true; }
+            else if (isLeftNull || isRightNull) { return false; }
+            else if (left.Width != right.Width || left.Height != right.Height) { return false; }
+            {
+                for (int row = 0; row < left.Height; row++)
+                {
+                    for (int column = 0; column < left.Width; column++)
+                    {
+                        if (left.arrays[row][column] != right.arrays[row][column]) { return false; }
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        public static bool operator !=(GeoMatrix left, GeoMatrix right)
+        {
+            return !(left == right);
         }
 
 
