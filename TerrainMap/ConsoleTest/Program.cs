@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using TerrainMapLibrary.Mathematics;
 
 namespace ConsoleTest
 {
@@ -8,6 +9,7 @@ namespace ConsoleTest
         public static void Main(string[] args)
         {
             ShowTitle();
+            Test();
             Console.ReadKey(true);
         }
 
@@ -25,6 +27,17 @@ namespace ConsoleTest
             Console.WriteLine($"{title} [Version {version}]");
             Console.WriteLine($"{copyright}. All rights reserved");
             Console.WriteLine();
+        }
+
+        public static void Test()
+        {
+            var matrix = new Matrix(2, 2);
+            matrix[0, 0] = 0;
+            matrix[0, 1] = 1;
+            matrix[1, 0] = 2;
+            matrix[1, 1] = 3;
+
+            var c = matrix.Inverse();
         }
     }
 }

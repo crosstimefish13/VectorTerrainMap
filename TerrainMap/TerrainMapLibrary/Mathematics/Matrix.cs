@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TerrainMapLibrary.Common;
 
 namespace TerrainMapLibrary.Mathematics
 {
@@ -14,7 +10,7 @@ namespace TerrainMapLibrary.Mathematics
     // bbs.bccn.net/thread-291334-1-1.html
     // wenku.baidu.com/view/b02ea63290c69ec3d5bb75cf.html?from=search
     // www2.edu-edu.com.cn/lesson_crs78/self/j_0022/soft/ch0605.html
-    internal class Matrix
+    public sealed class Matrix
     {
         private List<List<double>> matrix;
 
@@ -27,6 +23,24 @@ namespace TerrainMapLibrary.Mathematics
         public int Height
         {
             get { return matrix.Count; }
+        }
+
+        public double this[int row, int column]
+        {
+            get
+            {
+                if (row < 0 || row >= Height || column < 0 || column >= Width)
+                { MatrixException.InvalidIndex("row or column"); }
+
+                return matrix[row][column];
+            }
+            set
+            {
+                if (row < 0 || row >= Height || column < 0 || column >= Width)
+                { MatrixException.InvalidIndex("row or column"); }
+
+                matrix[row][column] = value;
+            }
         }
 
 
@@ -61,7 +75,7 @@ namespace TerrainMapLibrary.Mathematics
                 {
                     for (int column = 0; column < left.Width; column++)
                     {
-                        if (left.matrix[row][column] != right.matrix[row][column]) { return false; }
+                        if (FieldEqual(left.matrix[row][column], right.matrix[row][column]) == false) { return false; }
                     }
                 }
 
@@ -148,12 +162,28 @@ namespace TerrainMapLibrary.Mathematics
             return result;
         }
 
+        public static Matrix operator /(Matrix left, Matrix right)
+        {
+            if (left == null) { MatrixException.NullObject("left matrix"); }
+            if (right == null) { MatrixException.NullObject("right matrix"); }
+
+            // left matrix must be a square matrix
+            if (left.Width != left.Height) { MatrixException.NotSquare("left matrix"); }
+
+            // left matrix height must be equal with right matrix width
+            if (left.Height != right.Width) { MatrixException.InvalidMultiple("left and right matrix"); }
+
+            // get the inversed matrix of left, so left/right=inverse(left)*right, because left*inverse(left)=unit(left)
+            var result = left.Inverse() * right;
+            return result;
+        }
+
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is GeoMatrix)) { return false; }
-            var matrix = obj as GeoMatrix;
-            return this == matrix;
+            if (obj == null || !(obj is Matrix)) { return false; }
+
+            return this == (obj as Matrix);
         }
 
         public override int GetHashCode()
@@ -166,114 +196,59 @@ namespace TerrainMapLibrary.Mathematics
             return $"{Width} * {Height}";
         }
 
-        public GeoNumber GetValue(int row, int column)
+
+        public Matrix Copy()
         {
-            // ensure index is valid
-            if (row < 0 || row >= Height || column < 0 || column >= Width)
-            {
-                throw new Exception(ExceptionMessage.InvalidMatrixIndex);
-            }
-
-            return matrix[row][column].Copy();
-        }
-
-        public void SetValue(int row, int column, GeoNumber fill)
-        {
-            // ensure index is valid
-            if (row < 0 || row >= Height || column < 0 || column >= Width)
-            {
-                throw new Exception(ExceptionMessage.InvalidMatrixIndex);
-            }
-
-            // ensure fill value is valid
-            if (fill == null)
-            {
-                throw new Exception(ExceptionMessage.NullGeoNumber);
-            }
-
-            matrix[row][column] = fill.Copy();
-        }
-
-        public GeoMatrix Copy()
-        {
-            // copy each values
-            var result = new GeoMatrix(Width, Height);
+            var result = new Matrix(Width, Height);
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    result.arrays[row][column] = matrix[row][column].Copy();
+                    result.matrix[row][column] = matrix[row][column];
                 }
             }
 
             return result;
         }
 
-        public GeoMatrix Multiply(GeoNumber scalar)
+        public Matrix Transposition()
         {
-            // ensure value is valid
-            if (scalar == null)
-            {
-                throw new Exception(ExceptionMessage.NullGeoNumber);
-            }
-
-            // scalar multiply each x-y value
-            var result = new GeoMatrix(Width, Height);
+            // switch each row and column fields
+            var result = new Matrix(Height, Width);
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    result.arrays[row][column] = matrix[row][column] * scalar;
+                    result.matrix[column][row] = matrix[row][column];
                 }
             }
 
             return result;
         }
 
-        public GeoMatrix Transposition()
+        public Matrix ToUnit()
         {
-            // switch each row and column values
-            var result = new GeoMatrix(Height, Width);
-            for (int row = 0; row < Height; row++)
-            {
-                for (int column = 0; column < Width; column++)
-                {
-                    result.arrays[column][row] = matrix[row][column];
-                }
-            }
-
-            return result;
-        }
-
-        public GeoMatrix ToUnit()
-        {
-            // ensure both left and right are square matrix
-            if (Width != Height)
-            {
-                throw new Exception(ExceptionMessage.NotSquareMatrix);
-            }
+            // matrix must be a square matrix
+            if (Width != Height) { MatrixException.NotSquare(); }
 
             // the item values on diagonal from top left to right bottom are 1, other values are 0, like
             // 1 0 0
             // 0 1 0
             // 0 0 1
-            var result = new GeoMatrix(Width, Height);
-            var one = new GeoNumber("1");
+            var result = new Matrix(Width, Height);
             for (int row = 0; row < Height; row++)
             {
-                result.arrays[row][row] = one.Copy();
+                result.matrix[row][row] = 1;
             }
 
             return result;
         }
 
-        public GeoMatrix Inverse()
+        public Matrix Inverse()
         {
             // matrix1 is the original, while matrix2 is unit matrix
             var matrix1 = Copy();
             var matrix2 = ToUnit();
-            var zero = new GeoNumber("0");
-            var one = new GeoNumber("1");
 
             // elementary row operations to make matrix1 to a top triangle one, like
             // 1 x x
@@ -283,7 +258,7 @@ namespace TerrainMapLibrary.Mathematics
             for (int row = 0; row < Height; row++)
             {
                 var column = row;
-                if (matrix1.arrays[row][column] == zero)
+                if (FieldEqual(matrix1.matrix[row][column], 0))
                 {
                     // a special case that the value of matrix[row][column = row] is 0, but we want to make it to 1,
                     // so search items from matrix[row + 1][column = row] to matrix[height][column = row] to check if
@@ -292,7 +267,7 @@ namespace TerrainMapLibrary.Mathematics
                     for (int otherRow = row + 1; otherRow < Height; otherRow++)
                     {
                         // find the item that the value is not 0, save the row index
-                        if (matrix1.arrays[otherRow][column] != zero)
+                        if (matrix1.matrix[otherRow][column] != 0)
                         {
                             validRow = otherRow;
                             break;
@@ -301,26 +276,23 @@ namespace TerrainMapLibrary.Mathematics
 
                     // does not find the non 0 value, that means this matrix cannot be transformed to a top triangle 
                     // matrix, so it cannot be inversed
-                    if (validRow == -1)
-                    {
-                        throw new Exception(ExceptionMessage.InvalidInverseMatrix);
-                    }
+                    if (validRow == -1) { MatrixException.NotInverse(); }
 
                     // update current row
-                    matrix1.RowAdd(row, validRow, one);
-                    matrix2.RowAdd(row, validRow, one);
+                    matrix1.RowAdd(row, validRow);
+                    matrix2.RowAdd(row, validRow);
                 }
 
                 // make matrix[row][column = row] (the items on diagonal) to 1
-                var value = one / matrix1.arrays[row][row];
-                matrix1.RowMultiply(row, value);
-                matrix2.RowMultiply(row, value);
+                double value = 1d / matrix1.matrix[row][row];
+                matrix1.RowZoom(row, value);
+                matrix2.RowZoom(row, value);
 
                 // make items from matrix[row + 1][column = row] to matrix[height][column = row] to value of 0,
                 // because matrix[row][column = row] is 1 now, so let target item to sub itself
                 for (int otherRow = row + 1; otherRow < Height; otherRow++)
                 {
-                    value = -matrix1.arrays[otherRow][column];
+                    value = 0d - matrix1.matrix[otherRow][column];
                     matrix1.RowAdd(otherRow, row, value);
                     matrix2.RowAdd(otherRow, row, value);
                 }
@@ -336,7 +308,7 @@ namespace TerrainMapLibrary.Mathematics
                 var column = row;
                 for (int otherRow = row - 1; otherRow >= 0; otherRow--)
                 {
-                    var value = -matrix1.arrays[otherRow][column];
+                    var value = 0d - matrix1.matrix[otherRow][column];
                     matrix1.RowAdd(otherRow, row, value);
                     matrix2.RowAdd(otherRow, row, value);
                 }
@@ -349,34 +321,12 @@ namespace TerrainMapLibrary.Mathematics
         }
 
 
-
-
-
-
-
-
-
-
-        public static GeoMatrix operator /(GeoMatrix left, GeoMatrix right)
+        private static bool FieldEqual(double left, double right)
         {
-            // ensure left is square matrix
-            if (left.Width != left.Height)
-            {
-                throw new Exception(ExceptionMessage.NotSquareMatrix);
-            }
-
-            // ensure left height is equal with right width
-            if (left.Height != right.Width)
-            {
-                throw new Exception(ExceptionMessage.NotMultipleMatrixSize);
-            }
-
-            // get the inversed matrix of left, so left/right=inverse(left)*right, because left*inverse(left)=unit
-            var result = left.Inverse() * right;
-            return result;
+            if (left == right) { return true; }
+            else if (Math.Abs(left - right) <= double.Epsilon) { return true; }
+            else { return false; }
         }
-
-
 
 
         private void RowSwitch(int row1, int row2)
@@ -384,13 +334,13 @@ namespace TerrainMapLibrary.Mathematics
             // a row within the matrix can be switched with another row
             for (int column = 0; column < Width; column++)
             {
-                var tempValue = matrix[row1][column].Copy();
+                var tempValue = matrix[row1][column];
                 matrix[row1][column] = matrix[row2][column];
                 matrix[row2][column] = tempValue;
             }
         }
 
-        private void RowMultiply(int row, GeoNumber value)
+        private void RowZoom(int row, double value)
         {
             // each element in a row can be multiplied by a non-zero constant
             for (int column = 0; column < Width; column++)
@@ -399,12 +349,12 @@ namespace TerrainMapLibrary.Mathematics
             }
         }
 
-        private void RowAdd(int row1, int row2, GeoNumber row2Multiply)
+        private void RowAdd(int row1, int row2, double row2Scale = 1)
         {
             // A row can be replaced by the sum of that row and a multiple of another row
             for (int column = 0; column < Width; column++)
             {
-                matrix[row1][column] = matrix[row1][column] + matrix[row2][column] * row2Multiply;
+                matrix[row1][column] = matrix[row1][column] + matrix[row2][column] * row2Scale;
             }
         }
     }

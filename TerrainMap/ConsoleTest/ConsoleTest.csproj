@@ -47,5 +47,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TerrainMapLibrary\TerrainMapLibrary.csproj">
+      <Project>{b393fe35-8a81-49fb-ab16-2d2be38e5312}</Project>
+      <Name>TerrainMapLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
