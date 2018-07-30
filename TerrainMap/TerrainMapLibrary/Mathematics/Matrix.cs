@@ -75,7 +75,7 @@ namespace TerrainMapLibrary.Mathematics
                 {
                     for (int column = 0; column < left.Width; column++)
                     {
-                        if (FieldEqual(left.matrix[row][column], right.matrix[row][column]) == false) { return false; }
+                        if (Common.DoubleEqual(left.matrix[row][column], right.matrix[row][column]) == false) { return false; }
                     }
                 }
 
@@ -258,7 +258,7 @@ namespace TerrainMapLibrary.Mathematics
             for (int row = 0; row < Height; row++)
             {
                 var column = row;
-                if (FieldEqual(matrix1.matrix[row][column], 0))
+                if (Common.DoubleEqual(matrix1.matrix[row][column], 0))
                 {
                     // a special case that the value of matrix[row][column = row] is 0, but we want to make it to 1,
                     // so search items from matrix[row + 1][column = row] to matrix[height][column = row] to check if
@@ -318,14 +318,6 @@ namespace TerrainMapLibrary.Mathematics
             // so matrix2 now is transformed to a new matrix, this new matrix is the inversed matrix with original 
             // matrix1
             return matrix2;
-        }
-
-
-        private static bool FieldEqual(double left, double right)
-        {
-            if (left == right) { return true; }
-            else if (Math.Abs(left - right) <= double.Epsilon) { return true; }
-            else { return false; }
         }
 
 

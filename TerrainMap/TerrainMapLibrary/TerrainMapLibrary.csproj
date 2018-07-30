@@ -40,6 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interpolator\Data\MapPoint.cs" />
+    <Compile Include="Interpolator\Kriging\KrigingException.cs" />
+    <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
+    <Compile Include="Interpolator\Kriging\KrigingSemivarianceMap.cs" />
+    <Compile Include="Mathematics\Common.cs" />
     <Compile Include="Mathematics\Matrix.cs" />
     <Compile Include="Mathematics\MatrixException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
