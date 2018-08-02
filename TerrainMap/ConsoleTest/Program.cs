@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
+using TerrainMapLibrary.Interpolator.Data;
+using TerrainMapLibrary.Interpolator.Kriging;
 using TerrainMapLibrary.Mathematics;
 
 namespace ConsoleTest
@@ -31,13 +34,25 @@ namespace ConsoleTest
 
         public static void Test()
         {
-            var matrix = new Matrix(2, 2);
-            matrix[0, 0] = 0;
-            matrix[0, 1] = 1;
-            matrix[1, 0] = 2;
-            matrix[1, 1] = 3;
+            var filePath = @"..\..\..\SampleData\opendem\rostock\rostock.csv";
+            var indicator = new CSVReader.Indicator(0, 1, 2, CSVReader.Indicator.RowMode.SkipFirstRow, double.NaN);
+            var mapPoints = CSVReader.Read(filePath, indicator).RemoveInvalid(double.NaN);
+            var interpolator = new KrigingInterpolator(mapPoints);
 
-            var c = matrix.Inverse();
+            //long ticks = 0;
+            //long ticksCount = 10000;
+            //string timeSpan = string.Empty;
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
+
+
+            var conuter = new KrigingInterpolator.Counter(500, (obj) => 
+            {
+                Console.Write($"{obj.TimeLeft()}   {obj.Step.ToString("N0")}/{obj.StepLength.ToString("N0")}");
+                Console.SetCursorPosition(0, Console.CursorTop);
+            });
+
+            interpolator.GenerateSemivarianceMap(0, 1000, conuter);
         }
     }
 }

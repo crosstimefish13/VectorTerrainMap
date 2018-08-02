@@ -40,7 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interpolator\Data\MapPoint.cs" />
+    <Compile Include="Interpolator\Data\CSVReader.cs" />
+    <Compile Include="Interpolator\Data\MapPointList.cs" />
     <Compile Include="Interpolator\Kriging\KrigingException.cs" />
     <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
     <Compile Include="Interpolator\Kriging\KrigingSemivarianceMap.cs" />

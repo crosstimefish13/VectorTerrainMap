@@ -1,0 +1,3 @@
+http://www.opendem.info/download_xyz.html
+https://doi.pangaea.de/10.1594/PANGAEA.830567
+http://www.geog.uni-heidelberg.de/3dgeo/webservices_en.html
