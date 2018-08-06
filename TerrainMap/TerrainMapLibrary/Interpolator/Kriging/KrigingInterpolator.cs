@@ -90,7 +90,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
         public class SemivarianceMapFileCache
         {
-            private Dictionary<long, FileStream> cachesStream;
+            private List<FileStream> cachesStream;
 
             private List<byte> memoryRecords;
 
@@ -99,7 +99,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             public long RecordLength { get; private set; }
 
-            public long MaxRecordPerFile { get; private set; }
+            public long MaxFileRecord { get; private set; }
 
             public long MaxMemoryRecord { get; private set; }
 
@@ -108,46 +108,79 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             public void Add(List<byte> record)
             {
+                // validate record and MaxMemoryRecord
                 if (record == null || record.Count != RecordLength) { KrigingException.InvalidRecord("record"); }
+                if (memoryRecords.Count + record.Count > MaxMemoryRecord * RecordLength)
+                { KrigingException.InvalidAdd("record"); }
 
                 // add record into memory
                 memoryRecords.AddRange(record);
+            }
 
-                // get cache stream by using cache number
-                int cacheNumber = GetCacheCount(Count, MaxRecordPerFile) - 1;
-                var cacheStream = cachesStream[cacheNumber];
-                if (cacheStream.Length / RecordLength == MaxRecordPerFile)
+            public void Flush()
+            {
+                // return if does not need to flush
+                if (memoryRecords.Count == 0) { return; }
+
+                int cacheCount = GetCacheCount(Count, MaxFileRecord);
+                if (cacheCount == 0)
                 {
-                    // cache stream length is max length, need to create a new cache file
-                    cachesStream.Add(cacheNumber + 1, new FileStream(GetCachePath(CacheRoot, 0),
-                        FileMode.Open,
+                    // create first cache
+                    cachesStream.Add(new FileStream(GetCachePath(CacheRoot, 0),
+                        FileMode.Create,
                         FileAccess.ReadWrite));
-                    cacheStream = cachesStream.Last().Value;
+                    cacheCount = 1;
                 }
 
-                // write all memory records into cache file if needed
-                if (memoryRecords.Count / RecordLength == MaxMemoryRecord
-                    || (cacheStream.Length + memoryRecords.Count) / RecordLength == MaxRecordPerFile)
+                var cacheStream = cachesStream[cacheCount - 1];
+
+                // the sum of flush count and cache stream length must less or equal than max file length
+                int flushCount = memoryRecords.Count;
+                if (cacheStream.Length + memoryRecords.Count > MaxFileRecord * RecordLength)
+                { flushCount = (int)(MaxFileRecord * RecordLength - cacheStream.Length); }
+
+                // flush by using specified flush count
+                cacheStream.Seek(0, SeekOrigin.End);
+                cacheStream.Write(memoryRecords.ToArray(), 0, flushCount);
+                cacheStream.Flush();
+
+                // update count
+                Count += flushCount / RecordLength;
+
+                // remove the flushed bytes from memory records
+                if (flushCount < memoryRecords.Count) { memoryRecords = memoryRecords.Skip(flushCount).ToList(); }
+                else { memoryRecords.Clear(); }
+
+                if (memoryRecords.Count > 0)
                 {
-                    cacheStream.Write(memoryRecords.ToArray(), 0, memoryRecords.Count);
-                    cacheStream.Flush();
-                    memoryRecords.Clear();
+                    // need to create a new cache, then iterate flush until memory records count is 0
+                    cachesStream.Add(new FileStream(GetCachePath(CacheRoot, cacheCount),
+                        FileMode.Create,
+                        FileAccess.ReadWrite));
+                    Flush();
+                }
+                else
+                {
+                    // end of flush, need to update the record count into title file
+                    var titleStream = new FileStream(GetTitlePath(CacheRoot), FileMode.Open, FileAccess.Write);
+                    titleStream.Seek(24, SeekOrigin.Begin);
+                    var bytes = BitConverter.GetBytes(Count);
+                    titleStream.Write(bytes, 0, bytes.Length);
                 }
             }
 
             public static SemivarianceMapFileCache Generate(string cacheVersion,
                 string cacheDirectory = null,
                 long recordLength = 100,
-                long maxRecordPerFile = 10000000,
+                long maxFileRecord = 10000000,
                 long maxMemoryRercod = 100000)
             {
                 // validate paramaters
                 if (string.IsNullOrEmpty(cacheVersion.Trim()))
                 { KrigingException.InvalidCacheVersion("cacheVersion"); }
                 if (recordLength <= 0) { KrigingException.InvalidRecordLength("recordLength"); }
-                if (maxRecordPerFile <= 0) { KrigingException.InvalidMaxRecordPerFile("maxRecordPerFile"); }
-                if (maxMemoryRercod <= 0 || maxMemoryRercod > maxRecordPerFile)
-                { KrigingException.InvalidMaxMemoryRercod("maxMemoryRercod"); }
+                if (maxFileRecord <= 0) { KrigingException.InvalidMaxFileRecord("maxFileRecord"); }
+                if (maxMemoryRercod <= 0) { KrigingException.InvalidMaxMemoryRercod("maxMemoryRercod"); }
 
                 // delete all files then create cache root directory
                 string cacheRoot = GetCacheRoot(cacheVersion, cacheDirectory);
@@ -158,29 +191,25 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 var titleStream = new FileStream(GetTitlePath(cacheRoot), FileMode.Create, FileAccess.Write);
                 titleStream.Seek(0, SeekOrigin.Begin);
 
-                // 0-8, RecordLength
+                // 0-7, RecordLength
                 var bytes = BitConverter.GetBytes(recordLength);
                 titleStream.Write(bytes, 0, bytes.Length);
 
-                // 9-16, MaxRecordPerFile
-                bytes = BitConverter.GetBytes(maxRecordPerFile);
+                // 8-15, MaxFileRecord
+                bytes = BitConverter.GetBytes(maxFileRecord);
                 titleStream.Write(bytes, 0, bytes.Length);
 
-                // 17-24, AutoFlushRecord
+                // 16-23, MaxMemoryRercod
                 bytes = BitConverter.GetBytes(maxMemoryRercod);
                 titleStream.Write(bytes, 0, bytes.Length);
 
-                // 25-32, Count
+                // 24-31, Count
                 bytes = BitConverter.GetBytes(0L);
                 titleStream.Write(bytes, 0, bytes.Length);
 
                 titleStream.Flush();
                 titleStream.Close();
                 titleStream.Dispose();
-
-                cachesStream.Add(0, new FileStream(GetCachePath(CacheRoot, 0),
-                        FileMode.Open,
-                        FileAccess.ReadWrite));
 
                 // reload cache
                 var cache = Load(cacheVersion, cacheDirectory);
@@ -196,22 +225,22 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 var titleStream = new FileStream(GetTitlePath(cache.CacheRoot), FileMode.Open, FileAccess.Read);
                 titleStream.Seek(0, SeekOrigin.Begin);
 
-                // 0-8, RecordLength
+                // 0-7, RecordLength
                 var bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
                 cache.RecordLength = BitConverter.ToInt64(bytes, 0);
 
-                // 9-16, MaxRecordPerFile
+                // 8-15, MaxFileRecord
                 bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
-                cache.MaxRecordPerFile = BitConverter.ToInt64(bytes, 0);
+                cache.MaxFileRecord = BitConverter.ToInt64(bytes, 0);
 
-                // 17-24, AutoFlushRecord
+                // 16-23, MaxMemoryRercod
                 bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
                 cache.MaxMemoryRecord = BitConverter.ToInt64(bytes, 0);
 
-                // 25-32, Count
+                // 24-31, Count
                 bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
                 cache.Count = BitConverter.ToInt64(bytes, 0);
@@ -220,14 +249,13 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 titleStream.Dispose();
 
                 // load all data files
-                int cacheCount = GetCacheCount(cache.Count, cache.MaxRecordPerFile);
+                int cacheCount = GetCacheCount(cache.Count, cache.MaxFileRecord);
                 for (int cacheNumber = 0; cacheNumber < cacheCount; cacheNumber++)
                 {
                     var cacheStream = new FileStream(GetCachePath(cache.CacheRoot, cacheNumber),
                         FileMode.Open,
                         FileAccess.ReadWrite);
-
-                    cache.cachesStream.Add(cacheNumber, cacheStream);
+                    cache.cachesStream.Add(cacheStream);
                 }
 
                 return cache;
@@ -236,11 +264,11 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             private SemivarianceMapFileCache()
             {
-                cachesStream = new Dictionary<long, FileStream>();
-                memoryRecords = new List<string>();
+                cachesStream = new List<FileStream>();
+                memoryRecords = new List<byte>();
                 CacheRoot = string.Empty;
                 RecordLength = 0;
-                MaxRecordPerFile = 0;
+                MaxFileRecord = 0;
                 MaxMemoryRecord = 0;
                 Count = 0;
             }
@@ -271,146 +299,12 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 return filePath;
             }
 
-            private static int GetCacheCount(long recordCount, long maxRecordPerFile)
+            private static int GetCacheCount(long recordCount, long maxFileRecord)
             {
-                int cacheCount = (int)(recordCount / maxRecordPerFile);
-                if (cacheCount * maxRecordPerFile < recordCount) { cacheCount += 1; }
+                int cacheCount = (int)(recordCount / maxFileRecord);
+                if (cacheCount * maxFileRecord < recordCount) { cacheCount += 1; }
 
                 return cacheCount;
-            }
-
-            private static long GetCacheRecordCount(long recordLength, long cacheLength)
-            {
-                long count = cacheLength / recordLength;
-                return count;
-            }
-
-
-            public bool AddRecord(string record)
-            {
-                if (cachesStream != null && cachesStream.Length >= MaxRecordPerFile)
-                {
-                    AddGlobalIndex(Count - 1, Convert.ToInt64(Path.GetFileName(cachesStream.Name)));
-
-                    try
-                    {
-                        cachesStream.Flush();
-                        cachesStream.Close();
-                        indexesStream.Flush();
-                        indexesStream.Close();
-                    }
-                    catch (Exception inner) { throw inner; }
-                    finally
-                    {
-                        if (cachesStream != null) { cachesStream.Dispose(); }
-                        if (indexesStream != null) { indexesStream.Dispose(); }
-
-                        cachesStream = null;
-                        indexesStream = null;
-                    }
-                }
-
-                if (cachesStream == null)
-                {
-                    long fileNumber = 0;
-                    if (globalIndexes.Count > 0) { fileNumber = globalIndexes.Last().Value + 1; }
-
-                    string cacheFilePath = Path.Combine(CacheRoot, CacheVersion, $"{fileNumber}");
-                    string cacheFileIndexPath = Path.Combine(CacheRoot, CacheVersion, $"{indexName}{fileNumber}");
-
-                    try
-                    {
-                        cachesStream = new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write);
-                        indexesStream = new FileStream(cacheFileIndexPath, FileMode.Create, FileAccess.Write);
-                    }
-                    catch (Exception inner) { throw inner; }
-                    finally
-                    {
-                        if (cachesStream != null) { cachesStream.Dispose(); }
-                        if (indexesStream != null) { indexesStream.Dispose(); }
-
-                        cachesStream = null;
-                        indexesStream = null;
-                    }
-                }
-
-                if (cachesStream == null) { return false; }
-            }
-
-
-            //private SemivarianceMapFileCache(string version, string cacheDirectory)
-            //{
-            //    indexName = "index";
-            //    globalIndexes = new Dictionary<long, long>();
-            //    contentsStream = new Dictionary<long, FileStream>();
-            //    indexesStream = new Dictionary<long, FileStream>();
-            //    MaxRecordPerFile = 0;
-            //    AutoFlushRecord = true;
-            //    CacheRoot = cacheDirectory;
-            //    if (CacheRoot == null)
-            //    {
-            //        var assemblyLocation = Assembly.GetExecutingAssembly().Location;
-            //        CacheRoot = Path.Combine(Path.GetDirectoryName(assemblyLocation),
-            //            Path.GetFileNameWithoutExtension(assemblyLocation));
-            //    }
-
-            //    CacheVersion = version;
-            //    RecordCount = 0;
-            //}
-
-            private void LoadIntoMemory()
-            {
-                var topIndexPath = Path.Combine(CacheRoot, CacheVersion, indexName);
-                topIndexStream = new FileStream(topIndexPath, FileMode.Open, FileAccess.ReadWrite);
-                topIndexStream.Seek(0, SeekOrigin.Begin);
-
-                var bytes = new byte[8];
-                topIndexStream.Read(bytes, 0, 8);
-                MaxRecordPerFile = BitConverter.ToInt64(bytes, 0);
-
-                bytes = new byte[8];
-                topIndexStream.Read(bytes, 0, 8);
-                MaxMemoryRecord = BitConverter.ToInt64(bytes, 0) == 1L ? true : false;
-
-                bytes = new byte[8];
-                topIndexStream.Read(bytes, 0, 8);
-                Count = BitConverter.ToInt64(bytes, 0);
-
-                while (topIndexStream.Position < topIndexStream.Length)
-                {
-                    topIndexStream.Seek(8, SeekOrigin.Current);
-                    bytes = new byte[8];
-                    topIndexStream.Read(bytes, 0, 8);
-                    long fileNumber = BitConverter.ToInt64(bytes, 0);
-
-                    string contentPath = Path.Combine(CacheRoot, CacheVersion, $"{fileNumber}");
-                    string indexPath = Path.Combine(CacheRoot, CacheVersion, $"{indexName}{fileNumber}");
-
-                    var contentStream = new FileStream(contentPath, FileMode.Open, FileAccess.ReadWrite);
-                    var indexStream = new FileStream(indexPath, FileMode.Open, FileAccess.ReadWrite);
-
-                    cachesStream.Add(fileNumber, contentStream);
-                    indexesStream.Add(fileNumber, indexStream);
-                }
-            }
-
-            private void AddGlobalIndex(long endIndex, long fileNumber)
-            {
-                var indexFilePath = Path.Combine(CacheRoot, CacheVersion, indexName);
-                FileStream stream = new FileStream(indexFilePath, FileMode.Create, FileAccess.Write);
-                stream.Seek(0, SeekOrigin.End);
-
-                var bytes = BitConverter.GetBytes(endIndex);
-                stream.Write(bytes, 0, bytes.Length);
-
-                bytes = BitConverter.GetBytes(fileNumber);
-                stream.Write(bytes, 0, bytes.Length);
-
-                stream.Flush();
-                stream.Close();
-                stream.Dispose();
-
-                globalIndexes.Add(endIndex, fileNumber);
             }
         }
 

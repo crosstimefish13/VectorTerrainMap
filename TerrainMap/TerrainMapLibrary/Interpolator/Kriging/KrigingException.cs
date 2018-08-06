@@ -43,21 +43,27 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return ThrowException(message, paramName);
         }
 
-        internal static KrigingException InvalidMaxRecordPerFile(string paramName = null)
+        internal static KrigingException InvalidMaxFileRecord(string paramName = null)
         {
-            string message = "max record per file must be more than 0.";
+            string message = "max file record must be more than 0.";
             return ThrowException(message, paramName);
         }
 
         internal static KrigingException InvalidMaxMemoryRercod(string paramName = null)
         {
-            string message = "max memory record must be more than 0 and less than or equal with max record per file.";
+            string message = "max memory record must be more than 0 and less than or equal with max file record.";
             return ThrowException(message, paramName);
         }
 
         internal static KrigingException InvalidRecord(string paramName = null)
         {
             string message = "record length must be same with spcified record length.";
+            return ThrowException(message, paramName);
+        }
+
+        internal static KrigingException InvalidAdd(string paramName = null)
+        {
+            string message = "memory records are max, please flush memory records before adding new record.";
             return ThrowException(message, paramName);
         }
 
