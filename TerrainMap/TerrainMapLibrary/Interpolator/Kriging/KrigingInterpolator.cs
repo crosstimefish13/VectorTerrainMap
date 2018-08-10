@@ -13,78 +13,54 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 {
     public class KrigingInterpolator
     {
-
-
-
         public MapPointList Data { get; private set; }
 
 
-
-
-        public KrigingInterpolator(MapPointList data, string cacheDirectory = null)
+        public KrigingInterpolator(MapPointList data)
         {
-            Data = data;
-            if (Data == null) { Data = new MapPointList(); }
+            if (data == null || data.Count < 2) { KrigingException.InvalidData("data"); }
 
-            CacheDirectory = cacheDirectory;
-            if (CacheDirectory == null)
-            {
-                CacheDirectory = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
-            }
+            Data = data;
         }
 
 
-
-
-        public KrigingSemivarianceMap GenerateSemivarianceMap(double lagBins = 0,
-            int flushRecordCount = 1000,
-            Counter counter = null)
+        public void GenerateSemivarianceMapIndex(Counter counter = null)
         {
-            if (Data.Count < 2) { KrigingException.InvalidData("Data"); }
-            if (lagBins < 0) { KrigingException.InvalidLagBins("lagBins"); }
+            var cache = SemivarianceMapFileCache.Generate("0", null, 64, 33554432, false);
 
-            var map = new KrigingSemivarianceMap();
+            int flushStep = 0;
+            if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count); }
 
-            FileStream stream = null;
-            StreamWriter writer = null;
-
-            try
+            for (int i = 0; i < Data.Count; i++)
             {
-                var filePath = GetCacheFilePath(lagBins);
-                stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-                writer = new StreamWriter(stream);
-                int flushStep = 0;
-
-                if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count); }
-
-                for (int i = 0; i < Data.Count; i++)
+                var left = Data[i];
+                for (int j = i + 1; j < Data.Count; j++)
                 {
-                    for (int j = i + 1; j < Data.Count; j++)
-                    {
-                        double vectorX = Common.EuclidDistance(Data[i].X, Data[i].Y, Data[j].X, Data[j].Y);
-                        double vectorY = Common.Semivariance(Data[i].Z, Data[j].Z);
-                        writer.WriteLine($"{vectorX},{vectorY},{Data[i].X},{Data[i].Y},{Data[i].Z},{Data[j].X},{Data[j].Y},{Data[j].Z}");
+                    var right = Data[j];
+                    double vectorX = Common.EuclidDistance(Data[i].X, Data[i].Y, Data[j].X, Data[j].Y);
+                    double vectorY = Common.Semivariance(Data[i].Z, Data[j].Z);
 
-                        flushStep = flushStep >= flushRecordCount ? 0 : flushStep + 1;
-                        if (flushStep == 0) { writer.Flush(); }
+                    var bytes = new List<byte>();
+                    bytes.AddRange(BitConverter.GetBytes(vectorX));
+                    bytes.AddRange(BitConverter.GetBytes(vectorY));
+                    bytes.AddRange(BitConverter.GetBytes(left.X));
+                    bytes.AddRange(BitConverter.GetBytes(left.Y));
+                    bytes.AddRange(BitConverter.GetBytes(left.Z));
+                    bytes.AddRange(BitConverter.GetBytes(right.X));
+                    bytes.AddRange(BitConverter.GetBytes(right.Y));
+                    bytes.AddRange(BitConverter.GetBytes(right.Z));
+                    cache.Add(bytes);
 
-                        if (counter != null) { counter.AddStep(); }
-                    }
+                    flushStep = flushStep >= 1638400 ? 0 : flushStep + 1;
+                    if (flushStep == 0) { cache.Flush(); }
+
+                    if (counter != null) { counter.AddStep(); }
                 }
-
-                if (counter != null) { counter.Reset(); }
-
-                writer.Flush();
-                writer.Close();
-            }
-            catch (Exception inner) { throw inner; }
-            finally
-            {
-                if (writer != null) { writer.Dispose(); }
-                if (stream != null) { stream.Dispose(); }
             }
 
-            return map;
+            if (counter != null) { counter.Reset(); }
+
+            cache.Close();
         }
 
 
@@ -97,24 +73,30 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             public string CacheRoot { get; private set; }
 
-            public long RecordLength { get; private set; }
+            public int RecordLength { get; private set; }
 
-            public long MaxFileRecord { get; private set; }
+            public int MaxFileRecord { get; private set; }
 
-            public long MaxMemoryRecord { get; private set; }
+            public bool AutoFlush { get; private set; }
 
             public long Count { get; private set; }
+
+            public List<byte> this[long index]
+            {
+                get { return GetRecord(index); }
+            }
 
 
             public void Add(List<byte> record)
             {
                 // validate record and MaxMemoryRecord
                 if (record == null || record.Count != RecordLength) { KrigingException.InvalidRecord("record"); }
-                if (memoryRecords.Count + record.Count > MaxMemoryRecord * RecordLength)
-                { KrigingException.InvalidAdd("record"); }
 
                 // add record into memory
                 memoryRecords.AddRange(record);
+
+                // auto flush if needed
+                if (AutoFlush == true) { Flush(); }
             }
 
             public void Flush()
@@ -122,22 +104,20 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 // return if does not need to flush
                 if (memoryRecords.Count == 0) { return; }
 
-                int cacheCount = GetCacheCount(Count, MaxFileRecord);
-                if (cacheCount == 0)
+                if (cachesStream.Count == 0)
                 {
                     // create first cache
                     cachesStream.Add(new FileStream(GetCachePath(CacheRoot, 0),
                         FileMode.Create,
                         FileAccess.ReadWrite));
-                    cacheCount = 1;
                 }
 
-                var cacheStream = cachesStream[cacheCount - 1];
+                var cacheStream = cachesStream.Last();
 
                 // the sum of flush count and cache stream length must less or equal than max file length
                 int flushCount = memoryRecords.Count;
-                if (cacheStream.Length + memoryRecords.Count > MaxFileRecord * RecordLength)
-                { flushCount = (int)(MaxFileRecord * RecordLength - cacheStream.Length); }
+                if (cacheStream.Length + memoryRecords.Count > (long)MaxFileRecord * RecordLength)
+                { flushCount = (int)((long)MaxFileRecord * RecordLength - cacheStream.Length); }
 
                 // flush by using specified flush count
                 cacheStream.Seek(0, SeekOrigin.End);
@@ -154,7 +134,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 if (memoryRecords.Count > 0)
                 {
                     // need to create a new cache, then iterate flush until memory records count is 0
-                    cachesStream.Add(new FileStream(GetCachePath(CacheRoot, cacheCount),
+                    cachesStream.Add(new FileStream(GetCachePath(CacheRoot, cachesStream.Count),
                         FileMode.Create,
                         FileAccess.ReadWrite));
                     Flush();
@@ -166,21 +146,31 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     titleStream.Seek(24, SeekOrigin.Begin);
                     var bytes = BitConverter.GetBytes(Count);
                     titleStream.Write(bytes, 0, bytes.Length);
+                    titleStream.Close();
+                    titleStream.Dispose();
+                }
+            }
+
+            public void Close()
+            {
+                foreach (var cacheStream in cachesStream)
+                {
+                    cacheStream.Close();
+                    cacheStream.Dispose();
                 }
             }
 
             public static SemivarianceMapFileCache Generate(string cacheVersion,
                 string cacheDirectory = null,
-                long recordLength = 100,
-                long maxFileRecord = 10000000,
-                long maxMemoryRercod = 100000)
+                int recordLength = 100,
+                int maxFileRecord = 10000000,
+                bool autoFlush = false)
             {
                 // validate paramaters
                 if (string.IsNullOrEmpty(cacheVersion.Trim()))
                 { KrigingException.InvalidCacheVersion("cacheVersion"); }
                 if (recordLength <= 0) { KrigingException.InvalidRecordLength("recordLength"); }
                 if (maxFileRecord <= 0) { KrigingException.InvalidMaxFileRecord("maxFileRecord"); }
-                if (maxMemoryRercod <= 0) { KrigingException.InvalidMaxMemoryRercod("maxMemoryRercod"); }
 
                 // delete all files then create cache root directory
                 string cacheRoot = GetCacheRoot(cacheVersion, cacheDirectory);
@@ -192,15 +182,15 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 titleStream.Seek(0, SeekOrigin.Begin);
 
                 // 0-7, RecordLength
-                var bytes = BitConverter.GetBytes(recordLength);
+                var bytes = BitConverter.GetBytes((long)recordLength);
                 titleStream.Write(bytes, 0, bytes.Length);
 
                 // 8-15, MaxFileRecord
-                bytes = BitConverter.GetBytes(maxFileRecord);
+                bytes = BitConverter.GetBytes((long)maxFileRecord);
                 titleStream.Write(bytes, 0, bytes.Length);
 
-                // 16-23, MaxMemoryRercod
-                bytes = BitConverter.GetBytes(maxMemoryRercod);
+                // 16-23, AutoFlush
+                bytes = BitConverter.GetBytes(autoFlush == true ? 1L : 0L);
                 titleStream.Write(bytes, 0, bytes.Length);
 
                 // 24-31, Count
@@ -228,17 +218,17 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 // 0-7, RecordLength
                 var bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
-                cache.RecordLength = BitConverter.ToInt64(bytes, 0);
+                cache.RecordLength = (int)BitConverter.ToInt64(bytes, 0);
 
                 // 8-15, MaxFileRecord
                 bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
-                cache.MaxFileRecord = BitConverter.ToInt64(bytes, 0);
+                cache.MaxFileRecord = (int)BitConverter.ToInt64(bytes, 0);
 
-                // 16-23, MaxMemoryRercod
+                // 16-23, AutoFlush
                 bytes = new byte[8];
                 titleStream.Read(bytes, 0, 8);
-                cache.MaxMemoryRecord = BitConverter.ToInt64(bytes, 0);
+                cache.AutoFlush = BitConverter.ToInt64(bytes, 0) == 1 ? true : false;
 
                 // 24-31, Count
                 bytes = new byte[8];
@@ -249,7 +239,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 titleStream.Dispose();
 
                 // load all data files
-                int cacheCount = GetCacheCount(cache.Count, cache.MaxFileRecord);
+                int cacheCount = (int)(cache.Count / cache.MaxFileRecord);
+                if ((long)cacheCount * cache.MaxFileRecord < cache.Count) { cacheCount += 1; }
                 for (int cacheNumber = 0; cacheNumber < cacheCount; cacheNumber++)
                 {
                     var cacheStream = new FileStream(GetCachePath(cache.CacheRoot, cacheNumber),
@@ -269,8 +260,26 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 CacheRoot = string.Empty;
                 RecordLength = 0;
                 MaxFileRecord = 0;
-                MaxMemoryRecord = 0;
+                AutoFlush = false;
                 Count = 0;
+            }
+
+            private List<byte> GetRecord(long index)
+            {
+                // validate index
+                if (index < 0 || index >= Count) { KrigingException.InvalidIndex("index"); }
+
+                // cache offset and stream
+                int cacheNumber = (int)(index / MaxFileRecord);
+                long cacheOffset = (index - (long)cacheNumber * MaxFileRecord) * RecordLength;
+                var cacheStream = cachesStream[cacheNumber];
+
+                // read data
+                cacheStream.Seek(cacheOffset, SeekOrigin.Begin);
+                var bytes = new byte[RecordLength];
+                cacheStream.Read(bytes, 0, RecordLength);
+
+                return bytes.ToList();
             }
 
             private static string GetCacheRoot(string cacheVersion, string cacheDirectory)
@@ -293,18 +302,10 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 return filePath;
             }
 
-            private static string GetCachePath(string cacheRoot, long cacheNumber)
+            private static string GetCachePath(string cacheRoot, int cacheNumber)
             {
                 string filePath = Path.Combine(cacheRoot, $"{cacheNumber.ToString().PadLeft(8, '0')}.data");
                 return filePath;
-            }
-
-            private static int GetCacheCount(long recordCount, long maxFileRecord)
-            {
-                int cacheCount = (int)(recordCount / maxFileRecord);
-                if (cacheCount * maxFileRecord < recordCount) { cacheCount += 1; }
-
-                return cacheCount;
             }
         }
 

@@ -52,7 +52,7 @@ namespace ConsoleTest
                 Console.SetCursorPosition(0, Console.CursorTop);
             });
 
-            interpolator.GenerateSemivarianceMap(0, 1000, conuter);
+            interpolator.GenerateSemivarianceMapIndex(conuter);
         }
     }
 }

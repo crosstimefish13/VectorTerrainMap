@@ -49,11 +49,11 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return ThrowException(message, paramName);
         }
 
-        internal static KrigingException InvalidMaxMemoryRercod(string paramName = null)
-        {
-            string message = "max memory record must be more than 0 and less than or equal with max file record.";
-            return ThrowException(message, paramName);
-        }
+        //internal static KrigingException InvalidMaxMemoryRercod(string paramName = null)
+        //{
+        //    string message = "max memory record must be more than 0 and less than or equal with max file record.";
+        //    return ThrowException(message, paramName);
+        //}
 
         internal static KrigingException InvalidRecord(string paramName = null)
         {
@@ -61,9 +61,9 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return ThrowException(message, paramName);
         }
 
-        internal static KrigingException InvalidAdd(string paramName = null)
+        internal static KrigingException InvalidIndex(string paramName = null)
         {
-            string message = "memory records are max, please flush memory records before adding new record.";
+            string message = "index must be equal with 0 or more and less than Count.";
             return ThrowException(message, paramName);
         }
 
