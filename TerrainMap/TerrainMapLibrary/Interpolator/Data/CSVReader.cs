@@ -12,58 +12,43 @@ namespace TerrainMapLibrary.Interpolator.Data
             var mapPoints = new MapPointList();
             if (indicator == null) { indicator = new Indicator(); }
 
-            FileStream stream = null;
-            StreamReader reader = null;
+            // read to end, read each fields, these fields are splited with comma
+            var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read));
 
-            try
+            int rowCount = -1;
+            while (reader.EndOfStream == false)
             {
-                // read to end, read each fields, these fields are splited with comma
-                stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                reader = new StreamReader(stream);
+                rowCount += 1;
+                string line = reader.ReadLine();
 
-                int rowCount = -1;
-                while (reader.EndOfStream == false)
-                {
-                    rowCount += 1;
-                    string line = reader.ReadLine();
+                // continue if it is invalid row index
+                if (indicator.ExcludeRows.Contains(rowCount) == true) { continue; }
 
-                    // continue if need to skipt first row
-                    if (indicator.RowReadMode == Indicator.RowMode.SkipFirstRow && rowCount == 0) { continue; }
+                // default values
+                var mapPoint = new MapPointList.MapPoint(indicator.InvalidField,
+                    indicator.InvalidField,
+                    indicator.InvalidField);
 
-                    // continue if it is invalid row index
-                    if (indicator.RowReadMode == Indicator.RowMode.UseRowsIndex
-                            && indicator.RowsIndex.Contains(rowCount) == false)
-                    { continue; }
+                // read each xyz
+                var fields = line.Split(',').ToList();
 
-                    // default values
-                    var mapPoint = new MapPointList.MapPoint(indicator.InvalidField,
-                        indicator.InvalidField,
-                        indicator.InvalidField);
+                if (indicator.XColumn < fields.Count
+                    && double.TryParse(fields[indicator.XColumn].Trim(), out double x))
+                { mapPoint.X = x; }
 
-                    // read each xyz
-                    var fields = line.Split(',').ToList();
+                if (indicator.YColumn < fields.Count
+                    && double.TryParse(fields[indicator.YColumn].Trim(), out double y))
+                { mapPoint.Y = y; }
 
-                    if (indicator.XColumnIndex < fields.Count
-                        && double.TryParse(fields[indicator.XColumnIndex].Trim(), out double x))
-                    { mapPoint.X = x; }
+                if (indicator.ZColumn < fields.Count
+                    && double.TryParse(fields[indicator.ZColumn].Trim(), out double z))
+                { mapPoint.Z = z; }
 
-                    if (indicator.YColumnIndex < fields.Count
-                        && double.TryParse(fields[indicator.YColumnIndex].Trim(), out double y))
-                    { mapPoint.Y = y; }
-
-                    if (indicator.ZColumnIndex < fields.Count
-                        && double.TryParse(fields[indicator.ZColumnIndex].Trim(), out double z))
-                    { mapPoint.Z = z; }
-
-                    mapPoints.Add(mapPoint);
-                }
+                mapPoints.Add(mapPoint);
             }
-            catch (Exception inner) { throw inner; }
-            finally
-            {
-                if (reader != null) { reader.Dispose(); }
-                if (stream != null) { stream.Dispose(); }
-            }
+
+            reader.Close();
+            reader.Dispose();
 
             return mapPoints;
         }
@@ -71,39 +56,133 @@ namespace TerrainMapLibrary.Interpolator.Data
 
         public class Indicator
         {
-            public int XColumnIndex { get; set; }
+            private int xColumnl;
 
-            public int YColumnIndex { get; set; }
+            private int yColumnl;
 
-            public int ZColumnIndex { get; set; }
+            private int zColumnl;
 
-            public RowMode RowReadMode { get; set; }
 
-            public List<int> RowsIndex { get; private set; }
+            public int XColumn
+            {
+                get { return xColumnl; }
+                set
+                {
+                    if (value < 0)
+                    { throw new Exception("value must be more than or equal with 0."); }
+
+                    xColumnl = value;
+                }
+            }
+
+            public int YColumn
+            {
+                get { return yColumnl; }
+                set
+                {
+                    if (value < 0)
+                    { throw new Exception("value must be more than or equal with 0."); }
+
+                    yColumnl = value;
+                }
+            }
+
+            public int ZColumn
+            {
+                get { return zColumnl; }
+                set
+                {
+                    if (value < 0)
+                    { throw new Exception("value must be more than or equal with 0."); }
+
+                    zColumnl = value;
+                }
+            }
+
+            public IndexList ExcludeRows { get; private set; }
 
             public double InvalidField { get; set; }
 
 
-            public Indicator(int xColumnIndex = 0,
-                int yColumnIndex = 1,
-                int zColumnIndex = 2,
-                RowMode rowReadMode = RowMode.FromStartToEnd,
-                double invalidField = double.NaN)
+            public Indicator()
             {
-                XColumnIndex = xColumnIndex;
-                YColumnIndex = yColumnIndex;
-                ZColumnIndex = zColumnIndex;
-                RowReadMode = rowReadMode;
-                RowsIndex = new List<int>();
-                InvalidField = invalidField;
+                xColumnl = 0;
+                yColumnl = 1;
+                zColumnl = 2;
+                ExcludeRows = new IndexList();
+                InvalidField = double.NaN;
             }
 
 
-            public enum RowMode
+            public override bool Equals(object obj)
             {
-                FromStartToEnd = 0,
-                SkipFirstRow = 1,
-                UseRowsIndex = 2
+                throw new NotSupportedException();
+            }
+
+            public override int GetHashCode()
+            {
+                return XColumn.GetHashCode() + YColumn.GetHashCode() + ZColumn.GetHashCode()
+                     + ExcludeRows.GetHashCode() + InvalidField.GetHashCode();
+            }
+
+            public override string ToString()
+            {
+                return $"XColumn: {XColumn}, XColumn: {YColumn}, XColumn: {ZColumn}, ExcludeRows: {ExcludeRows.ToString()}, InvalidField: {InvalidField}";
+            }
+
+
+            public class IndexList
+            {
+                private List<int> indexes;
+
+
+                public int this[int index]
+                {
+                    get { return indexes[index]; }
+                    set
+                    {
+                        if (value < 0)
+                        { throw new Exception("index value must be more than or equal with 0."); }
+
+                        indexes[index] = value;
+                    }
+                }
+
+
+                public IndexList()
+                {
+                    indexes = new List<int>();
+                }
+
+
+                public override bool Equals(object obj)
+                {
+                    throw new NotSupportedException();
+                }
+
+                public override int GetHashCode()
+                {
+                    return indexes.GetHashCode();
+                }
+
+                public override string ToString()
+                {
+                    return $"Count: {indexes.Count}";
+                }
+
+
+                public void Add(int item)
+                {
+                    if (item < 0)
+                    { throw new Exception("index value must be more than or equal with 0."); }
+
+                    indexes.Add(item);
+                }
+
+                public bool Contains(int item)
+                {
+                    return indexes.Contains(item);
+                }
             }
         }
     }

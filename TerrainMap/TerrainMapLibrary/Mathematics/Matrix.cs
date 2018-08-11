@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TerrainMapLibrary.Mathematics
@@ -26,26 +27,15 @@ namespace TerrainMapLibrary.Mathematics
 
         public double this[int row, int column]
         {
-            get
-            {
-                if (row < 0 || row >= Height || column < 0 || column >= Width)
-                { MatrixException.InvalidIndex("row or column"); }
-
-                return matrix[row][column];
-            }
-            set
-            {
-                if (row < 0 || row >= Height || column < 0 || column >= Width)
-                { MatrixException.InvalidIndex("row or column"); }
-
-                matrix[row][column] = value;
-            }
+            get { return matrix[row][column]; }
+            set { matrix[row][column] = value; }
         }
 
 
         public Matrix(int width = 1, int height = 1, double fill = 0)
         {
-            if (width <= 0 || height <= 0) { MatrixException.InvalidSize("width or left"); }
+            if (width <= 0 || height <= 0)
+            { throw new Exception("matrix width and height must be more than or equal with 1."); }
 
             // initialize matrix
             matrix = new List<List<double>>();
@@ -74,7 +64,8 @@ namespace TerrainMapLibrary.Mathematics
                 {
                     for (int column = 0; column < left.Width; column++)
                     {
-                        if (Common.DoubleEqual(left.matrix[row][column], right.matrix[row][column]) == false) { return false; }
+                        if (Common.DoubleEqual(left.matrix[row][column], right.matrix[row][column]) == false)
+                        { return false; }
                     }
                 }
 
@@ -89,8 +80,6 @@ namespace TerrainMapLibrary.Mathematics
 
         public static Matrix operator *(Matrix left, double right)
         {
-            if (left == null) { MatrixException.NullObject("left matrix"); }
-
             // each fields of left matrix multiple right
             var result = new Matrix(left.Width, left.Height);
             for (int row = 0; row < left.Height; row++)
@@ -106,12 +95,8 @@ namespace TerrainMapLibrary.Mathematics
 
         public static Matrix operator +(Matrix left, Matrix right)
         {
-            if (left == null) { MatrixException.NullObject("left matrix"); }
-            if (right == null) { MatrixException.NullObject("right matrix"); }
-
-            // matrix size must be same with each other
             if (left.Width != right.Width || left.Height != right.Height)
-            { MatrixException.NotSameSize("left and right matrix"); }
+            { throw new Exception("the size of left matrix must be same with right."); }
 
             // add each fields one by one
             var result = new Matrix(left.Width, left.Height);
@@ -128,20 +113,15 @@ namespace TerrainMapLibrary.Mathematics
 
         public static Matrix operator -(Matrix left, Matrix right)
         {
-            if (left == null) { MatrixException.NullObject("left matrix"); }
-            if (right == null) { MatrixException.NullObject("right matrix"); }
-
             var result = left + right * (-1);
             return result;
         }
 
         public static Matrix operator *(Matrix left, Matrix right)
         {
-            if (left == null) { MatrixException.NullObject("left matrix"); }
-            if (right == null) { MatrixException.NullObject("right matrix"); }
-
             // left matrix height must be equal with right matrix width
-            if (left.Height != right.Width) { MatrixException.InvalidMultiple("left and right matrix"); }
+            if (left.Height != right.Width)
+            { throw new Exception("the height of left matrix must be equal with width of right."); }
 
             // if C = A * B, then C(ij) is row (i) of A multiply and add column (j) of B
             var result = new Matrix(right.Width, left.Height);
@@ -163,15 +143,6 @@ namespace TerrainMapLibrary.Mathematics
 
         public static Matrix operator /(Matrix left, Matrix right)
         {
-            if (left == null) { MatrixException.NullObject("left matrix"); }
-            if (right == null) { MatrixException.NullObject("right matrix"); }
-
-            // left matrix must be a square matrix
-            if (left.Width != left.Height) { MatrixException.NotSquare("left matrix"); }
-
-            // left matrix height must be equal with right matrix width
-            if (left.Height != right.Width) { MatrixException.InvalidMultiple("left and right matrix"); }
-
             // get the inversed matrix of left, so left/right=inverse(left)*right, because left*inverse(left)=unit(left)
             var result = left.Inverse() * right;
             return result;
@@ -228,7 +199,8 @@ namespace TerrainMapLibrary.Mathematics
         public Matrix ToUnit()
         {
             // matrix must be a square matrix
-            if (Width != Height) { MatrixException.NotSquare(); }
+            if (Width != Height)
+            { throw new Exception("the width of matrix must be equal with height."); }
 
             // the item values on diagonal from top left to right bottom are 1, other values are 0, like
             // 1 0 0
@@ -275,7 +247,8 @@ namespace TerrainMapLibrary.Mathematics
 
                     // does not find the non 0 value, that means this matrix cannot be transformed to a top triangle 
                     // matrix, so it cannot be inversed
-                    if (validRow == -1) { MatrixException.NotInverse(); }
+                    if (validRow == -1)
+                    { throw new Exception("matrix cannot be inversed."); }
 
                     // update current row
                     matrix1.RowAdd(row, validRow);

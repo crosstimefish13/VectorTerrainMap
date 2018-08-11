@@ -42,13 +42,13 @@
   <ItemGroup>
     <Compile Include="Interpolator\Data\CSVReader.cs" />
     <Compile Include="Interpolator\Data\MapPointList.cs" />
-    <Compile Include="Interpolator\Kriging\KrigingException.cs" />
     <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
     <Compile Include="Interpolator\Kriging\KrigingSemivarianceMap.cs" />
     <Compile Include="Mathematics\Common.cs" />
     <Compile Include="Mathematics\Matrix.cs" />
-    <Compile Include="Mathematics\MatrixException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\FixedItemFileCache.cs" />
+    <Compile Include="Utils\StepCounter.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

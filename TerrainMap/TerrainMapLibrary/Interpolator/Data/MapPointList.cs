@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TerrainMapLibrary.Mathematics;
 
 namespace TerrainMapLibrary.Interpolator.Data
@@ -11,6 +12,7 @@ namespace TerrainMapLibrary.Interpolator.Data
         public MapPoint this[int index]
         {
             get { return mapPoints[index]; }
+            set { mapPoints[index] = value ?? throw new ArgumentNullException(); }
         }
 
         public int Count
@@ -27,18 +29,18 @@ namespace TerrainMapLibrary.Interpolator.Data
 
         public void Add(MapPoint mapPoint)
         {
+            if (mapPoint == null)
+            { throw new ArgumentNullException(); }
+
             mapPoints.Add(mapPoint);
         }
 
-        public MapPointList RemoveInvalid(double invalidField)
+        public MapPointList RemoveAll(MapPoint item)
         {
             var result = new MapPointList();
             foreach (var mapPoint in mapPoints)
             {
-                if (Common.DoubleEqual(mapPoint.X, invalidField) == false
-                    && Common.DoubleEqual(mapPoint.Y, invalidField) == false
-                    && Common.DoubleEqual(mapPoint.Z, invalidField) == false)
-                { result.mapPoints.Add(mapPoint); }
+                if (mapPoint != item) { result.Add(mapPoint); }
             }
 
             return result;
