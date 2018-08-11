@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerrainMapLibrary.Mathematics.Sequencer;
 
 namespace TerrainMapLibrary.Utils
 {
-    public sealed class FixedItemFileCache
+    public sealed class FixedItemFileCache : ISequence<List<byte>>
     {
         private List<FileStream> streams;
 
@@ -307,6 +308,32 @@ namespace TerrainMapLibrary.Utils
         {
             string filePath = Path.Combine(root, $"{bodyNumber.ToString().PadLeft(8, '0')}.data");
             return filePath;
+        }
+
+
+        List<byte> ISequence<List<byte>>.GetItem(long index)
+        {
+            return GetItem(index);
+        }
+
+        void ISequence<List<byte>>.UpdateItem(long index, List<byte> item)
+        {
+            UpdateItem(index, item);
+        }
+
+        long ISequence<List<byte>>.GetCount()
+        {
+            return Count;
+        }
+
+        void ISequence<List<byte>>.Flush()
+        {
+            FlushUpdated();
+        }
+
+        bool ISequence<List<byte>>.GetAutoFlush()
+        {
+            return AutoFlush;
         }
     }
 }
