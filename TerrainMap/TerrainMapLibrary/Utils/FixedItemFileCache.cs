@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace TerrainMapLibrary.Utils
 {
@@ -10,7 +9,9 @@ namespace TerrainMapLibrary.Utils
     {
         private List<FileStream> streams;
 
-        private List<byte> memoryItems;
+        private List<List<byte>> addedItems;
+
+        private Dictionary<long, List<byte>> updatedItems;
 
 
         public string Root { get; private set; }
@@ -26,6 +27,7 @@ namespace TerrainMapLibrary.Utils
         public List<byte> this[long index]
         {
             get { return GetItem(index); }
+            set { UpdateItem(index, value); }
         }
 
 
@@ -36,7 +38,7 @@ namespace TerrainMapLibrary.Utils
 
         public override int GetHashCode()
         {
-            return streams.GetHashCode() + memoryItems.GetHashCode() + Root.GetHashCode()
+            return streams.GetHashCode() + addedItems.GetHashCode() + updatedItems.GetHashCode() + Root.GetHashCode()
                 + ItemLength.GetHashCode() + FileItem.GetHashCode() + AutoFlush.GetHashCode() + Count.GetHashCode();
         }
 
@@ -48,93 +50,43 @@ namespace TerrainMapLibrary.Utils
 
         public void Add(List<byte> item)
         {
-            // validate record and MaxMemoryRecord
             if (item == null || item.Count != ItemLength)
             { throw new Exception("the length of item must be equal with ItemLength."); }
 
-            // add record into memory
-            memoryItems.AddRange(item);
-
-            // auto flush if needed
+            addedItems.Add(item);
             if (AutoFlush == true) { Flush(); }
         }
 
         public void Flush()
         {
-            // return if does not need to flush
-            if (memoryItems.Count == 0) { return; }
-
-            if (streams.Count == 0)
-            {
-                // create first cache
-                streams.Add(new FileStream(GetCachePath(Root, 0),
-                    FileMode.Create,
-                    FileAccess.ReadWrite));
-            }
-
-            var cacheStream = streams.Last();
-
-            // the sum of flush count and cache stream length must less or equal than max file length
-            int flushCount = memoryItems.Count;
-            if (cacheStream.Length + memoryItems.Count > (long)FileItem * ItemLength)
-            { flushCount = (int)((long)FileItem * ItemLength - cacheStream.Length); }
-
-            // flush by using specified flush count
-            cacheStream.Seek(0, SeekOrigin.End);
-            cacheStream.Write(memoryItems.ToArray(), 0, flushCount);
-            cacheStream.Flush();
-
-            // update count
-            Count += flushCount / ItemLength;
-
-            // remove the flushed bytes from memory records
-            if (flushCount < memoryItems.Count) { memoryItems = memoryItems.Skip(flushCount).ToList(); }
-            else { memoryItems.Clear(); }
-
-            if (memoryItems.Count > 0)
-            {
-                // need to create a new cache, then iterate flush until memory records count is 0
-                streams.Add(new FileStream(GetCachePath(Root, streams.Count),
-                    FileMode.Create,
-                    FileAccess.ReadWrite));
-                Flush();
-            }
-            else
-            {
-                // end of flush, need to update the record count into head file
-                var headStream = new FileStream(GetHeadPath(Root), FileMode.Open, FileAccess.Write);
-                headStream.Seek(24, SeekOrigin.Begin);
-                var bytes = BitConverter.GetBytes(Count);
-                headStream.Write(bytes, 0, bytes.Length);
-                headStream.Close();
-                headStream.Dispose();
-            }
+            FlushUpdated();
+            FlushAdded();
         }
 
         public void Close()
         {
-            foreach (var cacheStream in streams)
+            Flush();
+            foreach (var stream in streams)
             {
-                cacheStream.Close();
-                cacheStream.Dispose();
+                stream.Close();
+                stream.Dispose();
             }
+
+            addedItems.Clear();
+            updatedItems.Clear();
         }
 
 
-        public static FixedItemFileCache Generate(string version, string directory = null,
-            int itemLength = 1000, int fileItem = 1000, bool autoFlush = false)
+        public static FixedItemFileCache Generate(string root, int itemLength = 100, int fileItem = 100,
+            bool autoFlush = false)
         {
-            if (string.IsNullOrEmpty(version.Trim()))
-            { throw new Exception("version must not be null or empty."); }
-
             if (itemLength <= 0)
             { throw new Exception("itemLength must be more than 0."); }
 
             if (fileItem <= 0)
             { throw new Exception("fileItem must be more than 0."); }
 
-            // delete all files then create cache root directory
-            string root = GetRoot(version, directory);
+            // delete all files then create root directory
             if (Directory.Exists(root) == true) { Directory.Delete(root, true); }
             if (Directory.Exists(root) == false) { Directory.CreateDirectory(root); }
 
@@ -142,121 +94,208 @@ namespace TerrainMapLibrary.Utils
             var headStream = new FileStream(GetHeadPath(root), FileMode.Create, FileAccess.Write);
             headStream.Seek(0, SeekOrigin.Begin);
 
-            // 0-7, ItemLength
-            var bytes = BitConverter.GetBytes((long)itemLength);
-            headStream.Write(bytes, 0, bytes.Length);
+            // 0-3, ItemLength
+            var array = BitConverter.GetBytes(itemLength);
+            headStream.Write(array, 0, array.Length);
 
-            // 8-15, FileItem
-            bytes = BitConverter.GetBytes((long)fileItem);
-            headStream.Write(bytes, 0, bytes.Length);
+            // 4-7, FileItem
+            array = BitConverter.GetBytes(fileItem);
+            headStream.Write(array, 0, array.Length);
 
-            // 16-23, AutoFlush
-            bytes = BitConverter.GetBytes(autoFlush == true ? 1L : 0L);
-            headStream.Write(bytes, 0, bytes.Length);
+            // 8, AutoFlush
+            array = BitConverter.GetBytes(autoFlush);
+            headStream.Write(array, 0, array.Length);
 
-            // 24-31, Count
-            bytes = BitConverter.GetBytes(0L);
-            headStream.Write(bytes, 0, bytes.Length);
+            // 9-16, Count
+            array = BitConverter.GetBytes(0L);
+            headStream.Write(array, 0, array.Length);
 
             headStream.Flush();
             headStream.Close();
             headStream.Dispose();
 
             // reload cache
-            var cache = Load(version, directory);
+            var cache = Load(root);
             return cache;
         }
 
-        public static FixedItemFileCache Load(string version, string directory = null)
+        public static FixedItemFileCache Load(string root)
         {
-            var cache = new FixedItemFileCache();
-            cache.Root = GetRoot(version, directory);
+            var cache = new FixedItemFileCache(root);
 
             // read data from head file
             var headStream = new FileStream(GetHeadPath(cache.Root), FileMode.Open, FileAccess.Read);
             headStream.Seek(0, SeekOrigin.Begin);
 
-            // 0-7, ItemLength
-            var bytes = new byte[8];
-            headStream.Read(bytes, 0, 8);
-            cache.ItemLength = (int)BitConverter.ToInt64(bytes, 0);
+            // 0-3, ItemLength
+            var array = new byte[4];
+            headStream.Read(array, 0, array.Length);
+            cache.ItemLength = BitConverter.ToInt32(array, 0);
 
-            // 8-15, FileItem
-            bytes = new byte[8];
-            headStream.Read(bytes, 0, 8);
-            cache.FileItem = (int)BitConverter.ToInt64(bytes, 0);
+            // 4-7, FileItem
+            array = new byte[4];
+            headStream.Read(array, 0, array.Length);
+            cache.FileItem = BitConverter.ToInt32(array, 0);
 
-            // 16-23, AutoFlush
-            bytes = new byte[8];
-            headStream.Read(bytes, 0, 8);
-            cache.AutoFlush = BitConverter.ToInt64(bytes, 0) == 1 ? true : false;
+            // 8, AutoFlush
+            array = new byte[1];
+            headStream.Read(array, 0, array.Length);
+            cache.AutoFlush = BitConverter.ToBoolean(array, 0);
 
-            // 24-31, Count
-            bytes = new byte[8];
-            headStream.Read(bytes, 0, 8);
-            cache.Count = BitConverter.ToInt64(bytes, 0);
+            // 9-16, Count
+            array = new byte[8];
+            headStream.Read(array, 0, 8);
+            cache.Count = BitConverter.ToInt64(array, 0);
 
             headStream.Close();
             headStream.Dispose();
 
             // load all data files
-            int cacheCount = (int)(cache.Count / cache.FileItem);
-            if ((long)cacheCount * cache.FileItem < cache.Count) { cacheCount += 1; }
-            for (int cacheNumber = 0; cacheNumber < cacheCount; cacheNumber++)
+            int bodyCount = (int)(cache.Count / cache.FileItem);
+            if ((long)bodyCount * cache.FileItem < cache.Count) { bodyCount += 1; }
+            for (int bodyNumber = 0; bodyNumber < bodyCount; bodyNumber++)
             {
-                var cacheStream = new FileStream(GetCachePath(cache.Root, cacheNumber),
-                    FileMode.Open,
-                    FileAccess.ReadWrite);
-                cache.streams.Add(cacheStream);
+                var bodyStream = new FileStream(GetBodyPath(cache.Root, bodyNumber),
+                    FileMode.Open, FileAccess.ReadWrite);
+                cache.streams.Add(bodyStream);
             }
 
             return cache;
         }
 
 
-        private FixedItemFileCache()
+        private FixedItemFileCache(string root)
         {
             streams = new List<FileStream>();
-            memoryItems = new List<byte>();
-            Root = string.Empty;
+            addedItems = new List<List<byte>>();
+            updatedItems = new Dictionary<long, List<byte>>();
+            Root = root;
             ItemLength = 0;
             FileItem = 0;
             AutoFlush = false;
             Count = 0;
         }
 
+
         private List<byte> GetItem(long index)
         {
             // validate index
             if (index < 0 || index >= Count) { throw new IndexOutOfRangeException(); }
 
-            // cache offset and stream
-            int cacheNumber = (int)(index / FileItem);
-            long cacheOffset = (index - (long)cacheNumber * FileItem) * ItemLength;
-            var cacheStream = streams[cacheNumber];
+            // offset and stream
+            int bodyNumber = (int)(index / FileItem);
+            long boddyOffset = (index - (long)bodyNumber * FileItem) * ItemLength;
+            var stream = streams[bodyNumber];
 
             // read data
-            cacheStream.Seek(cacheOffset, SeekOrigin.Begin);
-            var bytes = new byte[ItemLength];
-            cacheStream.Read(bytes, 0, ItemLength);
+            stream.Seek(boddyOffset, SeekOrigin.Begin);
+            var array = new byte[ItemLength];
+            stream.Read(array, 0, array.Length);
 
-            return bytes.ToList();
+            return array.ToList();
         }
 
-
-        private static string GetRoot(string version, string directory)
+        private void UpdateItem(long index, List<byte> value)
         {
-            string cacheDirectory = directory;
-            if (cacheDirectory == null)
+            if (index < 0 || index >= Count) { throw new IndexOutOfRangeException(); }
+
+            if (value == null || value.Count != ItemLength)
+            { throw new Exception("the length of value must be equal with ItemLength."); }
+
+            updatedItems.Add(index, value);
+            if (AutoFlush == true) { FlushUpdated(); }
+        }
+
+        private void FlushUpdated()
+        {
+            // a dictionary to map body number and its updated items
+            var bodyNumberUpdatedItemsList = new Dictionary<int, Dictionary<long, List<byte>>>();
+            foreach (var indexItem in updatedItems)
             {
-                var assemblyLocation = Assembly.GetExecutingAssembly().Location;
-                cacheDirectory = Path.Combine(Path.GetDirectoryName(assemblyLocation),
-                    Path.GetFileNameWithoutExtension(assemblyLocation));
+                long index = indexItem.Key;
+                var item = indexItem.Value;
+                int bodyNumber = (int)(index / FileItem);
+
+                if (bodyNumberUpdatedItemsList.ContainsKey(bodyNumber) == false)
+                { bodyNumberUpdatedItemsList.Add(bodyNumber, new Dictionary<long, List<byte>>()); }
+
+                bodyNumberUpdatedItemsList[bodyNumber].Add(index, item);
             }
 
-            cacheDirectory = Path.Combine(cacheDirectory, version);
-            return cacheDirectory;
+            // write items in each cache file
+            foreach (var bodyNumberUpdatedItems in bodyNumberUpdatedItemsList)
+            {
+                // stream
+                int bodyNumber = bodyNumberUpdatedItems.Key;
+                var stream = streams[bodyNumber];
+                foreach (var indexItem in bodyNumberUpdatedItems.Value)
+                {
+                    // offset
+                    long index = indexItem.Key;
+                    var item = indexItem.Value;
+                    long boddyOffset = (index - (long)bodyNumber * FileItem) * ItemLength;
+
+                    // write data
+                    stream.Seek(boddyOffset, SeekOrigin.Begin);
+                    var array = item.ToArray();
+                    stream.Write(array, 0, array.Length);
+                }
+
+                stream.Flush();
+            }
+
+            updatedItems.Clear();
         }
+
+        private void FlushAdded()
+        {
+            if (addedItems.Count == 0) { return; }
+
+            // create first cache if needed
+            if (streams.Count == 0)
+            { streams.Add(new FileStream(GetBodyPath(Root, 0), FileMode.Create, FileAccess.ReadWrite)); }
+
+            var bodyStream = streams[streams.Count - 1];
+
+            // the sum of flush count and cache stream length must less or equal than max file length
+            int flushCount = addedItems.Count;
+            if (bodyStream.Length + (long)flushCount * ItemLength > (long)FileItem * ItemLength)
+            { flushCount = (int)(FileItem - bodyStream.Length / ItemLength); }
+
+            // flush specified array
+            var data = new List<byte>();
+            for (int i = 0; i < flushCount; i++)
+            { data.AddRange(addedItems[i]); }
+
+            bodyStream.Seek(0, SeekOrigin.End);
+            bodyStream.Write(data.ToArray(), 0, data.Count);
+            bodyStream.Flush();
+
+            // update count
+            Count += flushCount;
+
+            // remove the flushed items
+            if (flushCount < addedItems.Count) { addedItems = addedItems.Skip(flushCount).ToList(); }
+            else { addedItems.Clear(); }
+
+            if (addedItems.Count > 0)
+            {
+                // need to create a new cache, then iterate flush until added items count is 0
+                streams.Add(new FileStream(GetBodyPath(Root, streams.Count),
+                    FileMode.Create, FileAccess.ReadWrite));
+                FlushAdded();
+                return;
+            }
+
+            // end of flush, need to update the record count into head file
+            var headStream = new FileStream(GetHeadPath(Root), FileMode.Open, FileAccess.Write);
+            headStream.Seek(9, SeekOrigin.Begin);
+            var array = BitConverter.GetBytes(Count);
+            headStream.Write(array, 0, array.Length);
+            headStream.Close();
+            headStream.Dispose();
+        }
+
 
         private static string GetHeadPath(string root)
         {
@@ -264,9 +303,9 @@ namespace TerrainMapLibrary.Utils
             return filePath;
         }
 
-        private static string GetCachePath(string root, int cacheNumber)
+        private static string GetBodyPath(string root, int bodyNumber)
         {
-            string filePath = Path.Combine(root, $"{cacheNumber.ToString().PadLeft(8, '0')}.data");
+            string filePath = Path.Combine(root, $"{bodyNumber.ToString().PadLeft(8, '0')}.data");
             return filePath;
         }
     }

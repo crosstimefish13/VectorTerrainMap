@@ -27,7 +27,11 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         public void GenerateSemivarianceMapIndex(int cacheFileRecord = 67108864, int flushRecord = 8388608,
             StepCounter counter = null)
         {
-            var cache = FixedItemFileCache.Generate("0", null, 64, cacheFileRecord, false);
+            var assemblyLocation = Assembly.GetExecutingAssembly().Location;
+            string cacheRoot = Path.Combine(Path.GetDirectoryName(assemblyLocation),
+                Path.GetFileNameWithoutExtension(assemblyLocation));
+
+            var cache = FixedItemFileCache.Generate(cacheRoot, 64, cacheFileRecord, false);
 
             int flushStep = 0;
             if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count / 2); }
@@ -61,7 +65,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             if (counter != null) { counter.Reset(counter.StepLength, counter.StepLength); }
 
-            cache.Flush();
             cache.Close();
         }
     }
