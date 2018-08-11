@@ -34,25 +34,18 @@ namespace ConsoleTest
 
         public static void Test()
         {
-            var filePath = @"..\..\..\SampleData\opendem\rostock\rostock.csv";
+            var filePath = @"..\..\..\SampleData\opendem\rostock_test\rostock.csv";
             var indicator = new CSVReader.Indicator(0, 1, 2, CSVReader.Indicator.RowMode.SkipFirstRow, double.NaN);
             var mapPoints = CSVReader.Read(filePath, indicator).RemoveInvalid(double.NaN);
             var interpolator = new KrigingInterpolator(mapPoints);
 
-            //long ticks = 0;
-            //long ticksCount = 10000;
-            //string timeSpan = string.Empty;
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
-
-
-            var conuter = new KrigingInterpolator.Counter(500, (obj) => 
+            var conuter = new KrigingInterpolator.Counter((obj) =>
             {
                 Console.Write($"{obj.TimeLeft()}   {obj.Step.ToString("N0")}/{obj.StepLength.ToString("N0")}");
                 Console.SetCursorPosition(0, Console.CursorTop);
             });
 
-            interpolator.GenerateSemivarianceMapIndex(conuter);
+            interpolator.GenerateSemivarianceMapIndex(250000, 100000, conuter);
         }
     }
 }

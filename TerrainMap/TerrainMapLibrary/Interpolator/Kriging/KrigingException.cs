@@ -19,11 +19,11 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return ThrowException(message, paramName);
         }
 
-        internal static KrigingException InvalidParallel(string paramName = null)
-        {
-            string message = "parallel must be 1 or more.";
-            return ThrowException(message, paramName);
-        }
+        //internal static KrigingException InvalidParallel(string paramName = null)
+        //{
+        //    string message = "parallel must be 1 or more.";
+        //    return ThrowException(message, paramName);
+        //}
 
         internal static KrigingException InvalidData(string paramName = null)
         {

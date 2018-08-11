@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using TerrainMapLibrary.Interpolator.Data;
 using TerrainMapLibrary.Mathematics;
 
@@ -24,12 +22,13 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         }
 
 
-        public void GenerateSemivarianceMapIndex(Counter counter = null)
+        public void GenerateSemivarianceMapIndex(int cacheFileRecord = 67108864, int flushRecord = 8388608,
+            Counter counter = null)
         {
-            var cache = SemivarianceMapFileCache.Generate("0", null, 64, 33554432, false);
+            var cache = SemivarianceMapFileCache.Generate("0", null, 64, cacheFileRecord, false);
 
             int flushStep = 0;
-            if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count); }
+            if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count / 2); }
 
             for (int i = 0; i < Data.Count; i++)
             {
@@ -51,7 +50,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     bytes.AddRange(BitConverter.GetBytes(right.Z));
                     cache.Add(bytes);
 
-                    flushStep = flushStep >= 1638400 ? 0 : flushStep + 1;
+                    flushStep = flushStep >= flushRecord ? 0 : flushStep + 1;
                     if (flushStep == 0) { cache.Flush(); }
 
                     if (counter != null) { counter.AddStep(); }
@@ -60,6 +59,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             if (counter != null) { counter.Reset(); }
 
+            cache.Flush();
             cache.Close();
         }
 
@@ -325,18 +325,22 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             public long RefreshInterval { get; private set; }
 
+            public long ScopeInterval { get; private set; }
+
             public Action<Counter> RefreshAction { get; set; }
 
 
-            public Counter(long refreshInterval = 1000, Action<Counter> refreshAction = null)
+            public Counter(Action<Counter> refreshAction = null,
+                long refreshInterval = 1000, long scopeInterval = 5000)
             {
                 refreshTimer = new Stopwatch();
                 stepPerRefresh = 0;
                 Step = 0;
                 StepLength = 0;
                 TicksLeft = 0;
-                RefreshInterval = refreshInterval;
                 RefreshAction = refreshAction;
+                RefreshInterval = refreshInterval;
+                ScopeInterval = scopeInterval;
             }
 
 
@@ -375,6 +379,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
                 // update the ticks left per refresh interval if needed
                 long refreshTicks = RefreshInterval * TimeSpan.TicksPerMillisecond;
+                long scopeTicks = ScopeInterval * TimeSpan.TicksPerMillisecond;
                 if (refreshTimer.ElapsedTicks >= refreshTicks)
                 {
                     refreshTimer.Stop();
@@ -382,10 +387,11 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     long newTicksLeft = (StepLength - Step) / stepPerRefresh * refreshTicks;
 
                     // update ticks left if needed
-                    if (TicksLeft == 0 || TicksLeft - newTicksLeft > refreshTicks) { TicksLeft = newTicksLeft; }
-                    else if (TicksLeft - newTicksLeft <= refreshTicks) { TicksLeft -= refreshTicks; }
+                    if (TicksLeft == 0 || Math.Abs(TicksLeft - newTicksLeft) >= scopeTicks)
+                    { TicksLeft = newTicksLeft; }
+                    else { TicksLeft -= refreshTicks; }
 
-                    if (TicksLeft == 0) { TicksLeft = 0; }
+                    if (TicksLeft < refreshTicks) { TicksLeft = refreshTicks; }
 
                     stepPerRefresh = 0;
                     refreshTimer.Restart();
