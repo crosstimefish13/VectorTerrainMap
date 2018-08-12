@@ -7,6 +7,7 @@ using System.Reflection;
 using TerrainMapLibrary.Interpolator.Data;
 using TerrainMapLibrary.Mathematics;
 using TerrainMapLibrary.Utils;
+using TerrainMapLibrary.Utils.Sequence;
 
 namespace TerrainMapLibrary.Interpolator.Kriging
 {
@@ -31,9 +32,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             string cacheRoot = Path.Combine(Path.GetDirectoryName(assemblyLocation),
                 Path.GetFileNameWithoutExtension(assemblyLocation));
 
-            var cache = FixedItemFileCache.Generate(cacheRoot, 64, cacheFileRecord, false);
+            var cache = ListFileSequence.Generate(cacheRoot, 64, cacheFileRecord, flushRecord);
 
-            int flushStep = 0;
             if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count / 2); }
 
             for (int i = 0; i < Data.Count; i++)
@@ -45,19 +45,16 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     double vectorX = Common.EuclidDistance(Data[i].X, Data[i].Y, Data[j].X, Data[j].Y);
                     double vectorY = Common.Semivariance(Data[i].Z, Data[j].Z);
 
-                    var bytes = new List<byte>();
-                    bytes.AddRange(BitConverter.GetBytes(vectorX));
-                    bytes.AddRange(BitConverter.GetBytes(vectorY));
-                    bytes.AddRange(BitConverter.GetBytes(left.X));
-                    bytes.AddRange(BitConverter.GetBytes(left.Y));
-                    bytes.AddRange(BitConverter.GetBytes(left.Z));
-                    bytes.AddRange(BitConverter.GetBytes(right.X));
-                    bytes.AddRange(BitConverter.GetBytes(right.Y));
-                    bytes.AddRange(BitConverter.GetBytes(right.Z));
+                    var bytes = BitConverter.GetBytes(vectorX)
+                        .Concat(BitConverter.GetBytes(vectorY))
+                        .Concat(BitConverter.GetBytes(left.X))
+                        .Concat(BitConverter.GetBytes(left.Y))
+                        .Concat(BitConverter.GetBytes(left.Z))
+                        .Concat(BitConverter.GetBytes(right.X))
+                        .Concat(BitConverter.GetBytes(right.Y))
+                        .Concat(BitConverter.GetBytes(right.Z))
+                        .ToArray();
                     cache.Add(bytes);
-
-                    flushStep = flushStep >= flushRecord ? 0 : flushStep + 1;
-                    if (flushStep == 0) { cache.Flush(); }
 
                     if (counter != null) { counter.AddStep(); }
                 }
