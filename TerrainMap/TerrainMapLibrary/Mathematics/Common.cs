@@ -11,6 +11,14 @@ namespace TerrainMapLibrary.Mathematics
             else { return false; }
         }
 
+        public static int FloatCompare(float left, float right)
+        {
+            if (left == right) { return 0; }
+            else if (Math.Abs(left - right) <= float.Epsilon) { return 0; }
+            else if (left > right) { return 1; }
+            else { return -1; }
+        }
+
         public static double EuclidDistance(double leftX, double leftY, double rightX, double rightY)
         {
             double diffX = (leftX - rightX);

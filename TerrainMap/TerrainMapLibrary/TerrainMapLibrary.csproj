@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Interpolator\Data\CSVReader.cs" />
     <Compile Include="Interpolator\Data\MapPointList.cs" />
+    <Compile Include="Interpolator\Kriging\GraphicsExtension.cs" />
     <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
     <Compile Include="Interpolator\Kriging\KrigingLagBinsSemivarianceMap.cs" />
     <Compile Include="Mathematics\Common.cs" />

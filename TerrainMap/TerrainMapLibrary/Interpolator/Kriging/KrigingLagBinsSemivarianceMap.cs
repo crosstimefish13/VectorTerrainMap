@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Reflection;
 using TerrainMapLibrary.Interpolator.Data;
@@ -32,6 +34,40 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             var vector = ToVector(sequence[index]);
             return vector;
         }
+
+        public Bitmap GenerateImage(int width, int height, float margin = 10f)
+        {
+            var image = new Bitmap(width, height);
+            var g = Graphics.FromImage(image);
+
+            g.Clear(Color.White);
+
+            //g.DrawLine(linePen, margin, height - margin, width - margin, height - margin);
+            //g.DrawLine(linePen, margin, height - margin, margin, margin);
+
+            //linePen.Dispose();
+            g.DrawRoundedLine(Pens.Black, 10, 50f, 50f, 100f, 100f);
+
+            g.Dispose();
+            return image;
+        }
+
+        //private GraphicsPath
+
+        //private GraphicsPath CreateRoundedRectanglePath(Rectangle rectangle, int cornerRadius)
+        //{
+        //    var roundedRectangle = new GraphicsPath();
+        //    roundedRectangle.AddArc(rectangle.X, rectangle.Y, cornerRadius * 2, cornerRadius * 2, 180, 90);
+        //    roundedRectangle.AddLine(rectangle.X + cornerRadius, rectangle.Y, rectangle.Right - cornerRadius * 2, rectangle.Y);
+        //    roundedRectangle.AddArc(rectangle.X + rectangle.Width - cornerRadius * 2, rectangle.Y, cornerRadius * 2, cornerRadius * 2, 270, 90);
+        //    roundedRectangle.AddLine(rectangle.Right, rectangle.Y + cornerRadius * 2, rectangle.Right, rectangle.Y + rectangle.Height - cornerRadius * 2);
+        //    roundedRectangle.AddArc(rectangle.X + rectangle.Width - cornerRadius * 2, rectangle.Y + rectangle.Height - cornerRadius * 2, cornerRadius * 2, cornerRadius * 2, 0, 90);
+        //    roundedRectangle.AddLine(rectangle.Right - cornerRadius * 2, rectangle.Bottom, rectangle.X + cornerRadius * 2, rectangle.Bottom);
+        //    roundedRectangle.AddArc(rectangle.X, rectangle.Bottom - cornerRadius * 2, cornerRadius * 2, cornerRadius * 2, 90, 90);
+        //    roundedRectangle.AddLine(rectangle.X, rectangle.Bottom - cornerRadius * 2, rectangle.X, rectangle.Y + cornerRadius * 2);
+        //    roundedRectangle.CloseFigure();
+        //    return roundedRectangle;
+        //}
 
 
         public static KrigingLagBinsSemivarianceMap BuildOriginal(MapPointList data, string root = null,

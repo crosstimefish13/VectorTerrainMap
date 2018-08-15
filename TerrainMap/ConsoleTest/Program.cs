@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Reflection;
 using TerrainMapLibrary.Interpolator.Data;
 using TerrainMapLibrary.Interpolator.Kriging;
@@ -77,13 +78,21 @@ namespace ConsoleTest
             //map = KrigingLagBinsSemivarianceMap.Build(total / 100, null, counter);
             //map.Close();
 
+            //var map = KrigingLagBinsSemivarianceMap
+            //    .Load(KrigingLagBinsSemivarianceMap.GetALlLagBins()[1]);
+            //var values = new List<double>();
+            //for (long i = 0; i < map.VectorCount; i++)
+            //{
+            //    values.Add(map.GetVector(i).X);
+            //}
+            //map.Close();
+
             var map = KrigingLagBinsSemivarianceMap
                 .Load(KrigingLagBinsSemivarianceMap.GetALlLagBins()[1]);
-            var values = new List<double>();
-            for (long i = 0; i < map.VectorCount; i++)
-            {
-                values.Add(map.GetVector(i).X);
-            }
+
+            var image = map.GenerateImage(800, 800, 50f);
+            image.Save(@"test.png", ImageFormat.Png);
+
             map.Close();
         }
     }
