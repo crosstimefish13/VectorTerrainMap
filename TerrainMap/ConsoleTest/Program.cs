@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using TerrainMapLibrary.Interpolator.Data;
 using TerrainMapLibrary.Interpolator.Kriging;
 using TerrainMapLibrary.Mathematics;
 using TerrainMapLibrary.Utils;
+using TerrainMapLibrary.Utils.Sequence;
 
 namespace ConsoleTest
 {
@@ -44,15 +46,40 @@ namespace ConsoleTest
             var mapPoints = CSVReader.Read(filePath, indicator)
                 .RemoveAll(new MapPointList.MapPoint(double.NaN, double.NaN, double.NaN));
 
-            var interpolator = new KrigingInterpolator(mapPoints);
-            var conuter = new StepCounter((obj) =>
+            //var interpolator = new KrigingInterpolator(mapPoints);
+            //var counter = new StepCounter((obj) =>
+            //{
+            //    Console.Write($"{obj.TimeLeft()}   {obj.Step.ToString("N0")}/{obj.StepLength.ToString("N0")}");
+            //    Console.SetCursorPosition(0, Console.CursorTop);
+            //});
+            //interpolator.GenerateSemivarianceMapIndex(250000, 100000, counter);
+            //Console.SetCursorPosition(0, Console.CursorTop + 1);
+
+            //interpolator.Sort(counter);
+            //Console.SetCursorPosition(0, Console.CursorTop + 1);
+
+            var counter = new StepCounter((obj) =>
             {
-                Console.Write($"{obj.TimeLeft()}   {obj.Step.ToString("N0")}/{obj.StepLength.ToString("N0")}");
+                if (obj.Step == obj.StepLength) { Console.SetCursorPosition(0, Console.CursorTop + 1); }
+
+                Console.Write($"{obj.Name}   {obj.TimeLeft()}   {obj.Step.ToString("N0")}/{obj.StepLength.ToString("N0")}");
                 Console.SetCursorPosition(0, Console.CursorTop);
             });
-            interpolator.GenerateSemivarianceMapIndex(250000, 100000, conuter);
 
-            Console.SetCursorPosition(0, Console.CursorTop + 1);
+            var map = KrigingLagBinsSemivarianceMap.BuildOriginal(mapPoints, null, counter);
+            map.Close();
+            //var semivarianceMap = new KrigingSemivarianceMap(mapPoints);
+            //semivarianceMap.BuildOriginal(counter);
+
+            //var data = ListFileSequence.Load(@"TerrainMapLibrary");
+            //var values = new List<double>();
+            //for (long i = 0; i < data.Count; i++)
+            //{
+            //    var value = BitConverter.ToDouble(data[i], 0);
+            //    values.Add(value);
+            //}
+
+            //data.Close();
         }
     }
 }

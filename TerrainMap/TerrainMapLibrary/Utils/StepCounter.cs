@@ -10,6 +10,8 @@ namespace TerrainMapLibrary.Utils
         private long stepPerRefresh;
 
 
+        public string Name { get; private set; }
+
         public long Step { get; private set; }
 
         public long StepLength { get; private set; }
@@ -34,6 +36,7 @@ namespace TerrainMapLibrary.Utils
 
             refreshTimer = new Stopwatch();
             stepPerRefresh = 0;
+            Name = null;
             Step = 0;
             StepLength = 0;
             TicksLeft = 0;
@@ -61,10 +64,11 @@ namespace TerrainMapLibrary.Utils
         }
 
 
-        public void Reset(long stepLength = 0, long step = 0)
+        public void Reset(long stepLength = 0, long step = 0, string name = null)
         {
             refreshTimer.Stop();
             stepPerRefresh = 0;
+            Name = name;
             Step = step;
             StepLength = stepLength;
             TicksLeft = 0;

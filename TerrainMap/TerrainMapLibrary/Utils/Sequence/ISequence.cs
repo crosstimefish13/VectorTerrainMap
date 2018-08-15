@@ -9,5 +9,7 @@
         void Update(long index, byte[] element);
 
         byte[] GetElement(long index);
+
+        void Flush();
     }
 }

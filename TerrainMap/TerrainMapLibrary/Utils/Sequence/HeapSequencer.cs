@@ -1,22 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TerrainMapLibrary.Utils.Sequence
 {
     public sealed class HeapSequencer : Sequencer
     {
-        public HeapSequencer(ISequence sequence, Func<byte[], byte[], int> comparer)
-            : base(sequence, comparer)
+        public HeapSequencer(ISequence sequence, Func<byte[], byte[], int> comparer, StepCounter counter = null)
+            : base(sequence, comparer, counter)
         { }
 
 
+        public override bool Equals(object obj)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
         public override void Sort()
         {
+            if (Counter != null)
+            { Counter.Reset(Convert.ToInt64(Sequence.Count * Math.Log(Sequence.Count, 2)), 0, "Sorting"); }
+
             // build max heap
-            for (long index = Sequence.Count / 2 - 1; index >= 0; index--) { Heapify(index); }
+            for (long index = Sequence.Count / 2 - 1; index >= 0; index--)
+            { Heapify(index, Sequence.Count - 1); }
+
+            long heapLength = Sequence.Count;
+            while (heapLength > 1)
+            {
+                // reduce the heap length
+                heapLength -= 1;
+
+                // swap the top max element with last heap element
+                var maxElement = Sequence.GetElement(0);
+                var lastElement = Sequence.GetElement(heapLength);
+                Sequence.Update(0, lastElement);
+                Sequence.Update(heapLength, maxElement);
+
+                // build a max heap again
+                Heapify(0, heapLength);
+            }
+
+            Sequence.Flush();
+
+            if (Counter != null) { Counter.Reset(Counter.StepLength, Counter.StepLength, "Sorting"); }
         }
 
         public override void InsertSort(ISequence result)
@@ -25,8 +60,10 @@ namespace TerrainMapLibrary.Utils.Sequence
         }
 
 
-        private void Heapify(long topIndex)
+        private void Heapify(long topIndex, long heapLength)
         {
+            if (Counter != null) { Counter.AddStep(); }
+
             // max element is top element
             var topElement = Sequence.GetElement(topIndex);
             long maxIndex = topIndex;
@@ -34,10 +71,10 @@ namespace TerrainMapLibrary.Utils.Sequence
 
             // compare max element with left element if needed
             long leftIndex = topIndex * 2 + 1;
-            if (leftIndex < Sequence.Count)
+            if (leftIndex < heapLength)
             {
                 var leftElement = Sequence.GetElement(leftIndex);
-                if (Comparer(leftElement, maxElement) > 1)
+                if (Comparer(leftElement, maxElement) > 0)
                 {
                     // set max element to left element
                     maxIndex = leftIndex;
@@ -47,10 +84,10 @@ namespace TerrainMapLibrary.Utils.Sequence
 
             // compare max element with right element if needed
             long rightIndex = topIndex * 2 + 2;
-            if (rightIndex < Sequence.Count)
+            if (rightIndex < heapLength)
             {
                 var rightElement = Sequence.GetElement(rightIndex);
-                if (Comparer(rightElement, maxElement) > 1)
+                if (Comparer(rightElement, maxElement) > 0)
                 {
                     // set max element to right element
                     maxIndex = rightIndex;
@@ -65,7 +102,7 @@ namespace TerrainMapLibrary.Utils.Sequence
                 Sequence.Update(maxIndex, topElement);
 
                 // compare the swaped node
-                Heapify(maxIndex);
+                Heapify(maxIndex, heapLength);
             }
         }
     }

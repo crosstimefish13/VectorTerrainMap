@@ -63,7 +63,7 @@ namespace TerrainMapLibrary.Utils.Sequence
 
             // get element from cache, added or updated if needed
             var element = new byte[ElementLength];
-            if (cacheElements.TryGetValue(index, out byte[] value) == true) { value.CopyTo(element, 0); }
+            if (TryGetCache(index, out byte[] value) == true) { value.CopyTo(element, 0); }
             else if (index >= fileElementCount) { addedElements[(int)(index - fileElementCount)].CopyTo(element, 0); }
             else if (updatedElements.ContainsKey(index) == true) { updatedElements[index].CopyTo(element, 0); }
             else
@@ -119,8 +119,9 @@ namespace TerrainMapLibrary.Utils.Sequence
                 // flush updated elements if needed
                 if (updatedElements.Count >= MemoryElement) { FlushUpdated(); }
 
-                // add element into memory
-                updatedElements.Add(index, value);
+                // add or update element into memory
+                if (updatedElements.ContainsKey(index)) { updatedElements[index] = value; }
+                else { updatedElements.Add(index, value); }
             }
 
             // update cache
