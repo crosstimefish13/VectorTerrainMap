@@ -24,7 +24,7 @@ namespace TerrainMapLibrary.Utils
 
 
         public StepCounter(Action<StepCounter> refreshAction = null,
-            long refreshInterval = 1000, long scopeInterval = 5000)
+            long refreshInterval = 500, long scopeInterval = 5000)
         {
             if (refreshInterval <= 0)
             { throw new Exception("refreshInterval must be more than 0."); }

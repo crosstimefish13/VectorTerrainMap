@@ -34,6 +34,8 @@ namespace TerrainMapLibrary.Utils.Sequence
             set { Update(index, value); }
         }
 
+        public bool EnableMemoryCache { get; set; }
+
 
         public override bool Equals(object obj)
         {
@@ -45,7 +47,7 @@ namespace TerrainMapLibrary.Utils.Sequence
             return fileElementCount.GetHashCode() + bodyStreams.GetHashCode()
                 + addedElements.GetHashCode() + updatedElements.GetHashCode() + cacheElements.GetHashCode()
                 + Root.GetHashCode() + ElementLength.GetHashCode() + FileElement.GetHashCode()
-                + MemoryElement.GetHashCode() + Count.GetHashCode();
+                + MemoryElement.GetHashCode() + Count.GetHashCode() + EnableMemoryCache.GetHashCode();
         }
 
         public override string ToString()
@@ -249,11 +251,15 @@ namespace TerrainMapLibrary.Utils.Sequence
             FileElement = 0;
             MemoryElement = 0;
             Count = 0;
+            EnableMemoryCache = false;
         }
 
 
         private void UpdateCache(long index, byte[] element)
         {
+            // return if disabled memeory cache
+            if (EnableMemoryCache == false) { return; }
+
             if (cacheElements.ContainsKey(index)) { cacheElements[index] = element; }
             else
             {
@@ -265,6 +271,13 @@ namespace TerrainMapLibrary.Utils.Sequence
 
         private bool TryGetCache(long index, out byte[] element)
         {
+            // return if disabled memeory cache
+            if (EnableMemoryCache == false)
+            {
+                element = null;
+                return false;
+            }
+
             return cacheElements.TryGetValue(index, out element);
         }
 
@@ -326,12 +339,12 @@ namespace TerrainMapLibrary.Utils.Sequence
             { flushCount = (int)(FileElement - bodyStream.Length / ElementLength); }
 
             // flush specified array
-            var array = new byte[0];
+            var list = new List<byte>();
             for (int i = 0; i < flushCount; i++)
-            { array = array.Concat(addedElements[i]).ToArray(); }
+            { list.AddRange(addedElements[i]); }
 
             bodyStream.Seek(0, SeekOrigin.End);
-            bodyStream.Write(array, 0, array.Length);
+            bodyStream.Write(list.ToArray(), 0, list.Count);
             bodyStream.Flush();
 
             // update count
@@ -353,7 +366,7 @@ namespace TerrainMapLibrary.Utils.Sequence
             // end of flush, need to update the record count into head file
             var headStream = new FileStream(GetHeadPath(Root), FileMode.Open, FileAccess.Write);
             headStream.Seek(12, SeekOrigin.Begin);
-            array = BitConverter.GetBytes(Count);
+            var array = BitConverter.GetBytes(Count);
             headStream.Write(array, 0, array.Length);
             headStream.Close();
             headStream.Dispose();
@@ -371,8 +384,5 @@ namespace TerrainMapLibrary.Utils.Sequence
             string filePath = Path.Combine(root, $"{bodyNumber.ToString().PadLeft(8, '0')}.data");
             return filePath;
         }
-
-
-
     }
 }

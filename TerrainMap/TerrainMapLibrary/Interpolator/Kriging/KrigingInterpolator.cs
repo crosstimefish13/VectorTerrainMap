@@ -33,6 +33,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 Path.GetFileNameWithoutExtension(assemblyLocation));
 
             var cache = ListFileSequence.Generate(cacheRoot, 64, cacheFileRecord, flushRecord);
+            cache.EnableMemoryCache = false;
 
             if (counter != null) { counter.Reset((long)(Data.Count - 1) * Data.Count / 2); }
 
@@ -45,16 +46,16 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     double vectorX = Common.EuclidDistance(Data[i].X, Data[i].Y, Data[j].X, Data[j].Y);
                     double vectorY = Common.Semivariance(Data[i].Z, Data[j].Z);
 
-                    var bytes = BitConverter.GetBytes(vectorX)
-                        .Concat(BitConverter.GetBytes(vectorY))
-                        .Concat(BitConverter.GetBytes(left.X))
-                        .Concat(BitConverter.GetBytes(left.Y))
-                        .Concat(BitConverter.GetBytes(left.Z))
-                        .Concat(BitConverter.GetBytes(right.X))
-                        .Concat(BitConverter.GetBytes(right.Y))
-                        .Concat(BitConverter.GetBytes(right.Z))
-                        .ToArray();
-                    cache.Add(bytes);
+                    var bytes = new List<byte>();
+                    bytes.AddRange(BitConverter.GetBytes(vectorX));
+                    bytes.AddRange(BitConverter.GetBytes(vectorY));
+                    bytes.AddRange(BitConverter.GetBytes(left.X));
+                    bytes.AddRange(BitConverter.GetBytes(left.Y));
+                    bytes.AddRange(BitConverter.GetBytes(left.Z));
+                    bytes.AddRange(BitConverter.GetBytes(right.X));
+                    bytes.AddRange(BitConverter.GetBytes(right.Y));
+                    bytes.AddRange(BitConverter.GetBytes(right.Z));
+                    cache.Add(bytes.ToArray());
 
                     if (counter != null) { counter.AddStep(); }
                 }
