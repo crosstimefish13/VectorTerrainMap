@@ -66,20 +66,25 @@ namespace ConsoleTest
                 Console.SetCursorPosition(0, Console.CursorTop);
             });
 
-            var map = KrigingLagBinsSemivarianceMap.BuildOriginal(mapPoints, null, counter);
+            //// build original
+            //var map = KrigingLagBinsSemivarianceMap.BuildOriginal(mapPoints, null, counter);
+            //map.Close();
+
+            //// build lag bins
+            //var map = KrigingLagBinsSemivarianceMap.Load(0);
+            //double total = map.GetVector(0).X + map.GetVector(map.VectorCount - 1).X;
+            //map.Close();
+            //map = KrigingLagBinsSemivarianceMap.Build(total / 100, null, counter);
+            //map.Close();
+
+            var map = KrigingLagBinsSemivarianceMap
+                .Load(KrigingLagBinsSemivarianceMap.GetALlLagBins()[1]);
+            var values = new List<double>();
+            for (long i = 0; i < map.VectorCount; i++)
+            {
+                values.Add(map.GetVector(i).X);
+            }
             map.Close();
-            //var semivarianceMap = new KrigingSemivarianceMap(mapPoints);
-            //semivarianceMap.BuildOriginal(counter);
-
-            //var data = ListFileSequence.Load(@"TerrainMapLibrary");
-            //var values = new List<double>();
-            //for (long i = 0; i < data.Count; i++)
-            //{
-            //    var value = BitConverter.ToDouble(data[i], 0);
-            //    values.Add(value);
-            //}
-
-            //data.Close();
         }
     }
 }

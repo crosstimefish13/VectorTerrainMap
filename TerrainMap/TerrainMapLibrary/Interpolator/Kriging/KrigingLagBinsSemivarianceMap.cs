@@ -16,10 +16,21 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
         public double LagBins { get; private set; }
 
+        public long VectorCount
+        {
+            get { return sequence.Count; }
+        }
+
 
         public void Close()
         {
             sequence.Close();
+        }
+
+        public MapPointList.MapPoint GetVector(long index)
+        {
+            var vector = ToVector(sequence[index]);
+            return vector;
         }
 
 
@@ -51,11 +62,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     // calculate the Euclid distance and semivariance
                     double vectorX = Common.EuclidDistance(left.X, left.Y, right.X, right.Y);
                     double vectorY = Common.Semivariance(left.Z, right.Z);
-
-                    var bytes = new List<byte>();
-                    bytes.AddRange(BitConverter.GetBytes(vectorX));
-                    bytes.AddRange(BitConverter.GetBytes(vectorY));
-                    sequence.Add(bytes.ToArray());
+                    var element = ToArray(vectorX, vectorY);
+                    sequence.Add(element);
 
                     if (counter != null) { counter.AddStep(); }
                 }
@@ -71,11 +79,12 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             // use heap sequencer to sort the sequence
             var sequencer = new HeapSequencer(sequence, (left, right) =>
             {
-                // compare the first value of Euclid distance
-                double leftValue = BitConverter.ToDouble(left, 0);
-                double rightValue = BitConverter.ToDouble(right, 0);
-                if (leftValue > rightValue) { return 1; }
-                else if (leftValue < rightValue) { return -1; }
+                var leftVector = ToVector(left);
+                var rightVector = ToVector(right);
+
+                // compare the Euclid distance
+                if (leftVector.X > rightVector.X) { return 1; }
+                else if (leftVector.X < rightVector.X) { return -1; }
                 else { return 0; }
             }, counter);
 
@@ -110,23 +119,20 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             long elementCount = 0;
             for (long index = 0; index < originalSequence.Count; index++)
             {
-                var array = originalSequence[index];
-                double vectorX = BitConverter.ToDouble(array, 0);
-                double vectorY = BitConverter.ToDouble(array, 8);
-
+                var vector = ToVector(originalSequence[index]);
                 if (elementCount == 0)
                 {
                     // set values when first original lement
-                    maxVectorX = vectorX + lagBins;
-                    sumVectorX = vectorX;
-                    sumVectorY = vectorY;
+                    maxVectorX = vector.X + lagBins;
+                    sumVectorX = vector.X;
+                    sumVectorY = vector.Y;
                     elementCount = 1;
                 }
-                else if (vectorX < maxVectorX)
+                else if (vector.X < maxVectorX)
                 {
                     // add the vector
-                    sumVectorX += vectorX;
-                    sumVectorY += vectorY;
+                    sumVectorX += vector.X;
+                    sumVectorY += vector.Y;
                     elementCount += 1;
                 }
                 else
@@ -134,16 +140,12 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     // add a new element while overing lag bins
                     double avgVectorX = sumVectorX / elementCount;
                     double avgVectorY = sumVectorY / elementCount;
-
-                    var bytes = new List<byte>();
-                    bytes.AddRange(BitConverter.GetBytes(avgVectorX));
-                    bytes.AddRange(BitConverter.GetBytes(avgVectorY));
-                    sequence.Add(bytes.ToArray());
+                    sequence.Add(ToArray(avgVectorX, avgVectorY));
 
                     // reset the values
                     maxVectorX += lagBins;
-                    sumVectorX = vectorX;
-                    sumVectorY = vectorY;
+                    sumVectorX = vector.X;
+                    sumVectorY = vector.Y;
                     elementCount = 1;
                 }
 
@@ -152,11 +154,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     // add the last one
                     double avgVectorX = sumVectorX / elementCount;
                     double avgVectorY = sumVectorY / elementCount;
-
-                    var bytes = new List<byte>();
-                    bytes.AddRange(BitConverter.GetBytes(avgVectorX));
-                    bytes.AddRange(BitConverter.GetBytes(avgVectorY));
-                    sequence.Add(bytes.ToArray());
+                    sequence.Add(ToArray(avgVectorX, avgVectorY));
                 }
 
                 if (counter != null) { counter.AddStep(); }
@@ -216,6 +214,23 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         private static string GetLagBinsPath(string root, double lagBins)
         {
             return Path.Combine(root, lagBins.ToString());
+        }
+
+        private static byte[] ToArray(params double[] values)
+        {
+            var bytes = new List<byte>();
+            foreach (var value in values)
+            { bytes.AddRange(BitConverter.GetBytes(value)); }
+
+            return bytes.ToArray();
+        }
+
+        private static MapPointList.MapPoint ToVector(byte[] element)
+        {
+            double x = BitConverter.ToDouble(element, 0);
+            double y = BitConverter.ToDouble(element, 8);
+            var vector = new MapPointList.MapPoint(x, y);
+            return vector;
         }
     }
 }
