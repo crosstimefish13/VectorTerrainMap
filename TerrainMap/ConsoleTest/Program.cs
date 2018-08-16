@@ -63,7 +63,7 @@ namespace ConsoleTest
             //var map = SemivarianceMap.Load(0);
             //double total = map[0].EuclidDistance + map[map.VectorCount - 1].EuclidDistance;
             //map.Close();
-            //map = SemivarianceMap.Build(total / 100, null, counter);
+            //map = SemivarianceMap.Build(total / 1000, null, counter);
             //map.Close();
 
             //var map = SemivarianceMap.Load(SemivarianceMap.GetALlLagBins()[1]);
@@ -75,7 +75,7 @@ namespace ConsoleTest
             //map.Close();
 
             var map = SemivarianceMap
-                .Load(SemivarianceMap.GetALlLagBins()[1]);
+                .Load(SemivarianceMap.GetALlLagBins()[2]);
 
             var image = map.GenerateImage(800, 800, 50f);
             image.Save(@"test.png", ImageFormat.Png);

@@ -38,12 +38,69 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         public Bitmap GenerateImage(int width, int height, float margin = 10f)
         {
             var image = new Bitmap(width, height);
-            var g = Graphics.FromImage(image);
 
+            var g = Graphics.FromImage(image);
             g.Clear(Color.White);
 
-            g.DrawRoundedLine(Color.Black, 4f, margin, height - margin, width - margin, height - margin);
-            g.DrawRoundedLine(Color.Black, 4f, margin, height - margin, margin, margin);
+            var client = new RectangleF(margin, margin, width - margin * 2f, height - margin * 2f);
+            g.DrawRectangle(Pens.Blue, client.X, client.Y, client.Width, client.Height);
+
+            g.DrawText("Euclid Distance", Color.Black, client.Right - 120f, client.Bottom - 20f);
+            g.DrawText("Semivariance", Color.Black, client.Left, client.Top);
+
+            client = new RectangleF(client.X, client.Y + 20f, client.Width, client.Height - 40f);
+            g.DrawRectangle(Pens.Blue, client.X, client.Y, client.Width, client.Height);
+
+            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Right, client.Bottom - 6f);
+            g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom - 12f);
+            g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom);
+
+            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Left + 6f, client.Top);
+            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left, client.Top + 6f);
+            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left + 12f, client.Top + 6f);
+
+            //g.DrawRoundedLine(Color.Black, 3f, margin, height - margin, width - margin, height - margin);
+            //g.DrawRoundedLine(Color.Black, 3f, width - margin, height - margin, width - margin - 6f, height - margin - 6f);
+            //g.DrawRoundedLine(Color.Black, 3f, width - margin, height - margin, width - margin - 6f, height - margin + 6f);
+
+            //g.DrawRoundedLine(Color.Black, 3f, margin, height - margin, margin, margin);
+            //g.DrawRoundedLine(Color.Black, 3f, margin, margin, margin - 6f, margin + 6f);
+            //g.DrawRoundedLine(Color.Black, 3f, margin, margin, margin + 6f, margin + 6f);
+
+            float scaleWidth = (width - margin * 2f) / 20f;
+            float scaleHeight = (height - margin * 2f) / 20f;
+            float scopeWidth = scaleWidth * (20f - 2f);
+            float scopeHeight = scaleHeight * (20f - 2f);
+
+            var brush = new SolidBrush(Color.Red);
+            var pen = new Pen(Color.Black);
+            double valueWidth = sequence[sequence.Count - 1].EuclidDistance - sequence[0].EuclidDistance;
+            double valueHeight = sequence[sequence.Count - 1].Semivariance - sequence[0].Semivariance;
+            for (long index = 0; index < sequence.Count; index++)
+            {
+                var vector = sequence[index];
+                float valueX = scaleWidth + (float)((vector.EuclidDistance - sequence[0].EuclidDistance) * scopeWidth / valueWidth);
+                float valueY = scaleHeight + (float)((vector.Semivariance - sequence[0].Semivariance) * scopeHeight / valueHeight);
+                g.FillEllipse(brush, margin + valueX - 2f, height - margin - valueY - 2f, 4f, 4f);
+                g.DrawEllipse(pen, margin + valueX - 2f, height - margin - valueY - 2f, 4f, 4f);
+            }
+
+            brush.Dispose();
+            pen.Dispose();
+
+            //brush = new SolidBrush(Color.Black);
+            //var font = new Font("Arial", 12f, FontStyle.Regular);
+            //g.DrawString("Euclid Distance", font, brush, width - margin - 120f, height - margin - 16f);
+            //font.Dispose();
+            //brush.Dispose();
+
+            //g.DrawRectangle(Pens.Blue, margin, margin, width - margin * 2, height - margin * 2);
+
+
+            //for (int i = 1; i < 20; i++)
+            //{
+            //    g.DrawRoundedLine(Color.Black, 3f, margin + scaleWidth * i, height - margin, margin + scaleWidth * i, height - margin - 3f);
+            //}
 
             g.Dispose();
             return image;
@@ -77,7 +134,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             if (root == null) { root = GetDefaultRoot(); }
 
             // element size is 16 B, each file size is 4 GB and memory size is 128 MB
-            var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, 0), 16, 67108864, 2097152);
+            var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, 0, false), 16, 67108864, 2097152);
 
             // do not use memory cache while adding elements
             vectors.EnableMemoryCache = false;
@@ -132,8 +189,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             if (root == null) { root = GetDefaultRoot(); }
 
             // load original sequence and generate new sequence by using lag bins
-            var originalSequence = FileSequence<Vector>.Load(GetLagBinsPath(root, 0));
-            var sequence = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins),
+            var originalSequence = FileSequence<Vector>.Load(GetLagBinsPath(root, 0, false));
+            var sequence = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins, false),
                 originalSequence.ElementLength,
                 originalSequence.FileElement,
                 originalSequence.MemoryElement);
@@ -183,15 +240,32 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             if (counter != null) { counter.Reset(counter.StepLength, counter.StepLength, "Building"); }
 
-            var map = Load(lagBins, root);
+            var map = Load(lagBins, false, root);
             return map;
         }
 
-        public static SemivarianceMap Load(double lagBins, string root = null)
+        public static SemivarianceMap Normalize(double lagBins, string root = null, StepCounter counter = null)
+        {
+            if (lagBins < 0 || Common.DoubleCompare(lagBins, 0) < 0)
+            { throw new Exception("lagBins must be more than or equal with 0"); }
+
+            var sourceSequence = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins, false));
+            var sequence = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins, true),
+                sourceSequence.ElementLength,
+                sourceSequence.FileElement,
+                sourceSequence.MemoryElement);
+
+            var minVector = sourceSequence[0];
+
+            var map = Load(lagBins, true, root);
+            return map;
+        }
+
+        public static SemivarianceMap Load(double lagBins, bool normalized = true, string root = null)
         {
             if (root == null) { root = GetDefaultRoot(); }
 
-            var sequence = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins));
+            var sequence = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins, normalized));
             var map = new SemivarianceMap() { sequence = sequence, LagBins = lagBins };
 
             return map;
@@ -229,9 +303,13 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return root;
         }
 
-        private static string GetLagBinsPath(string root, double lagBins)
+        private static string GetLagBinsPath(string root, double lagBins, bool normalized)
         {
-            return Path.Combine(root, lagBins.ToString());
+            string path = null;
+            if (normalized == true) { path = Path.Combine(root, $"n{lagBins.ToString()}"); }
+            else { path = Path.Combine(root, lagBins.ToString()); }
+
+            return path;
         }
 
 
