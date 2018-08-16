@@ -47,18 +47,6 @@ namespace ConsoleTest
             var mapPoints = CSVReader.Read(filePath, indicator)
                 .RemoveAll(new MapPointList.MapPoint(double.NaN, double.NaN, double.NaN));
 
-            //var interpolator = new KrigingInterpolator(mapPoints);
-            //var counter = new StepCounter((obj) =>
-            //{
-            //    Console.Write($"{obj.TimeLeft()}   {obj.Step.ToString("N0")}/{obj.StepLength.ToString("N0")}");
-            //    Console.SetCursorPosition(0, Console.CursorTop);
-            //});
-            //interpolator.GenerateSemivarianceMapIndex(250000, 100000, counter);
-            //Console.SetCursorPosition(0, Console.CursorTop + 1);
-
-            //interpolator.Sort(counter);
-            //Console.SetCursorPosition(0, Console.CursorTop + 1);
-
             var counter = new StepCounter((obj) =>
             {
                 if (obj.Step == obj.StepLength) { Console.SetCursorPosition(0, Console.CursorTop + 1); }
@@ -68,27 +56,26 @@ namespace ConsoleTest
             });
 
             //// build original
-            //var map = KrigingLagBinsSemivarianceMap.BuildOriginal(mapPoints, null, counter);
+            //var map = SemivarianceMap.BuildOriginal(mapPoints, null, counter);
             //map.Close();
 
             //// build lag bins
-            //var map = KrigingLagBinsSemivarianceMap.Load(0);
-            //double total = map.GetVector(0).X + map.GetVector(map.VectorCount - 1).X;
+            //var map = SemivarianceMap.Load(0);
+            //double total = map[0].EuclidDistance + map[map.VectorCount - 1].EuclidDistance;
             //map.Close();
-            //map = KrigingLagBinsSemivarianceMap.Build(total / 100, null, counter);
+            //map = SemivarianceMap.Build(total / 100, null, counter);
             //map.Close();
 
-            //var map = KrigingLagBinsSemivarianceMap
-            //    .Load(KrigingLagBinsSemivarianceMap.GetALlLagBins()[1]);
+            //var map = SemivarianceMap.Load(SemivarianceMap.GetALlLagBins()[1]);
             //var values = new List<double>();
             //for (long i = 0; i < map.VectorCount; i++)
             //{
-            //    values.Add(map.GetVector(i).X);
+            //    values.Add(map[i].EuclidDistance);
             //}
             //map.Close();
 
-            var map = KrigingLagBinsSemivarianceMap
-                .Load(KrigingLagBinsSemivarianceMap.GetALlLagBins()[1]);
+            var map = SemivarianceMap
+                .Load(SemivarianceMap.GetALlLagBins()[1]);
 
             var image = map.GenerateImage(800, 800, 50f);
             image.Save(@"test.png", ImageFormat.Png);

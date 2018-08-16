@@ -64,7 +64,7 @@ namespace TerrainMapLibrary.Mathematics
                 {
                     for (int column = 0; column < left.Width; column++)
                     {
-                        if (Common.DoubleEqual(left.matrix[row][column], right.matrix[row][column]) == false)
+                        if (Common.DoubleCompare(left.matrix[row][column], right.matrix[row][column]) != 0)
                         { return false; }
                     }
                 }
@@ -229,7 +229,7 @@ namespace TerrainMapLibrary.Mathematics
             for (int row = 0; row < Height; row++)
             {
                 var column = row;
-                if (Common.DoubleEqual(matrix1.matrix[row][column], 0))
+                if (Common.DoubleCompare(matrix1.matrix[row][column], 0) == 0)
                 {
                     // a special case that the value of matrix[row][column = row] is 0, but we want to make it to 1,
                     // so search items from matrix[row + 1][column = row] to matrix[height][column = row] to check if
@@ -238,7 +238,7 @@ namespace TerrainMapLibrary.Mathematics
                     for (int otherRow = row + 1; otherRow < Height; otherRow++)
                     {
                         // find the item that the value is not 0, save the row index
-                        if (matrix1.matrix[otherRow][column] != 0)
+                        if (Common.DoubleCompare(matrix1.matrix[otherRow][column], 0) != 0)
                         {
                             validRow = otherRow;
                             break;

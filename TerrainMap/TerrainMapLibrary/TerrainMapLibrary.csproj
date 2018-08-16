@@ -45,14 +45,15 @@
     <Compile Include="Interpolator\Data\MapPointList.cs" />
     <Compile Include="Interpolator\Kriging\GraphicsExtension.cs" />
     <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
-    <Compile Include="Interpolator\Kriging\KrigingLagBinsSemivarianceMap.cs" />
+    <Compile Include="Interpolator\Kriging\SemivarianceMap.cs" />
     <Compile Include="Mathematics\Common.cs" />
     <Compile Include="Utils\Sequence\HeapSequencer.cs" />
+    <Compile Include="Utils\Sequence\IElement.cs" />
     <Compile Include="Utils\Sequence\ISequence.cs" />
     <Compile Include="Utils\Sequence\Sequencer.cs" />
     <Compile Include="Mathematics\Matrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\Sequence\ListFileSequence.cs" />
+    <Compile Include="Utils\Sequence\FileSequence.cs" />
     <Compile Include="Utils\StepCounter.cs" />
   </ItemGroup>
   <ItemGroup />

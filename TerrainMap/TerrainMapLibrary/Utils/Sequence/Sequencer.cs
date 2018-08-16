@@ -2,16 +2,16 @@
 
 namespace TerrainMapLibrary.Utils.Sequence
 {
-    public abstract class Sequencer
+    public abstract class Sequencer<T> where T : IElement
     {
-        public ISequence Sequence { get; private set; }
+        public ISequence<T> Sequence { get; private set; }
 
-        public Func<byte[], byte[], int> Comparer { get; private set; }
+        public Func<T, T, int> Comparer { get; private set; }
 
         public StepCounter Counter { get; set; }
 
 
-        public Sequencer(ISequence sequence, Func<byte[], byte[], int> comparer, StepCounter counter = null)
+        public Sequencer(ISequence<T> sequence, Func<T, T, int> comparer, StepCounter counter = null)
         {
             if (sequence == null || comparer == null) { throw new ArgumentNullException(); }
 
@@ -39,6 +39,6 @@ namespace TerrainMapLibrary.Utils.Sequence
 
         public abstract void Sort();
 
-        public abstract void InsertSort(ISequence result);
+        public abstract void InsertSort(ISequence<T> result);
     }
 }

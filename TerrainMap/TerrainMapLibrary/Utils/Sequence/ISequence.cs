@@ -1,14 +1,14 @@
 ﻿namespace TerrainMapLibrary.Utils.Sequence
 {
-    public interface ISequence
+    public interface ISequence<T> where T : IElement
     {
         long Count { get; }
 
-        void Add(byte[] element);
+        void Add(T element);
 
-        void Update(long index, byte[] element);
+        void Update(long index, T element);
 
-        byte[] GetElement(long index);
+        T GetElement(long index);
 
         void Flush();
     }

@@ -70,9 +70,9 @@ namespace TerrainMapLibrary.Interpolator.Data
                 if (left is null && right is null) { return true; }
                 else if (left is null || right is null) { return false; }
                 // compare xyz
-                else if (Common.DoubleEqual(left.X, right.X) == false) { return false; }
-                else if (Common.DoubleEqual(left.Y, right.Y) == false) { return false; }
-                else if (Common.DoubleEqual(left.Z, right.Z) == false) { return false; }
+                else if (Common.DoubleCompare(left.X, right.X) != 0) { return false; }
+                else if (Common.DoubleCompare(left.Y, right.Y) != 0) { return false; }
+                else if (Common.DoubleCompare(left.Z, right.Z) != 0) { return false; }
                 else { return true; }
             }
 

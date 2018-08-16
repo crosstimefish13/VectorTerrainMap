@@ -4,11 +4,12 @@ namespace TerrainMapLibrary.Mathematics
 {
     public static class Common
     {
-        public static bool DoubleEqual(double left, double right)
+        public static int DoubleCompare(double left, double right)
         {
-            if (left == right) { return true; }
-            else if (Math.Abs(left - right) <= double.Epsilon) { return true; }
-            else { return false; }
+            if (left == right) { return 0; }
+            else if (Math.Abs(left - right) <= double.Epsilon) { return 0; }
+            else if (left > right) { return 1; }
+            else { return -1; }
         }
 
         public static int FloatCompare(float left, float right)

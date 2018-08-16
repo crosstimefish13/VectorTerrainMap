@@ -2,9 +2,9 @@
 
 namespace TerrainMapLibrary.Utils.Sequence
 {
-    public sealed class HeapSequencer : Sequencer
+    public sealed class HeapSequencer<T> : Sequencer<T> where T : IElement
     {
-        public HeapSequencer(ISequence sequence, Func<byte[], byte[], int> comparer, StepCounter counter = null)
+        public HeapSequencer(ISequence<T> sequence, Func<T, T, int> comparer, StepCounter counter = null)
             : base(sequence, comparer, counter)
         { }
 
@@ -54,7 +54,7 @@ namespace TerrainMapLibrary.Utils.Sequence
             if (Counter != null) { Counter.Reset(Counter.StepLength, Counter.StepLength, "Sorting"); }
         }
 
-        public override void InsertSort(ISequence result)
+        public override void InsertSort(ISequence<T> result)
         {
             throw new NotSupportedException();
         }
