@@ -42,11 +42,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             g.Clear(Color.White);
 
-            //g.DrawLine(linePen, margin, height - margin, width - margin, height - margin);
-            //g.DrawLine(linePen, margin, height - margin, margin, margin);
-
-            //linePen.Dispose();
-            g.DrawRoundedLine(Pens.Black, 10, 50f, 50f, 100f, 100f);
+            g.DrawRoundedLine(Color.Black, 4f, margin, height - margin, width - margin, height - margin);
+            g.DrawRoundedLine(Color.Black, 4f, margin, height - margin, margin, margin);
 
             g.Dispose();
             return image;
