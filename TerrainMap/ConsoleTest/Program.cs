@@ -60,7 +60,7 @@ namespace ConsoleTest
             //map.Close();
 
             //// build lag bins
-            //var map = SemivarianceMap.Load(0);
+            //var map = SemivarianceMap.Load(0, false);
             //double total = map[0].EuclidDistance + map[map.VectorCount - 1].EuclidDistance;
             //map.Close();
             //map = SemivarianceMap.Build(total / 1000, null, counter);
@@ -75,9 +75,9 @@ namespace ConsoleTest
             //map.Close();
 
             var map = SemivarianceMap
-                .Load(SemivarianceMap.GetALlLagBins()[2]);
+                .Load(SemivarianceMap.GetALlLagBins()[2], false);
 
-            var image = map.GenerateImage(800, 800, 50f);
+            var image = map.GenerateImage(1366, 768);
             image.Save(@"test.png", ImageFormat.Png);
 
             map.Close();

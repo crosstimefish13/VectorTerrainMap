@@ -42,67 +42,53 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             var g = Graphics.FromImage(image);
             g.Clear(Color.White);
 
+            // draw top left and bottom right text
             var client = new RectangleF(margin, margin, width - margin * 2f, height - margin * 2f);
-            g.DrawRectangle(Pens.Blue, client.X, client.Y, client.Width, client.Height);
-
             g.DrawText("Euclid Distance", Color.Black, client.Right - 120f, client.Bottom - 20f);
             g.DrawText("Semivariance", Color.Black, client.Left, client.Top);
 
+            // draw left and bottom arrow
             client = new RectangleF(client.X, client.Y + 20f, client.Width, client.Height - 40f);
-            g.DrawRectangle(Pens.Blue, client.X, client.Y, client.Width, client.Height);
-
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Right, client.Bottom - 6f);
             g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom - 12f);
             g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom);
-
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Left + 6f, client.Top);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left, client.Top + 6f);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left + 12f, client.Top + 6f);
 
-            //g.DrawRoundedLine(Color.Black, 3f, margin, height - margin, width - margin, height - margin);
-            //g.DrawRoundedLine(Color.Black, 3f, width - margin, height - margin, width - margin - 6f, height - margin - 6f);
-            //g.DrawRoundedLine(Color.Black, 3f, width - margin, height - margin, width - margin - 6f, height - margin + 6f);
-
-            //g.DrawRoundedLine(Color.Black, 3f, margin, height - margin, margin, margin);
-            //g.DrawRoundedLine(Color.Black, 3f, margin, margin, margin - 6f, margin + 6f);
-            //g.DrawRoundedLine(Color.Black, 3f, margin, margin, margin + 6f, margin + 6f);
-
-            float scaleWidth = (width - margin * 2f) / 20f;
-            float scaleHeight = (height - margin * 2f) / 20f;
-            float scopeWidth = scaleWidth * (20f - 2f);
-            float scopeHeight = scaleHeight * (20f - 2f);
-
-            var brush = new SolidBrush(Color.Red);
-            var pen = new Pen(Color.Black);
-            double valueWidth = sequence[sequence.Count - 1].EuclidDistance - sequence[0].EuclidDistance;
-            double valueHeight = sequence[sequence.Count - 1].Semivariance - sequence[0].Semivariance;
+            // draw points
+            client = new RectangleF(client.X + 6f + margin, client.Y + margin, client.Width - 6f - margin * 2, client.Height - 6f - margin * 2);
+            Vector minVector = new Vector(double.MaxValue, double.MaxValue);
+            Vector maxVector = new Vector(double.MinValue, double.MinValue);
             for (long index = 0; index < sequence.Count; index++)
             {
-                var vector = sequence[index];
-                float valueX = scaleWidth + (float)((vector.EuclidDistance - sequence[0].EuclidDistance) * scopeWidth / valueWidth);
-                float valueY = scaleHeight + (float)((vector.Semivariance - sequence[0].Semivariance) * scopeHeight / valueHeight);
-                g.FillEllipse(brush, margin + valueX - 2f, height - margin - valueY - 2f, 4f, 4f);
-                g.DrawEllipse(pen, margin + valueX - 2f, height - margin - valueY - 2f, 4f, 4f);
+                if (Common.DoubleCompare(sequence[index].EuclidDistance, minVector.EuclidDistance) < 0)
+                { minVector.EuclidDistance = sequence[index].EuclidDistance; }
+
+                if (Common.DoubleCompare(sequence[index].Semivariance, minVector.Semivariance) < 0)
+                { minVector.Semivariance = sequence[index].Semivariance; }
+
+                if (Common.DoubleCompare(sequence[index].EuclidDistance, maxVector.EuclidDistance) > 0)
+                { maxVector.EuclidDistance = sequence[index].EuclidDistance; }
+
+                if (Common.DoubleCompare(sequence[index].Semivariance, maxVector.Semivariance) > 0)
+                { maxVector.Semivariance = sequence[index].Semivariance; }
             }
 
-            brush.Dispose();
-            pen.Dispose();
+            double scaleWidht = client.Width / (maxVector.EuclidDistance - minVector.EuclidDistance);
+            double scaleHeight = client.Height / (maxVector.Semivariance - minVector.Semivariance);
+            for (long index = 0; index < sequence.Count; index++)
+            {
+                float drawX = client.Left + (float)((sequence[index].EuclidDistance - minVector.EuclidDistance) * scaleWidht);
+                float drawY = client.Bottom - (float)((sequence[index].Semivariance - minVector.EuclidDistance) * scaleHeight);
+                g.DrawPoint(Color.Red, Color.Black, 4f, 1f, drawX, drawY);
+            }
 
-            //brush = new SolidBrush(Color.Black);
-            //var font = new Font("Arial", 12f, FontStyle.Regular);
-            //g.DrawString("Euclid Distance", font, brush, width - margin - 120f, height - margin - 16f);
-            //font.Dispose();
-            //brush.Dispose();
-
-            //g.DrawRectangle(Pens.Blue, margin, margin, width - margin * 2, height - margin * 2);
-
-
-            //for (int i = 1; i < 20; i++)
-            //{
-            //    g.DrawRoundedLine(Color.Black, 3f, margin + scaleWidth * i, height - margin, margin + scaleWidth * i, height - margin - 3f);
-            //}
+            DrawExponential(g, client, Color.DarkGreen, 3f,
+                maxVector.EuclidDistance - minVector.EuclidDistance, scaleWidht, scaleHeight);
 
             g.Dispose();
+
             return image;
         }
 
@@ -177,7 +163,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             vectors.Close();
 
-            var map = Load(0, root);
+            var map = Load(0, false, root);
             return map;
         }
 
@@ -310,6 +296,72 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             else { path = Path.Combine(root, lagBins.ToString()); }
 
             return path;
+        }
+
+
+        private void DrawGaussian(Graphics g, RectangleF client, double minX, double maxX, double minY, double maxY, double valueWidth, double valueHeight)
+        {
+            double c0 = 10;
+            double c = 450;
+            double a = 0.009;
+            double b = 0.023;
+
+            var points = new List<PointF>();
+            for (int i = 0; i < client.Width; i++)
+            {
+                double valueX = (maxX - minX) / client.Width * i;
+                double valueY = c0;
+                if (valueX > b)
+                {
+                    double cX = valueX - b;
+                    valueY = c0 + c * (1 - Math.Exp(-(cX * cX / (a * a))));
+                }
+
+                float x = client.Left + (float)(valueX * valueWidth);
+                float y = client.Bottom - (float)(valueY * valueHeight);
+
+                points.Add(new PointF(x, y));
+            }
+
+            var path = new GraphicsPath();
+            path.AddCurve(points.ToArray());
+            g.DrawPath(Pens.Blue, path);
+            path.Dispose();
+        }
+
+        private void DrawExponential(Graphics g, RectangleF client, Color color, float width,
+            double valueWidthX, double scaleWidth, double scaleHeight)
+        {
+            double c0 = 10;
+            double c = 550;
+            double a = 0.01;
+            double b = 0.0245;
+
+            var points = new List<PointF>();
+            for (int i = 0; i < client.Width; i++)
+            {
+                double valueX = valueWidthX * i / client.Width;
+                double valueY = c0;
+                if (Common.DoubleCompare(valueX, b) > 0)
+                {
+                    double formulaX = valueX - b;
+                    valueY = c0 + c * (1 - Math.Exp((-formulaX) / a));
+                }
+
+                float x = client.Left + (float)(valueX * scaleWidth);
+                float y = client.Bottom - (float)(valueY * scaleHeight);
+
+                points.Add(new PointF(x, y));
+            }
+
+            var path = new GraphicsPath();
+            path.AddCurve(points.ToArray());
+            var pen = new Pen(color, width);
+
+            g.DrawPath(pen, path);
+
+            pen.Dispose();
+            path.Dispose();
         }
 
 
