@@ -9,21 +9,6 @@ namespace TerrainMapLibrary.Utils.Sequence
         { }
 
 
-        public override bool Equals(object obj)
-        {
-            throw new NotSupportedException();
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return base.ToString();
-        }
-
         public override void Sort()
         {
             if (Counter != null)

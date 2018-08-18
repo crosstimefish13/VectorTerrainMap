@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Reflection;
 using TerrainMapLibrary.Interpolator.Data;
@@ -74,13 +75,20 @@ namespace ConsoleTest
             //}
             //map.Close();
 
-            var map = SemivarianceMap
-                .Load(SemivarianceMap.GetALlLagBins()[2], false);
+            var map = SemivarianceMap.Load(SemivarianceMap.GetALlLagBins()[2]);
+            
+            var image = new Bitmap(1366, 768);
+            var g = Graphics.FromImage(image);
+            var chart = map.GetChart(image.Width, image.Height, 20f);
+            map.DrawData(g, chart);
 
-            var image = map.GenerateImage(1366, 768);
-            image.Save(@"test.png", ImageFormat.Png);
+            var model = new ExponentialModel(0.0245, 10, 0.01, 550);
+            map.DrawModelCurve(g, chart, model);
 
+            g.Dispose();
             map.Close();
+            image.Save(@"test.png", ImageFormat.Png);
+            image.Dispose();
         }
     }
 }

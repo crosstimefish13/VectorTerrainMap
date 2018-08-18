@@ -43,8 +43,10 @@
   <ItemGroup>
     <Compile Include="Interpolator\Data\CSVReader.cs" />
     <Compile Include="Interpolator\Data\MapPointList.cs" />
+    <Compile Include="Interpolator\Kriging\ExponentialModel.cs" />
     <Compile Include="Interpolator\Kriging\GraphicsExtension.cs" />
     <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
+    <Compile Include="Interpolator\Kriging\Model.cs" />
     <Compile Include="Interpolator\Kriging\SemivarianceMap.cs" />
     <Compile Include="Mathematics\Common.cs" />
     <Compile Include="Utils\Sequence\HeapSequencer.cs" />

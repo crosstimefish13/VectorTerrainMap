@@ -14,104 +14,132 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 {
     public class SemivarianceMap
     {
-        private FileSequence<Vector> sequence;
+        private FileSequence<Vector> vectors;
 
 
         public double LagBins { get; private set; }
 
         public long VectorCount
         {
-            get { return sequence.Count; }
+            get { return vectors.Count; }
         }
 
         public Vector this[long index]
         {
-            get { return sequence[index]; }
+            get { return vectors[index]; }
         }
 
 
         public void Close()
         {
-            sequence.Close();
+            vectors.Close();
         }
 
-        public Bitmap GenerateImage(int width, int height, float margin = 10f)
+        public Chart GetChart(int width = 800, int height = 600, float margin = 10f)
         {
-            var image = new Bitmap(width, height);
+            // CanvasWidth CanvasHeight Margin
+            var chart = new Chart()
+            {
+                CanvasWidth = width,
+                CanvasHeight = height,
+                Margin = margin
+            };
 
-            var g = Graphics.FromImage(image);
+            // VectorsCanvasClient
+            chart.VectorsCanvasClient = new RectangleF(margin * 2f + 12f, margin * 2f + 20f,
+                width - margin * 4f - 18f, height - margin * 4f - 52f);
+
+            // MinVector MaxVector
+            chart.MinVector = new Vector(double.MaxValue, double.MaxValue);
+            chart.MaxVector = new Vector(double.MinValue, double.MinValue);
+            for (long index = 0; index < vectors.Count; index++)
+            {
+                if (Common.DoubleCompare(vectors[index].EuclidDistance, chart.MinVector.EuclidDistance) < 0)
+                { chart.MinVector.EuclidDistance = vectors[index].EuclidDistance; }
+
+                if (Common.DoubleCompare(vectors[index].Semivariance, chart.MinVector.Semivariance) < 0)
+                { chart.MinVector.Semivariance = vectors[index].Semivariance; }
+
+                if (Common.DoubleCompare(vectors[index].EuclidDistance, chart.MaxVector.EuclidDistance) > 0)
+                { chart.MaxVector.EuclidDistance = vectors[index].EuclidDistance; }
+
+                if (Common.DoubleCompare(vectors[index].Semivariance, chart.MaxVector.Semivariance) > 0)
+                { chart.MaxVector.Semivariance = vectors[index].Semivariance; }
+            }
+
+            // VectorToCanvasScaleX VectorToCanvasScaleY
+            chart.VectorToCanvasScaleX = chart.VectorsCanvasClient.Width /
+                (chart.MaxVector.EuclidDistance - chart.MinVector.EuclidDistance);
+            chart.VectorToCanvasScaleY = chart.VectorsCanvasClient.Height /
+                (chart.MaxVector.Semivariance - chart.MinVector.Semivariance);
+
+            return chart;
+        }
+
+        public void DrawData(Graphics g, Chart chart)
+        {
             g.Clear(Color.White);
 
-            // draw top left and bottom right text
-            var client = new RectangleF(margin, margin, width - margin * 2f, height - margin * 2f);
-            g.DrawText("Euclid Distance", Color.Black, client.Right - 120f, client.Bottom - 20f);
-            g.DrawText("Semivariance", Color.Black, client.Left, client.Top);
+            // draw vectors
+            for (long index = 0; index < vectors.Count; index++)
+            {
+                double offsetX = (vectors[index].EuclidDistance - chart.MinVector.EuclidDistance)
+                    * chart.VectorToCanvasScaleX;
+                double offsetY = (vectors[index].Semivariance - chart.MinVector.EuclidDistance)
+                    * chart.VectorToCanvasScaleY;
+
+                float drawX = chart.VectorsCanvasClient.Left + (float)offsetX;
+                float drawY = chart.VectorsCanvasClient.Bottom - (float)offsetY;
+                g.DrawPoint(Color.Red, Color.Black, 4f, 1f, drawX, drawY);
+            }
 
             // draw left and bottom arrow
-            client = new RectangleF(client.X, client.Y + 20f, client.Width, client.Height - 40f);
+            var client = new RectangleF(chart.VectorsCanvasClient.Left - chart.Margin - 12f,
+                chart.VectorsCanvasClient.Top - chart.Margin,
+                chart.VectorsCanvasClient.Width + chart.Margin * 2 + 12f,
+                chart.VectorsCanvasClient.Height + chart.Margin * 2 + 12f);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Right, client.Bottom - 6f);
-            g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom - 12f);
+            g.DrawRoundedLine(Color.Black, 3f,
+                client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom - 12f);
             g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Left + 6f, client.Top);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left, client.Top + 6f);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left + 12f, client.Top + 6f);
 
-            // draw points
-            client = new RectangleF(client.X + 6f + margin, client.Y + margin, client.Width - 6f - margin * 2, client.Height - 6f - margin * 2);
-            Vector minVector = new Vector(double.MaxValue, double.MaxValue);
-            Vector maxVector = new Vector(double.MinValue, double.MinValue);
-            for (long index = 0; index < sequence.Count; index++)
-            {
-                if (Common.DoubleCompare(sequence[index].EuclidDistance, minVector.EuclidDistance) < 0)
-                { minVector.EuclidDistance = sequence[index].EuclidDistance; }
-
-                if (Common.DoubleCompare(sequence[index].Semivariance, minVector.Semivariance) < 0)
-                { minVector.Semivariance = sequence[index].Semivariance; }
-
-                if (Common.DoubleCompare(sequence[index].EuclidDistance, maxVector.EuclidDistance) > 0)
-                { maxVector.EuclidDistance = sequence[index].EuclidDistance; }
-
-                if (Common.DoubleCompare(sequence[index].Semivariance, maxVector.Semivariance) > 0)
-                { maxVector.Semivariance = sequence[index].Semivariance; }
-            }
-
-            double scaleWidht = client.Width / (maxVector.EuclidDistance - minVector.EuclidDistance);
-            double scaleHeight = client.Height / (maxVector.Semivariance - minVector.Semivariance);
-            for (long index = 0; index < sequence.Count; index++)
-            {
-                float drawX = client.Left + (float)((sequence[index].EuclidDistance - minVector.EuclidDistance) * scaleWidht);
-                float drawY = client.Bottom - (float)((sequence[index].Semivariance - minVector.EuclidDistance) * scaleHeight);
-                g.DrawPoint(Color.Red, Color.Black, 4f, 1f, drawX, drawY);
-            }
-
-            DrawExponential(g, client, Color.DarkGreen, 3f,
-                maxVector.EuclidDistance - minVector.EuclidDistance, scaleWidht, scaleHeight);
-
-            g.Dispose();
-
-            return image;
+            // draw top left and bottom right text
+            client = new RectangleF(client.X, client.Y - 20f, client.Width, client.Height + 40f);
+            g.DrawText("Euclid Distance", Color.Black, client.Right - 120f, client.Bottom - 20f);
+            g.DrawText("Semivariance", Color.Black, client.Left, client.Top);
         }
 
-        //private GraphicsPath
+        public void DrawModelCurve(Graphics g, Chart chart, Model model)
+        {
+            // get the curve points
+            double rangeX = chart.MaxVector.EuclidDistance - chart.MinVector.EuclidDistance;
+            var points = new List<PointF>();
+            for (int i = 0; i < chart.CanvasWidth; i++)
+            {
+                double valueX = rangeX * i / chart.CanvasWidth;
+                double valueY = model.Map(valueX);
 
-        //private GraphicsPath CreateRoundedRectanglePath(Rectangle rectangle, int cornerRadius)
-        //{
-        //    var roundedRectangle = new GraphicsPath();
-        //    roundedRectangle.AddArc(rectangle.X, rectangle.Y, cornerRadius * 2, cornerRadius * 2, 180, 90);
-        //    roundedRectangle.AddLine(rectangle.X + cornerRadius, rectangle.Y, rectangle.Right - cornerRadius * 2, rectangle.Y);
-        //    roundedRectangle.AddArc(rectangle.X + rectangle.Width - cornerRadius * 2, rectangle.Y, cornerRadius * 2, cornerRadius * 2, 270, 90);
-        //    roundedRectangle.AddLine(rectangle.Right, rectangle.Y + cornerRadius * 2, rectangle.Right, rectangle.Y + rectangle.Height - cornerRadius * 2);
-        //    roundedRectangle.AddArc(rectangle.X + rectangle.Width - cornerRadius * 2, rectangle.Y + rectangle.Height - cornerRadius * 2, cornerRadius * 2, cornerRadius * 2, 0, 90);
-        //    roundedRectangle.AddLine(rectangle.Right - cornerRadius * 2, rectangle.Bottom, rectangle.X + cornerRadius * 2, rectangle.Bottom);
-        //    roundedRectangle.AddArc(rectangle.X, rectangle.Bottom - cornerRadius * 2, cornerRadius * 2, cornerRadius * 2, 90, 90);
-        //    roundedRectangle.AddLine(rectangle.X, rectangle.Bottom - cornerRadius * 2, rectangle.X, rectangle.Y + cornerRadius * 2);
-        //    roundedRectangle.CloseFigure();
-        //    return roundedRectangle;
-        //}
+                float drawX = chart.VectorsCanvasClient.Left + (float)(valueX * chart.VectorToCanvasScaleX);
+                float drawY = chart.VectorsCanvasClient.Bottom - (float)(valueY * chart.VectorToCanvasScaleY);
+                points.Add(new PointF(drawX, drawY));
+            }
+
+            // draw curve
+            var pen = new Pen(Color.DarkGreen, 3f);
+            var path = new GraphicsPath();
+            path.AddCurve(points.ToArray());
+
+            g.DrawPath(pen, path);
+
+            path.Dispose();
+            pen.Dispose();
+        }
 
 
-        public static SemivarianceMap BuildOriginal(MapPointList data, string root = null,
-            StepCounter counter = null)
+        public static SemivarianceMap BuildOriginal(MapPointList data, string root = null, StepCounter counter = null)
         {
             // validate the data
             if (data == null || data.Count < 2)
@@ -119,8 +147,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             if (root == null) { root = GetDefaultRoot(); }
 
-            // element size is 16 B, each file size is 4 GB and memory size is 128 MB
-            var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, 0, false), 16, 67108864, 2097152);
+            // element size is 16 B, each file size is 4 GB and memory size is 16 MB
+            var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, 0), 16, 67108864, 262144);
 
             // do not use memory cache while adding elements
             vectors.EnableMemoryCache = false;
@@ -163,7 +191,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             vectors.Close();
 
-            var map = Load(0, false, root);
+            var map = Load(0, root);
             return map;
         }
 
@@ -175,22 +203,21 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             if (root == null) { root = GetDefaultRoot(); }
 
             // load original sequence and generate new sequence by using lag bins
-            var originalSequence = FileSequence<Vector>.Load(GetLagBinsPath(root, 0, false));
-            var sequence = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins, false),
-                originalSequence.ElementLength,
-                originalSequence.FileElement,
-                originalSequence.MemoryElement);
+            var originalVectors = FileSequence<Vector>.Load(GetLagBinsPath(root, 0));
+            var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins),
+                originalVectors.ElementLength,
+                originalVectors.FileElement,
+                originalVectors.MemoryElement);
 
-            if (counter != null) { counter.Reset(originalSequence.Count, 0, "Building"); }
+            if (counter != null) { counter.Reset(originalVectors.Count, 0, "Building"); }
 
             // check each original elements
             var vectorGroup = new List<Vector>();
             double maxEuclidDistance = 0;
-            for (long index = 0; index < originalSequence.Count; index++)
+            for (long index = 0; index < originalVectors.Count; index++)
             {
-                var vector = originalSequence[index];
-                if (vectorGroup.Count == 0
-                    || Common.DoubleCompare(vector.EuclidDistance, maxEuclidDistance) < 0)
+                var vector = originalVectors[index];
+                if (vectorGroup.Count == 0 || Common.DoubleCompare(vector.EuclidDistance, maxEuclidDistance) < 0)
                 {
                     vectorGroup.Add(vector);
                     maxEuclidDistance = vectorGroup[0].EuclidDistance + lagBins;
@@ -201,7 +228,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     double avgEuclidDistance = vectorGroup.Sum(v => v.EuclidDistance) / vectorGroup.Count;
                     double avgSemivariance = vectorGroup.Sum(v => v.Semivariance) / vectorGroup.Count;
                     var avgVector = new Vector(avgEuclidDistance, avgSemivariance);
-                    sequence.Add(avgVector);
+                    vectors.Add(avgVector);
 
                     // reset the values
                     vectorGroup.Clear();
@@ -209,50 +236,33 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     maxEuclidDistance += lagBins;
                 }
 
-                if (index == originalSequence.Count - 1)
+                if (index == originalVectors.Count - 1)
                 {
                     // add the last one
                     double avgEuclidDistance = vectorGroup.Sum(v => v.EuclidDistance) / vectorGroup.Count;
                     double avgSemivariance = vectorGroup.Sum(v => v.Semivariance) / vectorGroup.Count;
                     var avgVector = new Vector(avgEuclidDistance, avgSemivariance);
-                    sequence.Add(avgVector);
+                    vectors.Add(avgVector);
                 }
 
                 if (counter != null) { counter.AddStep(); }
             }
 
-            sequence.Flush();
-            sequence.Close();
+            vectors.Flush();
+            vectors.Close();
 
             if (counter != null) { counter.Reset(counter.StepLength, counter.StepLength, "Building"); }
 
-            var map = Load(lagBins, false, root);
+            var map = Load(lagBins, root);
             return map;
         }
 
-        public static SemivarianceMap Normalize(double lagBins, string root = null, StepCounter counter = null)
-        {
-            if (lagBins < 0 || Common.DoubleCompare(lagBins, 0) < 0)
-            { throw new Exception("lagBins must be more than or equal with 0"); }
-
-            var sourceSequence = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins, false));
-            var sequence = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins, true),
-                sourceSequence.ElementLength,
-                sourceSequence.FileElement,
-                sourceSequence.MemoryElement);
-
-            var minVector = sourceSequence[0];
-
-            var map = Load(lagBins, true, root);
-            return map;
-        }
-
-        public static SemivarianceMap Load(double lagBins, bool normalized = true, string root = null)
+        public static SemivarianceMap Load(double lagBins, string root = null)
         {
             if (root == null) { root = GetDefaultRoot(); }
 
-            var sequence = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins, normalized));
-            var map = new SemivarianceMap() { sequence = sequence, LagBins = lagBins };
+            var vectors = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins));
+            var map = new SemivarianceMap() { vectors = vectors, LagBins = lagBins };
 
             return map;
         }
@@ -276,7 +286,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
         private SemivarianceMap()
         {
-            sequence = null;
+            vectors = null;
             LagBins = 0;
         }
 
@@ -289,79 +299,10 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return root;
         }
 
-        private static string GetLagBinsPath(string root, double lagBins, bool normalized)
+        private static string GetLagBinsPath(string root, double lagBins)
         {
-            string path = null;
-            if (normalized == true) { path = Path.Combine(root, $"n{lagBins.ToString()}"); }
-            else { path = Path.Combine(root, lagBins.ToString()); }
-
+            string path = Path.Combine(root, lagBins.ToString());
             return path;
-        }
-
-
-        private void DrawGaussian(Graphics g, RectangleF client, double minX, double maxX, double minY, double maxY, double valueWidth, double valueHeight)
-        {
-            double c0 = 10;
-            double c = 450;
-            double a = 0.009;
-            double b = 0.023;
-
-            var points = new List<PointF>();
-            for (int i = 0; i < client.Width; i++)
-            {
-                double valueX = (maxX - minX) / client.Width * i;
-                double valueY = c0;
-                if (valueX > b)
-                {
-                    double cX = valueX - b;
-                    valueY = c0 + c * (1 - Math.Exp(-(cX * cX / (a * a))));
-                }
-
-                float x = client.Left + (float)(valueX * valueWidth);
-                float y = client.Bottom - (float)(valueY * valueHeight);
-
-                points.Add(new PointF(x, y));
-            }
-
-            var path = new GraphicsPath();
-            path.AddCurve(points.ToArray());
-            g.DrawPath(Pens.Blue, path);
-            path.Dispose();
-        }
-
-        private void DrawExponential(Graphics g, RectangleF client, Color color, float width,
-            double valueWidthX, double scaleWidth, double scaleHeight)
-        {
-            double c0 = 10;
-            double c = 550;
-            double a = 0.01;
-            double b = 0.0245;
-
-            var points = new List<PointF>();
-            for (int i = 0; i < client.Width; i++)
-            {
-                double valueX = valueWidthX * i / client.Width;
-                double valueY = c0;
-                if (Common.DoubleCompare(valueX, b) > 0)
-                {
-                    double formulaX = valueX - b;
-                    valueY = c0 + c * (1 - Math.Exp((-formulaX) / a));
-                }
-
-                float x = client.Left + (float)(valueX * scaleWidth);
-                float y = client.Bottom - (float)(valueY * scaleHeight);
-
-                points.Add(new PointF(x, y));
-            }
-
-            var path = new GraphicsPath();
-            path.AddCurve(points.ToArray());
-            var pen = new Pen(color, width);
-
-            g.DrawPath(pen, path);
-
-            pen.Dispose();
-            path.Dispose();
         }
 
 
@@ -436,6 +377,57 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 list.AddRange(BitConverter.GetBytes(Semivariance));
 
                 return list.ToArray();
+            }
+        }
+
+
+        public class Chart
+        {
+            public int CanvasWidth { get; set; }
+
+            public int CanvasHeight { get; set; }
+
+            public float Margin { get; set; }
+
+            public RectangleF VectorsCanvasClient { get; set; }
+
+            public Vector MinVector { get; set; }
+
+            public Vector MaxVector { get; set; }
+
+            public double VectorToCanvasScaleX { get; set; }
+
+            public double VectorToCanvasScaleY { get; set; }
+
+
+            public Chart()
+            {
+                CanvasWidth = 0;
+                CanvasHeight = 0;
+                Margin = 0;
+                VectorsCanvasClient = RectangleF.Empty;
+                MinVector = new Vector();
+                MaxVector = new Vector();
+                VectorToCanvasScaleX = 0;
+                VectorToCanvasScaleY = 0;
+            }
+
+
+            public override bool Equals(object obj)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override int GetHashCode()
+            {
+                return CanvasWidth.GetHashCode() + CanvasHeight.GetHashCode() + Margin.GetHashCode()
+                    + VectorsCanvasClient.GetHashCode() + MinVector.GetHashCode() + MaxVector.GetHashCode()
+                    + VectorToCanvasScaleX.GetHashCode() + VectorToCanvasScaleY.GetHashCode();
+            }
+
+            public override string ToString()
+            {
+                return $"Width:{CanvasWidth}, Height:{CanvasHeight}, Margin:{Margin}";
             }
         }
     }
