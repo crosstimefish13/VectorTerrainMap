@@ -47,7 +47,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             // VectorsCanvasClient
             chart.VectorsCanvasClient = new RectangleF(margin * 2f + 12f, margin * 2f + 20f,
-                width - margin * 4f - 18f, height - margin * 4f - 52f);
+                width - margin * 4f - 18f, height - margin * 4f - 72f);
 
             // MinVector MaxVector
             chart.MinVector = new Vector(double.MaxValue, double.MaxValue);
@@ -106,10 +106,12 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left, client.Top + 6f);
             g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left + 12f, client.Top + 6f);
 
-            // draw top left and bottom right text
+            // draw top and bottom text
             client = new RectangleF(client.X, client.Y - 20f, client.Width, client.Height + 40f);
-            g.DrawText("Euclid Distance", Color.Black, client.Right - 120f, client.Bottom - 20f);
-            g.DrawText("Semivariance", Color.Black, client.Left, client.Top);
+            g.DrawText($"Semivariance    min = {chart.MinVector.Semivariance.ToString("N16")}    max = {chart.MaxVector.Semivariance.ToString("N16")}",
+                Color.Black, client.Left, client.Top);
+            g.DrawText($"Euclid Distance    min = {chart.MinVector.EuclidDistance.ToString("N16")}    max = {chart.MaxVector.EuclidDistance.ToString("N16")}                lag bins = {LagBins.ToString("N16")}    vector count = {vectors.Count}",
+                Color.Black, client.Left, client.Bottom - 20f);
         }
 
         public void DrawModelCurve(Graphics g, Chart chart, Model model)
@@ -136,6 +138,12 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             path.Dispose();
             pen.Dispose();
+
+            // draw bottom text
+            var location = new PointF(chart.VectorsCanvasClient.Left - chart.Margin - 12f,
+                chart.VectorsCanvasClient.Bottom + chart.Margin + 32f);
+            g.DrawText($"{model.GetType().Name}    minX = {model.MinX.ToString("N16")}    minY = {model.MinY.ToString("N16")}    maxX = {model.MaxX.ToString("N16")}    maxY = {model.MaxY.ToString("N16")}",
+                Color.Black, location.X, location.Y);
         }
 
 

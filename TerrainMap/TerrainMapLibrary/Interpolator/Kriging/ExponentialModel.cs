@@ -15,7 +15,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             double fx = x - MinX;
             if (Common.DoubleCompare(fx, 0) <= 0) { return MinY; }
 
-            double y = MinY + MaxY * (1 - Math.Exp((-fx) / MaxX));
+            double y = MinY + (MaxY - MinY) * (1 - Math.Exp((-fx) / (MaxX - MinX)));
             return y;
         }
     }

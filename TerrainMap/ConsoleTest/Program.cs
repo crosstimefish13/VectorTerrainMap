@@ -82,7 +82,7 @@ namespace ConsoleTest
             var chart = map.GetChart(image.Width, image.Height, 20f);
             map.DrawData(g, chart);
 
-            var model = new ExponentialModel(0.0245, 10, 0.01, 550);
+            var model = new ExponentialModel(0.0240, 11.5, 0.0425, 684.5);
             map.DrawModelCurve(g, chart, model);
 
             g.Dispose();
