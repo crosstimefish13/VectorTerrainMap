@@ -12,6 +12,7 @@ namespace TerrainMapGUI
 {
     public class MainForm : Form
     {
+
         public MainForm()
         {
             InitializeComponent();
@@ -39,7 +40,7 @@ namespace TerrainMapGUI
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Arial", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel, ((byte)(134)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MainForm";
