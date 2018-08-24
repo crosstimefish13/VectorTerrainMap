@@ -44,7 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\KrigingPanel.cs">
+    <Compile Include="Controls\Extensions\ExControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Extensions\ExTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Extensions\ExTrackBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TrackValue.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MainForm.cs">
