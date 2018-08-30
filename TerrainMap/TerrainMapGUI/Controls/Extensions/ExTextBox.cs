@@ -1,10 +1,18 @@
 ﻿using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace TerrainMapGUI.Controls.Extensions
 {
     internal class ExTextBox : TextBox
     {
+        private string watermarkText;
+
+        private Font watermarkFont;
+
+        private Color watermarkColor;
+
+
         [Browsable(true)]
         [DefaultValue(16)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -15,12 +23,54 @@ namespace TerrainMapGUI.Controls.Extensions
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool NumberInput { get; set; }
 
+        [Browsable(true)]
+        [DefaultValue("")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public string WatermarkText
+        {
+            get { return watermarkText; }
+            set
+            {
+                watermarkText = value;
+                Invalidate();
+            }
+        }
+
+        [Browsable(true)]
+        [DefaultValue(typeof(Font), "Arial, 13px, style=Italic")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public Font WatermarkFont
+        {
+            get { return watermarkFont; }
+            set
+            {
+                watermarkFont = value;
+                Invalidate();
+            }
+        }
+
+        [Browsable(true)]
+        [DefaultValue(typeof(Color), "GrayText")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public Color WatermarkColor
+        {
+            get { return watermarkColor; }
+            set
+            {
+                watermarkColor = value;
+                Invalidate();
+            }
+        }
+
 
         public ExTextBox()
             : base()
         {
             MaxDecimalLength = 16;
             NumberInput = true;
+            watermarkText = "";
+            watermarkFont = new Font("Arial", 13, FontStyle.Italic, GraphicsUnit.Pixel);
+            watermarkColor = SystemColors.GrayText;
         }
 
 
@@ -50,6 +100,20 @@ namespace TerrainMapGUI.Controls.Extensions
                 }
 
                 base.OnKeyPress(e);
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            if (m.Msg == 0xf && Focused == false && string.IsNullOrEmpty(Text) == true
+                && string.IsNullOrEmpty(watermarkText) == false)
+            {
+                var g = CreateGraphics();
+                TextRenderer.DrawText(g, watermarkText, watermarkFont, ClientRectangle,
+                    watermarkColor, BackColor, TextFormatFlags.Top | TextFormatFlags.Left);
+                g.Dispose();
             }
         }
     }

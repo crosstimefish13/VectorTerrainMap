@@ -53,7 +53,7 @@
     <Compile Include="Controls\Extensions\ExTrackBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\TrackValue.cs">
+    <Compile Include="Controls\TrackValueControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MainForm.cs">

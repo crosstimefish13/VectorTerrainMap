@@ -144,6 +144,7 @@ namespace TerrainMapGUI.Controls.Extensions
         {
             Size = new Size(100, 100);
             BackColor = Color.White;
+            TabStop = false;
             BackgroundImageChanged = null;
             BackgroundImageLayoutChanged = null;
             CausesValidationChanged = null;
