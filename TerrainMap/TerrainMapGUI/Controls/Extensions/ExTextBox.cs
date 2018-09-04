@@ -110,10 +110,13 @@ namespace TerrainMapGUI.Controls.Extensions
             if (m.Msg == 0xf && Focused == false && string.IsNullOrEmpty(Text) == true
                 && string.IsNullOrEmpty(watermarkText) == false)
             {
-                var g = CreateGraphics();
-                TextRenderer.DrawText(g, watermarkText, watermarkFont, ClientRectangle,
-                    watermarkColor, BackColor, TextFormatFlags.Top | TextFormatFlags.Left);
-                g.Dispose();
+                if (Enabled == true && Visible == true)
+                {
+                    var g = CreateGraphics();
+                    TextRenderer.DrawText(g, watermarkText, watermarkFont, ClientRectangle,
+                        watermarkColor, BackColor, TextFormatFlags.Top | TextFormatFlags.Left);
+                    g.Dispose();
+                }
             }
         }
     }

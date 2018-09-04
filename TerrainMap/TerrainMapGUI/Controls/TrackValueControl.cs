@@ -211,6 +211,7 @@ namespace TerrainMapGUI.Controls
             // btnMinMove
             // 
             btnMinMove.Text = "<";
+            btnMinMove.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
             btnMinMove.Location = new Point(102, 0);
             btnMinMove.Size = new Size(24, 24);
             btnMinMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -239,6 +240,7 @@ namespace TerrainMapGUI.Controls
             // btnMaxMove
             // 
             btnMaxMove.Text = ">";
+            btnMaxMove.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
             btnMaxMove.Location = new Point(226, 0);
             btnMaxMove.Size = new Size(24, 24);
             btnMaxMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
