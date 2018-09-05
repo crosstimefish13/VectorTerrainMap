@@ -2,17 +2,20 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using TerrainMapGUI.Controls.Extensions;
+using TerrainMapGUILibrary.Extensions;
 
-namespace TerrainMapGUI.Controls
+namespace TerrainMapGUILibrary.Components
 {
-    public sealed class InputValueControl : ExControl
+    [DefaultEvent("ValueChanged")]
+    [DefaultProperty("Value")]
+    [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
+    public sealed class InputValueComponent : ControlExtension
     {
-        private ExTextBox txbValue;
+        private TextBoxExtension txbValue;
 
         private CheckBox chbTrackValue;
 
-        private TrackValueControl tvcValue;
+        private TrackValueComponent tvcValue;
 
 
         [Browsable(true)]
@@ -106,7 +109,7 @@ namespace TerrainMapGUI.Controls
         }
 
 
-        public InputValueControl()
+        public InputValueComponent()
            : base()
         {
             InitializeComponent();
@@ -115,9 +118,9 @@ namespace TerrainMapGUI.Controls
 
         private void InitializeComponent()
         {
-            txbValue = new ExTextBox();
+            txbValue = new TextBoxExtension();
             chbTrackValue = new CheckBox();
-            tvcValue = new TrackValueControl();
+            tvcValue = new TrackValueComponent();
             SuspendLayout();
             // 
             // txbMinX

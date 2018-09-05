@@ -3,12 +3,12 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace TerrainMapGUI.Controls.Extensions
+namespace TerrainMapGUILibrary.Extensions
 {
     [DefaultEvent("Enter")]
     [DefaultProperty("Size")]
-    [ToolboxItemFilter("TerrainMapGUI.Controls.Extensions")]
-    public class ExControl : Control
+    [ToolboxItemFilter("TerrainMapGUILibrary.Extensions")]
+    public class ControlExtension : Control
     {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -139,7 +139,7 @@ namespace TerrainMapGUI.Controls.Extensions
         public new event EventHandler TextChanged;
 
 
-        public ExControl()
+        public ControlExtension()
             : base()
         {
             Size = new Size(100, 100);

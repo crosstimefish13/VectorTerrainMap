@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace TerrainMapGUI.Controls.Extensions
+namespace TerrainMapGUILibrary.Extensions
 {
-    internal class ExTextBox : TextBox
+    internal class TextBoxExtension : TextBox
     {
         private string watermarkText;
 
@@ -63,7 +63,7 @@ namespace TerrainMapGUI.Controls.Extensions
         }
 
 
-        public ExTextBox()
+        public TextBoxExtension()
             : base()
         {
             MaxDecimalLength = 16;

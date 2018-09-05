@@ -4,15 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F489C900-1DFE-4DEF-B1A1-884AC1A3CEEF}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>TerrainMapGUI</RootNamespace>
-    <AssemblyName>TerrainMapGUI</AssemblyName>
+    <ProjectGuid>{19C46EE6-64FE-4992-9484-173CFFF8F460}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TerrainMapGUILibrary</RootNamespace>
+    <AssemblyName>TerrainMapGUILibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,36 +32,38 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Components\FoldPanelComponent.cs">
+      <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Components\InputValueComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\TrackValueComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\KrigingSemivarianceMapControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\ControlExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\TextBoxExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\TrackBarExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TerrainMapGUILibrary\TerrainMapGUILibrary.csproj">
-      <Project>{19c46ee6-64fe-4992-9484-173cfff8f460}</Project>
-      <Name>TerrainMapGUILibrary</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

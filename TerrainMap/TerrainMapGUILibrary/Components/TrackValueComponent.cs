@@ -2,24 +2,24 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using TerrainMapGUI.Controls.Extensions;
+using TerrainMapGUILibrary.Extensions;
 
-namespace TerrainMapGUI.Controls
+namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("TrackValueChanged")]
     [DefaultProperty("TrackValue")]
-    [ToolboxItemFilter("TerrainMapGUI.Controls")]
-    public sealed class TrackValueControl : ExControl
+    [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
+    public sealed class TrackValueComponent : ControlExtension
     {
-        private ExTextBox txbMinValue;
+        private TextBoxExtension txbMinValue;
 
         private Button btnMinMove;
 
-        private ExTrackBar trbValue;
+        private TrackBarExtension trbValue;
 
         private Button btnMaxMove;
 
-        private ExTextBox txbMaxValue;
+        private TextBoxExtension txbMaxValue;
 
 
         [Browsable(true)]
@@ -178,7 +178,7 @@ namespace TerrainMapGUI.Controls
         }
 
 
-        public TrackValueControl()
+        public TrackValueComponent()
             : base()
         {
             InitializeComponent();
@@ -187,11 +187,11 @@ namespace TerrainMapGUI.Controls
 
         private void InitializeComponent()
         {
-            txbMinValue = new ExTextBox();
+            txbMinValue = new TextBoxExtension();
             btnMinMove = new Button();
-            trbValue = new ExTrackBar();
+            trbValue = new TrackBarExtension();
             btnMaxMove = new Button();
-            txbMaxValue = new ExTextBox();
+            txbMaxValue = new TextBoxExtension();
             SuspendLayout();
             // 
             // txbMinValue
@@ -293,7 +293,7 @@ namespace TerrainMapGUI.Controls
                 btnMaxMove.Enabled = false;
             }
 
-            if (sender is ExTextBox)
+            if (sender is TextBoxExtension)
             {
                 // invoke min max value changed
                 if (sender == txbMinValue && MinValueChanged != null)

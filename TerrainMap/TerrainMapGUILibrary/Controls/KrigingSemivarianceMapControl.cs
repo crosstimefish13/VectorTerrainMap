@@ -6,29 +6,33 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using TerrainMapGUI.Controls.Extensions;
+using TerrainMapGUILibrary.Components;
+using TerrainMapGUILibrary.Extensions;
 
-namespace TerrainMapGUI.Controls
+namespace TerrainMapGUILibrary.Controls
 {
-    public sealed class KrigingSemivarianceMapControl : ExControl
+    [DefaultEvent("ValueChanged")]
+    [DefaultProperty("Value")]
+    [ToolboxItemFilter("TerrainMapGUILibrary.Controls")]
+    public sealed class KrigingSemivarianceMapControl : ControlExtension
     {
         private Label lblMinX;
 
-        private InputValueControl ivcMinX;
+        private InputValueComponent ivcMinX;
 
         private Label lblMinY;
 
-        private InputValueControl ivcMinY;
+        private InputValueComponent ivcMinY;
 
         private Label lblMaxX;
 
-        private InputValueControl ivcMaxX;
+        private InputValueComponent ivcMaxX;
 
         private Label lblMaxY;
 
-        private InputValueControl ivcMaxY;
+        private InputValueComponent ivcMaxY;
 
-        private FoldPanelControl fpcContainer;
+        private FoldPanelComponent fpcContainer;
 
 
         [Browsable(true)]
@@ -130,14 +134,14 @@ namespace TerrainMapGUI.Controls
         private void InitializeComponent()
         {
             lblMinX = new Label();
-            ivcMinX = new InputValueControl();
+            ivcMinX = new InputValueComponent();
             lblMinY = new Label();
-            ivcMinY = new InputValueControl();
+            ivcMinY = new InputValueComponent();
             lblMaxX = new Label();
-            ivcMaxX = new InputValueControl();
+            ivcMaxX = new InputValueComponent();
             lblMaxY = new Label();
-            ivcMaxY = new InputValueControl();
-            fpcContainer = new FoldPanelControl();
+            ivcMaxY = new InputValueComponent();
+            fpcContainer = new FoldPanelComponent();
             SuspendLayout();
             // 
             // lblMinX

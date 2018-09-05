@@ -2,11 +2,14 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using TerrainMapGUI.Controls.Extensions;
+using TerrainMapGUILibrary.Extensions;
 
-namespace TerrainMapGUI.Controls
+namespace TerrainMapGUILibrary.Components
 {
-    public sealed class FoldPanelControl : ExControl
+    [DefaultEvent("IsFoldedChanged")]
+    [DefaultProperty("Title")]
+    [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
+    public sealed class FoldPanelComponent : ControlExtension
     {
         private Size minSize;
 
@@ -18,7 +21,7 @@ namespace TerrainMapGUI.Controls
 
         private Label lblArrow;
 
-        private ExControl conTitle;
+        private ControlExtension conTitle;
 
 
         [Browsable(true)]
@@ -106,7 +109,7 @@ namespace TerrainMapGUI.Controls
         public event EventHandler IsFoldedChanged;
 
 
-        public FoldPanelControl()
+        public FoldPanelComponent()
            : base()
         {
             minSize = new Size(100, 22);
@@ -133,7 +136,7 @@ namespace TerrainMapGUI.Controls
         {
             lblTitle = new Label();
             lblArrow = new Label();
-            conTitle = new ExControl();
+            conTitle = new ControlExtension();
             SuspendLayout();
             // 
             // lblTitle

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerrainMapLibrary", "Terrai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerrainMapGUI", "TerrainMapGUI\TerrainMapGUI.csproj", "{F489C900-1DFE-4DEF-B1A1-884AC1A3CEEF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerrainMapGUILibrary", "TerrainMapGUILibrary\TerrainMapGUILibrary.csproj", "{19C46EE6-64FE-4992-9484-173CFFF8F460}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F489C900-1DFE-4DEF-B1A1-884AC1A3CEEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F489C900-1DFE-4DEF-B1A1-884AC1A3CEEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F489C900-1DFE-4DEF-B1A1-884AC1A3CEEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19C46EE6-64FE-4992-9484-173CFFF8F460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19C46EE6-64FE-4992-9484-173CFFF8F460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19C46EE6-64FE-4992-9484-173CFFF8F460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19C46EE6-64FE-4992-9484-173CFFF8F460}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

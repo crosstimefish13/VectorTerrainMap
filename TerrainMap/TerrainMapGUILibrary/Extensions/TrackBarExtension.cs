@@ -3,16 +3,16 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace TerrainMapGUI.Controls.Extensions
+namespace TerrainMapGUILibrary.Extensions
 {
-    internal class ExTrackBar : TrackBar
+    internal class TrackBarExtension : TrackBar
     {
         [Browsable(true)]
         [DefaultValue(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new virtual bool ShowFocusCues { get; set; }
 
-        public ExTrackBar()
+        public TrackBarExtension()
             : base()
         {
             ShowFocusCues = false;
