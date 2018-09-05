@@ -161,7 +161,6 @@ namespace TerrainMapGUI.Controls
                 // control self tab stop always be false
                 txbMinValue.TabStop = value;
                 txbMaxValue.TabStop = value;
-                base.TabStop = false;
             }
         }
 
@@ -175,7 +174,6 @@ namespace TerrainMapGUI.Controls
             {
                 txbMinValue.TabIndex = value;
                 txbMaxValue.TabIndex = value;
-                base.TabIndex = value;
             }
         }
 

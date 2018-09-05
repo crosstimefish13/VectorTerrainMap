@@ -8,11 +8,11 @@ namespace TerrainMapGUI.Controls
 {
     public sealed class InputValueControl : ExControl
     {
-        private ExTextBox txbMinX;
+        private ExTextBox txbValue;
 
-        private CheckBox chbMinX;
+        private CheckBox chbTrackValue;
 
-        private TrackValueControl tvcMinX;
+        private TrackValueControl tvcValue;
 
 
         [Browsable(true)]
@@ -22,8 +22,8 @@ namespace TerrainMapGUI.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string WatermarkText
         {
-            get { return txbMinX.WatermarkText; }
-            set { txbMinX.WatermarkText = value; }
+            get { return txbValue.WatermarkText; }
+            set { txbValue.WatermarkText = value; }
         }
 
         [Browsable(true)]
@@ -33,13 +33,13 @@ namespace TerrainMapGUI.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
-            get { return txbMinX.MaxDecimalLength; }
+            get { return txbValue.MaxDecimalLength; }
             set
             {
                 if (value >= 0)
                 {
-                    txbMinX.MaxDecimalLength = value;
-                    tvcMinX.MaxDecimalLength = value;
+                    txbValue.MaxDecimalLength = value;
+                    tvcValue.MaxDecimalLength = value;
                 }
             }
         }
@@ -53,20 +53,20 @@ namespace TerrainMapGUI.Controls
         {
             get
             {
-                if (double.TryParse(txbMinX.Text, out double value) == true) { return value; }
+                if (double.TryParse(txbValue.Text, out double value) == true) { return value; }
                 else { return double.NaN; }
             }
             set
             {
-                if (chbMinX.Checked == true) { tvcMinX.TrackValue = value; }
+                if (chbTrackValue.Checked == true) { tvcValue.TrackValue = value; }
                 else
                 {
                     // input decimal length should be less or equal than max decimal length
                     string valueString = value.ToString();
                     int dotIndex = valueString.IndexOf('.');
                     if ((dotIndex >= 0 && valueString.Substring(dotIndex, valueString.Length - dotIndex - 1).Length
-                            <= txbMinX.MaxDecimalLength) || dotIndex < 0)
-                    { txbMinX.Text = valueString; }
+                            <= txbValue.MaxDecimalLength) || dotIndex < 0)
+                    { txbValue.Text = valueString; }
                 }
             }
         }
@@ -78,6 +78,34 @@ namespace TerrainMapGUI.Controls
         public event EventHandler ValueChanged;
 
 
+        [Browsable(true)]
+        [DefaultValue(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public new bool TabStop
+        {
+            get { return txbValue.TabStop; }
+            set
+            {
+                // control self tab stop always be false
+                txbValue.TabStop = value;
+                tvcValue.TabStop = value;
+            }
+        }
+
+        [Browsable(true)]
+        [DefaultValue(0)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public new int TabIndex
+        {
+            get { return txbValue.TabIndex; }
+            set
+            {
+                txbValue.TabIndex = value;
+                tvcValue.TabIndex = value;
+            }
+        }
+
+
         public InputValueControl()
            : base()
         {
@@ -87,46 +115,46 @@ namespace TerrainMapGUI.Controls
 
         private void InitializeComponent()
         {
-            txbMinX = new ExTextBox();
-            chbMinX = new CheckBox();
-            tvcMinX = new TrackValueControl();
+            txbValue = new ExTextBox();
+            chbTrackValue = new CheckBox();
+            tvcValue = new TrackValueControl();
             SuspendLayout();
             // 
             // txbMinX
             // 
-            txbMinX.Text = "0";
-            txbMinX.WatermarkText = "Value";
-            txbMinX.NumberInput = true;
-            txbMinX.MaxDecimalLength = 16;
-            txbMinX.Location = new Point(1, 1);
-            txbMinX.Size = new Size(100, 22);
-            txbMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            txbMinX.TextChanged += (sender, e) =>
+            txbValue.Text = "0";
+            txbValue.WatermarkText = "Value";
+            txbValue.NumberInput = true;
+            txbValue.MaxDecimalLength = 16;
+            txbValue.Location = new Point(1, 1);
+            txbValue.Size = new Size(100, 22);
+            txbValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            txbValue.TextChanged += (sender, e) =>
             { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
-            Controls.Add(txbMinX);
+            Controls.Add(txbValue);
             // 
             // chbMinX
             // 
-            chbMinX.Text = "Use Track:";
-            chbMinX.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
-            chbMinX.Location = new Point(110, 2);
-            chbMinX.Size = new Size(90, 18);
-            chbMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            chbMinX.TabStop = false;
-            chbMinX.CheckedChanged += (sender, e) =>
+            chbTrackValue.Text = "Use Track:";
+            chbTrackValue.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            chbTrackValue.Location = new Point(110, 2);
+            chbTrackValue.Size = new Size(90, 18);
+            chbTrackValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            chbTrackValue.TabStop = false;
+            chbTrackValue.CheckedChanged += (sender, e) =>
             {
-                txbMinX.Enabled = !chbMinX.Checked;
-                tvcMinX.Enabled = chbMinX.Checked;
+                txbValue.Enabled = !chbTrackValue.Checked;
+                tvcValue.Enabled = chbTrackValue.Checked;
             };
-            Controls.Add(chbMinX);
+            Controls.Add(chbTrackValue);
             // 
             // tvcMinX
             // 
-            tvcMinX.Location = new Point(200, 0);
-            tvcMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            tvcMinX.Enabled = false;
-            tvcMinX.TrackValueChanged += (sender, e) => { txbMinX.Text = tvcMinX.TrackValue.ToString(); };
-            Controls.Add(tvcMinX);
+            tvcValue.Location = new Point(200, 0);
+            tvcValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            tvcValue.Enabled = false;
+            tvcValue.TrackValueChanged += (sender, e) => { txbValue.Text = tvcValue.TrackValue.ToString(); };
+            Controls.Add(tvcValue);
             // 
             // this
             // 
