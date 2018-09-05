@@ -34,6 +34,8 @@ namespace TerrainMapGUILibrary.Controls
 
         private FoldPanelComponent fpcContainer;
 
+        private PictureBox pcbImage;
+
 
         [Browsable(true)]
         [Category("Function")]
@@ -142,6 +144,7 @@ namespace TerrainMapGUILibrary.Controls
             lblMaxY = new Label();
             ivcMaxY = new InputValueComponent();
             fpcContainer = new FoldPanelComponent();
+            pcbImage = new PictureBox();
             SuspendLayout();
             // 
             // lblMinX
@@ -221,10 +224,9 @@ namespace TerrainMapGUILibrary.Controls
             fpcContainer.Title = "Kriging Semivariance Map";
             fpcContainer.MinSize = new Size(180, 22);
             fpcContainer.MaxSize = new Size(613, 138);
-            fpcContainer.Location = new Point(0, 0);
+            fpcContainer.Location = new Point(12, 12);
             fpcContainer.Size = new Size(613, 138);
             fpcContainer.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            fpcContainer.SizeChanged += (sender, e) => { Size = fpcContainer.Size; };
             fpcContainer.IsFoldedChanged += (sender, e) =>
             {
                 ivcMinX.Enabled = !fpcContainer.IsFolded;
@@ -234,9 +236,17 @@ namespace TerrainMapGUILibrary.Controls
             };
             Controls.Add(fpcContainer);
             // 
+            // pcbImage
+            // 
+            pcbImage.BackColor = Color.AliceBlue;
+            pcbImage.Location = new Point(0, 0);
+            pcbImage.Size = new Size(650, 175);
+            pcbImage.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+            Controls.Add(pcbImage);
+            // 
             // this
             // 
-            Size = new Size(613, 138);
+            Size = new Size(650, 175);
             ValueChanged = null;
             ResumeLayout(false);
             PerformLayout();
