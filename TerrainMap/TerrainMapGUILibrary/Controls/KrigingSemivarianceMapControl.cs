@@ -39,6 +39,10 @@ namespace TerrainMapGUILibrary.Controls
 
         private InputValueComponent ivcMaxY;
 
+        private Label lblModel;
+
+        private ComboBox cmbModel;
+
         private FoldPanelComponent fpcContainer;
 
         private PictureBox pcbImage;
@@ -177,6 +181,8 @@ namespace TerrainMapGUILibrary.Controls
             ivcMaxX = new InputValueComponent();
             lblMaxY = new Label();
             ivcMaxY = new InputValueComponent();
+            lblModel = new Label();
+            cmbModel = new ComboBox();
             fpcContainer = new FoldPanelComponent();
             pcbImage = new PictureBox();
             SuspendLayout();
@@ -257,13 +263,37 @@ namespace TerrainMapGUILibrary.Controls
             ivcMaxY.ValueChanged += UpdateCurve;
             fpcContainer.Controls.Add(ivcMaxY);
             // 
+            // lblModel
+            // 
+            lblModel.Text = "Model:";
+            lblModel.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblModel.Location = new Point(1, 142);
+            lblModel.Size = new Size(49, 19);
+            lblModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            fpcContainer.Controls.Add(lblModel);
+            // 
+            // cmbModel
+            // 
+            cmbModel.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbModel.Items.AddRange(typeof(Model).Assembly.GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(Model)) && t.IsAbstract == false)
+                .Select(t => t.Name)
+                .ToArray());
+            cmbModel.SelectedIndex = 0;
+            cmbModel.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            cmbModel.Location = new Point(51, 138);
+            cmbModel.Size = new Size(190, 24);
+            cmbModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            cmbModel.SelectedIndexChanged += UpdateCurve;
+            fpcContainer.Controls.Add(cmbModel);
+            // 
             // fpcContainer
             // 
             fpcContainer.Title = "Kriging Semivariance Map";
             fpcContainer.MinSize = new Size(180, 22);
-            fpcContainer.MaxSize = new Size(613, 138);
+            fpcContainer.MaxSize = new Size(613, 168);
             fpcContainer.Location = new Point(12, 12);
-            fpcContainer.Size = new Size(613, 138);
+            fpcContainer.Size = new Size(613, 168);
             fpcContainer.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             fpcContainer.IsFoldedChanged += (sender, e) =>
             {
@@ -278,14 +308,14 @@ namespace TerrainMapGUILibrary.Controls
             // pcbImage
             // 
             pcbImage.Location = new Point(0, 0);
-            pcbImage.Size = new Size(650, 175);
+            pcbImage.Size = new Size(650, 200);
             pcbImage.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
             Controls.Add(pcbImage);
             // 
             // this
             // 
             Value = new MapValue(0, 0, 0, 0);
-            Size = new Size(650, 175);
+            Size = new Size(650, 200);
             ValueChanged = null;
             ResumeLayout(false);
             PerformLayout();
@@ -296,10 +326,15 @@ namespace TerrainMapGUILibrary.Controls
         {
             if (dataImage == null || chart == null || map == null || Value.IsValid() == false) { return; }
 
+            // get drawing model
+            var modelType = typeof(Model).Assembly.GetTypes()
+                .FirstOrDefault(t => t.Name == cmbModel.Items[cmbModel.SelectedIndex].ToString());
+            if (modelType == null) { return; }
+            var model = Activator.CreateInstance(modelType, Value.MinX, Value.MinY, Value.MaxX, Value.MaxY) as Model;
+
             // draw curve
             var image = (Image)dataImage.Clone();
             var g = Graphics.FromImage(image);
-            var model = new ExponentialModel(Value.MinX, Value.MinY, Value.MaxX, Value.MaxY);
             map.DrawModelCurve(g, chart, model);
             g.Dispose();
 

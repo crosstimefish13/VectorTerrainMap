@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -16,6 +17,7 @@ namespace TerrainMapGUILibrary.Extensions
             : base()
         {
             ShowFocusCues = false;
+            Font = new Font("Arial", 13, FontStyle.Regular, GraphicsUnit.Pixel);
         }
 
 

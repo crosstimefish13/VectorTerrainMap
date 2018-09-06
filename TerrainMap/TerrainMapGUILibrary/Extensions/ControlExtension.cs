@@ -142,6 +142,7 @@ namespace TerrainMapGUILibrary.Extensions
         public ControlExtension()
             : base()
         {
+            Font = new Font("Arial", 13, FontStyle.Regular, GraphicsUnit.Pixel);
             Size = new Size(100, 100);
             BackColor = Color.White;
             TabStop = false;

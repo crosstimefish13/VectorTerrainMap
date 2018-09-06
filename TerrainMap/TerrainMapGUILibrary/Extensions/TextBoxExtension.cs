@@ -122,6 +122,7 @@ namespace TerrainMapGUILibrary.Extensions
             watermarkText = "";
             watermarkFont = new Font("Arial", 13, FontStyle.Italic, GraphicsUnit.Pixel);
             watermarkColor = SystemColors.GrayText;
+            Font = new Font("Arial", 13, FontStyle.Regular, GraphicsUnit.Pixel);
         }
 
 
