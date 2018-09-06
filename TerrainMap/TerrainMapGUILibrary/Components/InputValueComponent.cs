@@ -21,7 +21,7 @@ namespace TerrainMapGUILibrary.Components
         [Browsable(true)]
         [Category("Function")]
         [Description("Watermark text for value input.")]
-        [DefaultValue("Value")]
+        [DefaultValue("")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string WatermarkText
         {
@@ -39,39 +39,24 @@ namespace TerrainMapGUILibrary.Components
             get { return txbValue.MaxDecimalLength; }
             set
             {
-                if (value >= 0)
-                {
-                    txbValue.MaxDecimalLength = value;
-                    tvcValue.MaxDecimalLength = value;
-                }
+                txbValue.MaxDecimalLength = value;
+                tvcValue.MaxDecimalLength = value;
             }
         }
 
         [Browsable(true)]
         [Category("Function")]
         [Description("Value input.")]
-        [DefaultValue(0)]
+        [DefaultValue(double.NaN)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public double Value
         {
             get
             {
-                if (double.TryParse(txbValue.Text, out double value) == true) { return value; }
-                else { return double.NaN; }
+                if (string.IsNullOrEmpty(txbValue.Text) == true) { return double.NaN; }
+                else { return double.Parse(txbValue.Text); }
             }
-            set
-            {
-                if (chbTrackValue.Checked == true) { tvcValue.TrackValue = value; }
-                else
-                {
-                    // input decimal length should be less or equal than max decimal length
-                    string valueString = value.ToString();
-                    int dotIndex = valueString.IndexOf('.');
-                    if ((dotIndex >= 0 && valueString.Substring(dotIndex, valueString.Length - dotIndex - 1).Length
-                            <= txbValue.MaxDecimalLength) || dotIndex < 0)
-                    { txbValue.Text = valueString; }
-                }
-            }
+            set { txbValue.Text = value.ToString(); }
         }
 
         [Browsable(true)]
@@ -123,9 +108,8 @@ namespace TerrainMapGUILibrary.Components
             tvcValue = new TrackValueComponent();
             SuspendLayout();
             // 
-            // txbMinX
+            // txbValue
             // 
-            txbValue.Text = "0";
             txbValue.WatermarkText = "Value";
             txbValue.NumberInput = true;
             txbValue.MaxDecimalLength = 16;
@@ -136,7 +120,7 @@ namespace TerrainMapGUILibrary.Components
             { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
             Controls.Add(txbValue);
             // 
-            // chbMinX
+            // chbTrackValue
             // 
             chbTrackValue.Text = "Use Track:";
             chbTrackValue.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
@@ -151,8 +135,12 @@ namespace TerrainMapGUILibrary.Components
             };
             Controls.Add(chbTrackValue);
             // 
-            // tvcMinX
+            // tvcValue
             // 
+            tvcValue.MaxDecimalLength = 16;
+            tvcValue.MinValue = 0;
+            tvcValue.MaxValue = 0;
+            tvcValue.TrackValue = 0;
             tvcValue.Location = new Point(200, 0);
             tvcValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             tvcValue.Enabled = false;

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Components;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapLibrary.Interpolator.Kriging;
 
 namespace TerrainMapGUILibrary.Controls
 {
@@ -16,6 +17,8 @@ namespace TerrainMapGUILibrary.Controls
     [ToolboxItemFilter("TerrainMapGUILibrary.Controls")]
     public sealed class KrigingSemivarianceMapControl : ControlExtension
     {
+        private SemivarianceMap.Chart chart;
+
         private Label lblMinX;
 
         private InputValueComponent ivcMinX;
@@ -47,13 +50,10 @@ namespace TerrainMapGUILibrary.Controls
             get { return ivcMinX.MaxDecimalLength; }
             set
             {
-                if (value >= 0)
-                {
-                    ivcMinX.MaxDecimalLength = value;
-                    ivcMinY.MaxDecimalLength = value;
-                    ivcMaxX.MaxDecimalLength = value;
-                    ivcMaxY.MaxDecimalLength = value;
-                }
+                ivcMinX.MaxDecimalLength = value;
+                ivcMinY.MaxDecimalLength = value;
+                ivcMaxX.MaxDecimalLength = value;
+                ivcMaxY.MaxDecimalLength = value;
             }
         }
 
@@ -66,14 +66,7 @@ namespace TerrainMapGUILibrary.Controls
         {
             get
             {
-                var value = new MapValue()
-                {
-                    MinX = ivcMinX.Value,
-                    MinY = ivcMinY.Value,
-                    MaxX = ivcMaxX.Value,
-                    MaxY = ivcMaxY.Value
-                };
-
+                var value = new MapValue(ivcMinX.Value, ivcMinY.Value, ivcMaxX.Value, ivcMaxY.Value);
                 return value;
             }
             set
@@ -93,6 +86,10 @@ namespace TerrainMapGUILibrary.Controls
         [Description("Occurs when value changed.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler ValueChanged;
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public SemivarianceMap Map { get; set; }
 
 
         [Browsable(true)]
@@ -129,7 +126,36 @@ namespace TerrainMapGUILibrary.Controls
 
         public KrigingSemivarianceMapControl()
         {
+            chart = null;
+
             InitializeComponent();
+        }
+
+
+        public void DrawData()
+        {
+            if (Map == null) { return; }
+
+            chart = Map.GetChart(Size.Width, Size.Height, 40f);
+            double minX = chart.MinVector.EuclidDistance;
+            double minY = chart.MinVector.Semivariance;
+            double maxX = chart.MaxVector.EuclidDistance;
+            double maxY = chart.MaxVector.Semivariance;
+
+            Value = new MapValue(minX, minY, maxX, maxY);
+            var model = new ExponentialModel(minX, minY, maxX, maxY);
+
+            //var model = new ExponentialModel(0.0240, 11.5, 0.0425, 684.5);
+
+            var image = new Bitmap(Size.Width, Size.Height);
+            var g = Graphics.FromImage(image);
+            Map.DrawData(g, chart);
+            Map.DrawModelCurve(g, chart, model);
+            g.Dispose();
+
+            var oldImage = pcbImage.Image;
+            pcbImage.Image = image;
+            if (oldImage != null) { oldImage.Dispose(); }
         }
 
 
@@ -158,6 +184,8 @@ namespace TerrainMapGUILibrary.Controls
             // 
             // ivcMinX
             // 
+            ivcMinX.Value = 0;
+            ivcMinX.MaxDecimalLength = 16;
             ivcMinX.WatermarkText = "Min X";
             ivcMinX.Location = new Point(50, 26);
             ivcMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -176,6 +204,8 @@ namespace TerrainMapGUILibrary.Controls
             // 
             // ivcMinY
             // 
+            ivcMinY.Value = 0;
+            ivcMinY.MaxDecimalLength = 16;
             ivcMinY.WatermarkText = "Min Y";
             ivcMinY.Location = new Point(50, 54);
             ivcMinY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -194,6 +224,8 @@ namespace TerrainMapGUILibrary.Controls
             // 
             // ivcMaxX
             // 
+            ivcMaxX.Value = 0;
+            ivcMaxX.MaxDecimalLength = 16;
             ivcMaxX.WatermarkText = "Max X";
             ivcMaxX.Location = new Point(50, 82);
             ivcMaxX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -212,6 +244,8 @@ namespace TerrainMapGUILibrary.Controls
             // 
             // ivcMaxY
             // 
+            ivcMaxY.Value = 0;
+            ivcMaxY.MaxDecimalLength = 16;
             ivcMaxY.WatermarkText = "Max Y";
             ivcMaxY.Location = new Point(50, 110);
             ivcMaxY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -238,7 +272,6 @@ namespace TerrainMapGUILibrary.Controls
             // 
             // pcbImage
             // 
-            pcbImage.BackColor = Color.AliceBlue;
             pcbImage.Location = new Point(0, 0);
             pcbImage.Size = new Size(650, 175);
             pcbImage.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
@@ -246,6 +279,8 @@ namespace TerrainMapGUILibrary.Controls
             // 
             // this
             // 
+            Value = new MapValue(0, 0, 0, 0);
+            Map = null;
             Size = new Size(650, 175);
             ValueChanged = null;
             ResumeLayout(false);
@@ -310,6 +345,7 @@ namespace TerrainMapGUILibrary.Controls
                 return $"MinX:{MinX}, MinY:{MinY}, MaxX:{MaxX}, MaxY:{MaxY}";
             }
         }
+
 
         public sealed class MapValueConverter : TypeConverter
         {
@@ -380,7 +416,8 @@ namespace TerrainMapGUILibrary.Controls
                 return base.CanConvertTo(context, destinationType);
             }
 
-            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
+                Type destinationType)
             {
                 if (value != null && destinationType != null)
                 {
@@ -414,7 +451,8 @@ namespace TerrainMapGUILibrary.Controls
                 return true;
             }
 
-            public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
+            public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value,
+                Attribute[] attributes)
             {
                 var propNames = typeof(MapValue).GetProperties().Select(p => p.Name).ToArray();
                 var propDescs = TypeDescriptor.GetProperties(typeof(MapValue), attributes);

@@ -32,11 +32,8 @@ namespace TerrainMapGUILibrary.Components
             get { return txbMinValue.MaxDecimalLength; }
             set
             {
-                if (value >= 0)
-                {
-                    txbMinValue.MaxDecimalLength = value;
-                    txbMaxValue.MaxDecimalLength = value;
-                }
+                txbMinValue.MaxDecimalLength = value;
+                txbMaxValue.MaxDecimalLength = value;
             }
         }
 
@@ -49,21 +46,10 @@ namespace TerrainMapGUILibrary.Components
         {
             get
             {
-                if (double.TryParse(txbMinValue.Text, out double minValue) == true) { return minValue; }
-                else { return double.NaN; }
+                if (string.IsNullOrEmpty(txbMinValue.Text) == true) { return double.NaN; }
+                else { return double.Parse(txbMinValue.Text); }
             }
-            set
-            {
-                // input decimal length should be less or equal than max decimal length
-                string minValueString = value.ToString();
-                int dotIndex = minValueString.IndexOf('.');
-                if ((dotIndex >= 0 && minValueString.Substring(dotIndex, minValueString.Length - dotIndex - 1).Length
-                        <= txbMinValue.MaxDecimalLength) || dotIndex < 0)
-                {
-                    txbMinValue.Text = minValueString;
-                    SetTrackControls(txbMinValue);
-                }
-            }
+            set { txbMinValue.Text = value.ToString(); }
         }
 
         [Browsable(true)]
@@ -75,21 +61,10 @@ namespace TerrainMapGUILibrary.Components
         {
             get
             {
-                if (double.TryParse(txbMaxValue.Text, out double maxValue) == true) { return maxValue; }
-                else { return double.NaN; }
+                if (string.IsNullOrEmpty(txbMaxValue.Text) == true) { return double.NaN; }
+                else { return double.Parse(txbMaxValue.Text); }
             }
-            set
-            {
-                // input decimal length should be less or equal than max decimal length
-                string maxValueString = value.ToString();
-                int dotIndex = maxValueString.IndexOf('.');
-                if ((dotIndex >= 0 && maxValueString.Substring(dotIndex, maxValueString.Length - dotIndex - 1).Length
-                        <= txbMaxValue.MaxDecimalLength) || dotIndex < 0)
-                {
-                    txbMaxValue.Text = maxValueString;
-                    SetTrackControls(txbMaxValue);
-                }
-            }
+            set { txbMaxValue.Text = value.ToString(); }
         }
 
         [Browsable(true)]

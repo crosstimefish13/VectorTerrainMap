@@ -58,6 +58,10 @@
       <Project>{19c46ee6-64fe-4992-9484-173cfff8f460}</Project>
       <Name>TerrainMapGUILibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TerrainMapLibrary\TerrainMapLibrary.csproj">
+      <Project>{b393fe35-8a81-49fb-ab16-2d2be38e5312}</Project>
+      <Name>TerrainMapLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">

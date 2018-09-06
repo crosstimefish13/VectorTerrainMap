@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,6 +7,12 @@ namespace TerrainMapGUILibrary.Extensions
 {
     internal class TextBoxExtension : TextBox
     {
+        private string text;
+
+        private int maxDecimalLength;
+
+        private bool numberInput;
+
         private string watermarkText;
 
         private Font watermarkFont;
@@ -16,12 +23,31 @@ namespace TerrainMapGUILibrary.Extensions
         [Browsable(true)]
         [DefaultValue(16)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int MaxDecimalLength { get; set; }
+        public int MaxDecimalLength
+        {
+            get { return maxDecimalLength; }
+            set
+            {
+                maxDecimalLength = value;
+                if (maxDecimalLength < 0) { maxDecimalLength = 0; }
+
+                if (numberInput == true) { Text = string.Empty; }
+            }
+        }
 
         [Browsable(true)]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public bool NumberInput { get; set; }
+        public bool NumberInput
+        {
+            get { return numberInput; }
+            set
+            {
+                numberInput = value;
+
+                if (numberInput == true) { Text = string.Empty; }
+            }
+        }
 
         [Browsable(true)]
         [DefaultValue("")]
@@ -62,12 +88,34 @@ namespace TerrainMapGUILibrary.Extensions
             }
         }
 
+        public override string Text
+        {
+            get { return base.Text; }
+            set
+            {
+                if (numberInput == true)
+                {
+                    if (string.IsNullOrEmpty(value) == true || double.TryParse(value, out double number) == false
+                    || double.IsNaN(number) == true || double.IsInfinity(number) == true)
+                    { base.Text = string.Empty; }
+                    else
+                    {
+                        base.Text = number.ToString();
+                        int dotIndex = base.Text.IndexOf('.');
+                        if (dotIndex >= 0 && base.Text.Length - dotIndex > maxDecimalLength)
+                        { base.Text = number.ToString($"N{maxDecimalLength}"); }
+                    }
+                }
+            }
+        }
+
 
         public TextBoxExtension()
             : base()
         {
-            MaxDecimalLength = 16;
-            NumberInput = true;
+            text = string.Empty;
+            maxDecimalLength = 16;
+            numberInput = false;
             watermarkText = "";
             watermarkFont = new Font("Arial", 13, FontStyle.Italic, GraphicsUnit.Pixel);
             watermarkColor = SystemColors.GrayText;
