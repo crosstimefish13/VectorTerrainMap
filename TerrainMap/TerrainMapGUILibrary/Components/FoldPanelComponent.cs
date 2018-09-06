@@ -45,9 +45,12 @@ namespace TerrainMapGUILibrary.Components
             get { return minSize; }
             set
             {
+                // limit min size
                 minSize = value;
                 if (minSize.Width < 1) { minSize.Width = 1; }
                 if (minSize.Height < 22) { minSize.Height = 22; }
+
+                Invalidate();
             }
         }
 
@@ -61,9 +64,12 @@ namespace TerrainMapGUILibrary.Components
             get { return maxSize; }
             set
             {
+                // limit max size
                 maxSize = value;
                 if (maxSize.Width < 1) { maxSize.Width = 1; }
                 if (maxSize.Height < 22) { maxSize.Height = 22; }
+
+                Invalidate();
             }
         }
 
@@ -80,6 +86,7 @@ namespace TerrainMapGUILibrary.Components
                 bool isFoldedChanged = false;
                 if (isFolded != value)
                 {
+                    // show arrow indicate text
                     if (value == true)
                     {
                         Size = minSize;
@@ -124,6 +131,7 @@ namespace TerrainMapGUILibrary.Components
         {
             base.OnPaint(e);
 
+            // draw border
             var pen = new Pen(SystemColors.ControlText, 1f);
             e.Graphics.DrawRectangle(pen,
                 ClientRectangle.Left, ClientRectangle.Top,

@@ -17,7 +17,11 @@ namespace TerrainMapGUILibrary.Controls
     [ToolboxItemFilter("TerrainMapGUILibrary.Controls")]
     public sealed class KrigingSemivarianceMapControl : ControlExtension
     {
+        private SemivarianceMap map;
+
         private SemivarianceMap.Chart chart;
+
+        private Image dataImage;
 
         private Label lblMinX;
 
@@ -73,10 +77,20 @@ namespace TerrainMapGUILibrary.Controls
             {
                 if (value != null)
                 {
+                    ivcMinX.ValueChanged -= UpdateCurve;
+                    ivcMinY.ValueChanged -= UpdateCurve;
+                    ivcMaxX.ValueChanged -= UpdateCurve;
+                    ivcMaxY.ValueChanged -= UpdateCurve;
                     ivcMinX.Value = value.MinX;
                     ivcMinY.Value = value.MinY;
                     ivcMaxX.Value = value.MaxX;
                     ivcMaxY.Value = value.MaxY;
+                    ivcMinX.ValueChanged += UpdateCurve;
+                    ivcMinY.ValueChanged += UpdateCurve;
+                    ivcMaxX.ValueChanged += UpdateCurve;
+                    ivcMaxY.ValueChanged += UpdateCurve;
+
+                    UpdateCurve();
                 }
             }
         }
@@ -86,10 +100,6 @@ namespace TerrainMapGUILibrary.Controls
         [Description("Occurs when value changed.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler ValueChanged;
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public SemivarianceMap Map { get; set; }
 
 
         [Browsable(true)]
@@ -126,36 +136,34 @@ namespace TerrainMapGUILibrary.Controls
 
         public KrigingSemivarianceMapControl()
         {
+            map = null;
             chart = null;
+            dataImage = null;
 
             InitializeComponent();
         }
 
 
-        public void DrawData()
+        public void LoadData(SemivarianceMap map)
         {
-            if (Map == null) { return; }
+            if (map == null) { return; }
+            if (dataImage != null) { dataImage.Dispose(); }
 
-            chart = Map.GetChart(Size.Width, Size.Height, 40f);
+            this.map = map;
+            chart = map.GetChart(Size.Width, Size.Height, 40f);
+            dataImage = new Bitmap(Size.Width, Size.Height);
+
+            // draw data
+            var g = Graphics.FromImage(dataImage);
+            map.DrawData(g, chart);
+            g.Dispose();
+
+            // update value, it would draw curve
             double minX = chart.MinVector.EuclidDistance;
             double minY = chart.MinVector.Semivariance;
             double maxX = chart.MaxVector.EuclidDistance;
             double maxY = chart.MaxVector.Semivariance;
-
             Value = new MapValue(minX, minY, maxX, maxY);
-            var model = new ExponentialModel(minX, minY, maxX, maxY);
-
-            //var model = new ExponentialModel(0.0240, 11.5, 0.0425, 684.5);
-
-            var image = new Bitmap(Size.Width, Size.Height);
-            var g = Graphics.FromImage(image);
-            Map.DrawData(g, chart);
-            Map.DrawModelCurve(g, chart, model);
-            g.Dispose();
-
-            var oldImage = pcbImage.Image;
-            pcbImage.Image = image;
-            if (oldImage != null) { oldImage.Dispose(); }
         }
 
 
@@ -189,8 +197,7 @@ namespace TerrainMapGUILibrary.Controls
             ivcMinX.WatermarkText = "Min X";
             ivcMinX.Location = new Point(50, 26);
             ivcMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            ivcMinX.ValueChanged += (sender, e) =>
-            { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
+            ivcMinX.ValueChanged += UpdateCurve;
             fpcContainer.Controls.Add(ivcMinX);
             // 
             // lblMinY
@@ -209,8 +216,7 @@ namespace TerrainMapGUILibrary.Controls
             ivcMinY.WatermarkText = "Min Y";
             ivcMinY.Location = new Point(50, 54);
             ivcMinY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            ivcMinY.ValueChanged += (sender, e) =>
-            { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
+            ivcMinY.ValueChanged += UpdateCurve;
             fpcContainer.Controls.Add(ivcMinY);
             // 
             // lblMaxX
@@ -229,8 +235,7 @@ namespace TerrainMapGUILibrary.Controls
             ivcMaxX.WatermarkText = "Max X";
             ivcMaxX.Location = new Point(50, 82);
             ivcMaxX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            ivcMaxX.ValueChanged += (sender, e) =>
-            { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
+            ivcMaxX.ValueChanged += UpdateCurve;
             fpcContainer.Controls.Add(ivcMaxX);
             // 
             // lblMaxY
@@ -249,8 +254,7 @@ namespace TerrainMapGUILibrary.Controls
             ivcMaxY.WatermarkText = "Max Y";
             ivcMaxY.Location = new Point(50, 110);
             ivcMaxY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            ivcMaxY.ValueChanged += (sender, e) =>
-            { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
+            ivcMaxY.ValueChanged += UpdateCurve;
             fpcContainer.Controls.Add(ivcMaxY);
             // 
             // fpcContainer
@@ -268,6 +272,7 @@ namespace TerrainMapGUILibrary.Controls
                 ivcMaxX.Enabled = !fpcContainer.IsFolded;
                 ivcMaxY.Enabled = !fpcContainer.IsFolded;
             };
+            fpcContainer.IsFolded = true;
             Controls.Add(fpcContainer);
             // 
             // pcbImage
@@ -280,11 +285,30 @@ namespace TerrainMapGUILibrary.Controls
             // this
             // 
             Value = new MapValue(0, 0, 0, 0);
-            Map = null;
             Size = new Size(650, 175);
             ValueChanged = null;
             ResumeLayout(false);
             PerformLayout();
+        }
+
+
+        private void UpdateCurve(object sender = null, EventArgs e = null)
+        {
+            if (dataImage == null || chart == null || map == null || Value.IsValid() == false) { return; }
+
+            // draw curve
+            var image = (Image)dataImage.Clone();
+            var g = Graphics.FromImage(image);
+            var model = new ExponentialModel(Value.MinX, Value.MinY, Value.MaxX, Value.MaxY);
+            map.DrawModelCurve(g, chart, model);
+            g.Dispose();
+
+            // update image
+            var oldImage = pcbImage.Image;
+            pcbImage.Image = image;
+            if (oldImage != null) { oldImage.Dispose(); }
+
+            if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); }
         }
 
 
@@ -306,6 +330,17 @@ namespace TerrainMapGUILibrary.Controls
                 MinY = minY;
                 MaxX = maxX;
                 MaxY = maxY;
+            }
+
+
+            public bool IsValid()
+            {
+                bool isInvalid = double.IsNaN(MinX) == true || double.IsInfinity(MinX) == true
+                    || double.IsNaN(MinY) == true || double.IsInfinity(MinY) == true
+                    || double.IsNaN(MaxX) == true || double.IsInfinity(MaxX) == true
+                    || double.IsNaN(MaxY) == true || double.IsInfinity(MaxY) == true;
+
+                return !isInvalid;
             }
 
 
@@ -362,6 +397,7 @@ namespace TerrainMapGUILibrary.Controls
             {
                 if (propertyValues != null)
                 {
+                    // create MapValue instance by using properties from UI Designer
                     var propNames = typeof(MapValue).GetProperties().Select(p => p.Name).ToArray();
                     var minX = propertyValues[propNames[0]];
                     var minY = propertyValues[propNames[1]];
@@ -390,6 +426,7 @@ namespace TerrainMapGUILibrary.Controls
             {
                 if (value != null && value is string)
                 {
+                    // convert from string to MapValue
                     if (culture == null) { culture = CultureInfo.CurrentCulture; }
                     char sep = culture.TextInfo.ListSeparator[0];
 
@@ -424,6 +461,7 @@ namespace TerrainMapGUILibrary.Controls
                     var source = value as MapValue;
                     if (destinationType == typeof(string))
                     {
+                        // convert from MapValue to string
                         if (culture == null) { culture = CultureInfo.CurrentCulture; }
                         char sep = culture.TextInfo.ListSeparator[0];
 
@@ -432,6 +470,7 @@ namespace TerrainMapGUILibrary.Controls
                     }
                     else if (destinationType == typeof(InstanceDescriptor))
                     {
+                        // convert from instance to MapValue
                         var ci = typeof(MapValue).GetConstructor(new Type[]
                             { typeof(double), typeof(double), typeof(double), typeof(double) });
                         if (ci != null)
@@ -454,8 +493,11 @@ namespace TerrainMapGUILibrary.Controls
             public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value,
                 Attribute[] attributes)
             {
+                // get properties from MapValue
                 var propNames = typeof(MapValue).GetProperties().Select(p => p.Name).ToArray();
                 var propDescs = TypeDescriptor.GetProperties(typeof(MapValue), attributes);
+
+                // TODO : sort is not work
                 propDescs.Sort(propNames);
                 return propDescs;
             }

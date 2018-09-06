@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -28,6 +27,7 @@ namespace TerrainMapGUILibrary.Extensions
             get { return maxDecimalLength; }
             set
             {
+                // value must be more than or equal 0
                 maxDecimalLength = value;
                 if (maxDecimalLength < 0) { maxDecimalLength = 0; }
 
@@ -95,12 +95,15 @@ namespace TerrainMapGUILibrary.Extensions
             {
                 if (numberInput == true)
                 {
+                    // need to format text as number
                     if (string.IsNullOrEmpty(value) == true || double.TryParse(value, out double number) == false
-                    || double.IsNaN(number) == true || double.IsInfinity(number) == true)
+                        || double.IsNaN(number) == true || double.IsInfinity(number) == true)
                     { base.Text = string.Empty; }
                     else
                     {
                         base.Text = number.ToString();
+
+                        // limit decimal length
                         int dotIndex = base.Text.IndexOf('.');
                         if (dotIndex >= 0 && base.Text.Length - dotIndex > maxDecimalLength)
                         { base.Text = number.ToString($"N{maxDecimalLength}"); }
@@ -128,7 +131,7 @@ namespace TerrainMapGUILibrary.Extensions
             if (NumberInput == false)
             { base.OnKeyPress(e); }
             // allow control keys
-            else if (char.IsControl(e.KeyChar))
+            else if (char.IsControl(e.KeyChar) == true)
             { base.OnKeyPress(e); }
             // allow first + and -
             else if (Text.Length == 0 && (e.KeyChar == '+' || e.KeyChar == '-'))
@@ -158,6 +161,7 @@ namespace TerrainMapGUILibrary.Extensions
             if (m.Msg == 0xf && Focused == false && string.IsNullOrEmpty(Text) == true
                 && string.IsNullOrEmpty(watermarkText) == false)
             {
+                // draw watermark text if needed
                 if (Enabled == true && Visible == true)
                 {
                     var g = CreateGraphics();

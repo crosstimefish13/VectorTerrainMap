@@ -27,6 +27,7 @@ namespace TerrainMapGUILibrary.Extensions
         {
             base.OnGotFocus(e);
 
+            // hide forus cues ifneeded
             if (ShowFocusCues == false)
             { SendMessage(Handle, 0x0128, (1 << 16) | (0x1 & 0xffff), 0); }
         }

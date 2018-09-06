@@ -64,8 +64,8 @@ namespace TerrainMapGUI
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            krigingSemivarianceMapControl1.Map = SemivarianceMap.Load(SemivarianceMap.GetALlLagBins()[2]);
-            krigingSemivarianceMapControl1.DrawData();
+            var map = SemivarianceMap.Load(SemivarianceMap.GetALlLagBins()[2]);
+            krigingSemivarianceMapControl1.LoadData(map);
         }
     }
 }
