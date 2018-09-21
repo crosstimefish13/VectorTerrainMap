@@ -14,6 +14,8 @@ namespace TerrainMapGUILibrary.Controls
 {
     [DefaultEvent("ValueChanged")]
     [DefaultProperty("Value")]
+    [DesignTimeVisible(true)]
+    [ToolboxItem(true)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Controls")]
     public sealed class KrigingSemivarianceMapControl : ControlExtension
     {

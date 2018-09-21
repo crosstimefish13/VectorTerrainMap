@@ -8,6 +8,8 @@ namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("ValueChanged")]
     [DefaultProperty("Value")]
+    [DesignTimeVisible(false)]
+    [ToolboxItem(false)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
     public sealed class InputValueComponent : ControlExtension
     {

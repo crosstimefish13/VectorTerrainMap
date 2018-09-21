@@ -8,6 +8,8 @@ namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("TrackValueChanged")]
     [DefaultProperty("TrackValue")]
+    [DesignTimeVisible(false)]
+    [ToolboxItem(false)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
     public sealed class TrackValueComponent : ControlExtension
     {

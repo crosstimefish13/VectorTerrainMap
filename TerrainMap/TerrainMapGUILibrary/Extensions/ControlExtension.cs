@@ -7,6 +7,8 @@ namespace TerrainMapGUILibrary.Extensions
 {
     [DefaultEvent("Enter")]
     [DefaultProperty("Size")]
+    [DesignTimeVisible(false)]
+    [ToolboxItem(false)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Extensions")]
     public class ControlExtension : Control
     {

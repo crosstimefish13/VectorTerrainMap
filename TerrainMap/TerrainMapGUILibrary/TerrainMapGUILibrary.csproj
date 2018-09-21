@@ -54,6 +54,9 @@
     <Compile Include="Controls\KrigingSemivarianceMapControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\ProcessControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\ControlExtension.cs">
       <SubType>Component</SubType>
     </Compile>

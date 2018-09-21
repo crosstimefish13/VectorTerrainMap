@@ -39,6 +39,7 @@ namespace TerrainMapGUI
             // krigingSemivarianceMapControl1
             // 
             this.krigingSemivarianceMapControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.krigingSemivarianceMapControl1.Font = new System.Drawing.Font("Arial", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.krigingSemivarianceMapControl1.Location = new System.Drawing.Point(0, 0);
             this.krigingSemivarianceMapControl1.Name = "krigingSemivarianceMapControl1";
             this.krigingSemivarianceMapControl1.Size = new System.Drawing.Size(1264, 681);

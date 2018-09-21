@@ -8,6 +8,8 @@ namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("IsFoldedChanged")]
     [DefaultProperty("Title")]
+    [DesignTimeVisible(false)]
+    [ToolboxItem(false)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
     public sealed class FoldPanelComponent : ControlExtension
     {
