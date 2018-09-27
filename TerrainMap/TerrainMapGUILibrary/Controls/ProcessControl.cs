@@ -13,6 +13,7 @@ using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Controls
 {
+    [DefaultEvent("SelectChanged")]
     [DefaultProperty("Items")]
     [DesignTimeVisible(true)]
     [ToolboxItem(true)]
@@ -59,12 +60,20 @@ namespace TerrainMapGUILibrary.Controls
         }
 
 
+        [Category("Function")]
+        [Description("Occurs when select changed.")]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public event EventHandler SelectChanged;
+
+
         public ProcessControl()
         {
             selectedIndex = -1;
             InnerItems = new ObservableCollection<ProcessItem>();
             InnerItems.CollectionChanged += (sender, e) => { RefreshItems(); };
             Items = new ProcessItemCollection() { Owner = this };
+            SelectChanged = null;
 
             InitializeComponent();
         }
@@ -136,7 +145,7 @@ namespace TerrainMapGUILibrary.Controls
                 item.DescriptionLabel.Visible = false;
                 cePanel.Controls.Add(item.DescriptionLabel);
             }
-            
+
             int offsetY = 10;
             if (InnerItems.Count > 0) { offsetY = InnerItems.Max(i => i.DescriptionLabel.Bounds.Bottom) + 10; }
 
@@ -168,7 +177,7 @@ namespace TerrainMapGUILibrary.Controls
 
                 offsetY = item.HeaderLabel.Bounds.Bottom + 10;
             }
-            
+
             // 
             // cePanel
             // 
@@ -208,6 +217,8 @@ namespace TerrainMapGUILibrary.Controls
             if (InnerItems.Count > 1 && selectedIndex > 0 && selectedIndex < InnerItems.Count)
             { btnBack.Enabled = true; }
             else { btnBack.Enabled = false; }
+
+            if (SelectChanged != null) { SelectChanged.Invoke(this, new EventArgs()); }
         }
 
 
