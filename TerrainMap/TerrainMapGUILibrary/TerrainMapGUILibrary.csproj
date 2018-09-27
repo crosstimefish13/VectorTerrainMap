@@ -60,6 +60,9 @@
     <Compile Include="Extensions\ControlExtension.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Extensions\PanelExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\TextBoxExtension.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -67,6 +70,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Themes\FontTheme.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TerrainMapLibrary\TerrainMapLibrary.csproj">

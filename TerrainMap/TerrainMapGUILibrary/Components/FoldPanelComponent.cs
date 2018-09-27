@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
@@ -26,10 +27,10 @@ namespace TerrainMapGUILibrary.Components
         private ControlExtension conTitle;
 
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Title for header bar.")]
         [DefaultValue("Title")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string Title
         {
@@ -37,10 +38,10 @@ namespace TerrainMapGUILibrary.Components
             set { lblTitle.Text = value; }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Size if folded.")]
         [DefaultValue(typeof(Size), "100, 22")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Size MinSize
         {
@@ -56,10 +57,10 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Size if not folded.")]
         [DefaultValue(typeof(Size), "100, 102")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Size MaxSize
         {
@@ -75,10 +76,10 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Indicate if folded or not.")]
         [DefaultValue(false)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool IsFolded
         {
@@ -111,9 +112,9 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Occurs when is folded value changed.")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler IsFoldedChanged;
 
@@ -152,7 +153,7 @@ namespace TerrainMapGUILibrary.Components
             // lblTitle
             // 
             lblTitle.Text = "Title";
-            lblTitle.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblTitle.Font = FontTheme.Normal();
             lblTitle.Location = new Point(1, 1);
             lblTitle.AutoSize = true;
             lblTitle.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -162,7 +163,7 @@ namespace TerrainMapGUILibrary.Components
             // lblArrow
             // 
             lblArrow.Text = "▲";
-            lblArrow.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblArrow.Font = FontTheme.Normal();
             lblArrow.Location = new Point(80, 1);
             lblArrow.Size = new Size(20, 19);
             lblArrow.Anchor = AnchorStyles.Top | AnchorStyles.Right;

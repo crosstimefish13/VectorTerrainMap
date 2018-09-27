@@ -3,13 +3,13 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Extensions
 {
     internal class TrackBarExtension : TrackBar
     {
         [Browsable(true)]
-        [DefaultValue(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new virtual bool ShowFocusCues { get; set; }
 
@@ -17,7 +17,7 @@ namespace TerrainMapGUILibrary.Extensions
             : base()
         {
             ShowFocusCues = false;
-            Font = new Font("Arial", 13, FontStyle.Regular, GraphicsUnit.Pixel);
+            Font = FontTheme.Normal();
         }
 
 

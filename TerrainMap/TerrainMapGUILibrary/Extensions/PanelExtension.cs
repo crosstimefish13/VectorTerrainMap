@@ -11,7 +11,7 @@ namespace TerrainMapGUILibrary.Extensions
     [DesignTimeVisible(false)]
     [ToolboxItem(false)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Extensions")]
-    public class ControlExtension : Control
+    public class PanelExtension : Panel
     {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -209,7 +209,7 @@ namespace TerrainMapGUILibrary.Extensions
         }
 
 
-        public ControlExtension()
+        public PanelExtension()
             : base()
         {
             Font = FontTheme.Normal();

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Extensions
 {
@@ -20,7 +21,6 @@ namespace TerrainMapGUILibrary.Extensions
 
 
         [Browsable(true)]
-        [DefaultValue(16)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
@@ -36,7 +36,6 @@ namespace TerrainMapGUILibrary.Extensions
         }
 
         [Browsable(true)]
-        [DefaultValue(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool NumberInput
         {
@@ -50,7 +49,6 @@ namespace TerrainMapGUILibrary.Extensions
         }
 
         [Browsable(true)]
-        [DefaultValue("")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string WatermarkText
         {
@@ -63,7 +61,6 @@ namespace TerrainMapGUILibrary.Extensions
         }
 
         [Browsable(true)]
-        [DefaultValue(typeof(Font), "Arial, 13px, style=Italic")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Font WatermarkFont
         {
@@ -76,7 +73,6 @@ namespace TerrainMapGUILibrary.Extensions
         }
 
         [Browsable(true)]
-        [DefaultValue(typeof(Color), "GrayText")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public Color WatermarkColor
         {
@@ -120,9 +116,9 @@ namespace TerrainMapGUILibrary.Extensions
             maxDecimalLength = 16;
             numberInput = false;
             watermarkText = "";
-            watermarkFont = new Font("Arial", 13, FontStyle.Italic, GraphicsUnit.Pixel);
+            watermarkFont = FontTheme.NormalItalic();
             watermarkColor = SystemColors.GrayText;
-            Font = new Font("Arial", 13, FontStyle.Regular, GraphicsUnit.Pixel);
+            Font = FontTheme.Normal();
         }
 
 

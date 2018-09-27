@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
@@ -24,10 +25,10 @@ namespace TerrainMapGUILibrary.Components
         private TextBoxExtension txbMaxValue;
 
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Max decimal length for min max value input.")]
         [DefaultValue(16)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
@@ -39,10 +40,10 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Min value to limit the track value.")]
         [DefaultValue(double.NaN)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public double MinValue
         {
@@ -54,10 +55,10 @@ namespace TerrainMapGUILibrary.Components
             set { txbMinValue.Text = value.ToString(); }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Max value to limit the track value.")]
         [DefaultValue(double.NaN)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public double MaxValue
         {
@@ -69,10 +70,10 @@ namespace TerrainMapGUILibrary.Components
             set { txbMaxValue.Text = value.ToString(); }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("The track value.")]
         [DefaultValue(double.NaN)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public double TrackValue
         {
@@ -108,51 +109,23 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Occurs when min value changed.")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler MinValueChanged;
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Occurs when max value changed.")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler MaxValueChanged;
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Occurs when track value changed.")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler TrackValueChanged;
-
-
-        [Browsable(true)]
-        [DefaultValue(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new bool TabStop
-        {
-            get { return txbMinValue.TabStop; }
-            set
-            {
-                // control self tab stop always be false
-                txbMinValue.TabStop = value;
-                txbMaxValue.TabStop = value;
-            }
-        }
-
-        [Browsable(true)]
-        [DefaultValue(0)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new int TabIndex
-        {
-            get { return txbMinValue.TabIndex; }
-            set
-            {
-                txbMinValue.TabIndex = value;
-                txbMaxValue.TabIndex = value;
-            }
-        }
 
 
         public TrackValueComponent()
@@ -186,7 +159,7 @@ namespace TerrainMapGUILibrary.Components
             // btnMinMove
             // 
             btnMinMove.Text = "<";
-            btnMinMove.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            btnMinMove.Font = FontTheme.Normal();
             btnMinMove.Location = new Point(102, 0);
             btnMinMove.Size = new Size(24, 24);
             btnMinMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -215,7 +188,7 @@ namespace TerrainMapGUILibrary.Components
             // btnMaxMove
             // 
             btnMaxMove.Text = ">";
-            btnMaxMove.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            btnMaxMove.Font = FontTheme.Normal();
             btnMaxMove.Location = new Point(226, 0);
             btnMaxMove.Size = new Size(24, 24);
             btnMaxMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;

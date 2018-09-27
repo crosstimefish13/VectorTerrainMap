@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Components;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapGUILibrary.Themes;
 using TerrainMapLibrary.Interpolator.Kriging;
 
 namespace TerrainMapGUILibrary.Controls
@@ -50,10 +51,10 @@ namespace TerrainMapGUILibrary.Controls
         private PictureBox pcbImage;
 
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Max decimal length for value input.")]
         [DefaultValue(16)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
@@ -67,10 +68,10 @@ namespace TerrainMapGUILibrary.Controls
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Value for map.")]
         [DefaultValue(typeof(MapValue), "0, 0, 0, 0")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public MapValue Value
         {
@@ -101,43 +102,11 @@ namespace TerrainMapGUILibrary.Controls
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Occurs when value changed.")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler ValueChanged;
-
-
-        [Browsable(true)]
-        [DefaultValue(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new bool TabStop
-        {
-            get { return ivcMinX.TabStop; }
-            set
-            {
-                // control self tab stop always be false
-                ivcMinX.TabStop = value;
-                ivcMinY.TabStop = value;
-                ivcMaxX.TabStop = value;
-                ivcMaxY.TabStop = value;
-            }
-        }
-
-        [Browsable(true)]
-        [DefaultValue(0)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new int TabIndex
-        {
-            get { return ivcMinX.TabIndex; }
-            set
-            {
-                ivcMinX.TabIndex = value;
-                ivcMinY.TabIndex = value;
-                ivcMaxX.TabIndex = value;
-                ivcMaxY.TabIndex = value;
-            }
-        }
 
 
         public KrigingSemivarianceMapControl()
@@ -192,7 +161,7 @@ namespace TerrainMapGUILibrary.Controls
             // lblMinX
             // 
             lblMinX.Text = "Min X:";
-            lblMinX.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblMinX.Font = FontTheme.Normal();
             lblMinX.Location = new Point(1, 30);
             lblMinX.Size = new Size(49, 19);
             lblMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -211,7 +180,7 @@ namespace TerrainMapGUILibrary.Controls
             // lblMinY
             // 
             lblMinY.Text = "Min Y:";
-            lblMinY.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblMinY.Font = FontTheme.Normal();
             lblMinY.Location = new Point(1, 58);
             lblMinY.Size = new Size(49, 19);
             lblMinY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -230,7 +199,7 @@ namespace TerrainMapGUILibrary.Controls
             // lblMaxX
             // 
             lblMaxX.Text = "Max X:";
-            lblMaxX.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblMaxX.Font = FontTheme.Normal();
             lblMaxX.Location = new Point(1, 86);
             lblMaxX.Size = new Size(49, 19);
             lblMaxX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -249,7 +218,7 @@ namespace TerrainMapGUILibrary.Controls
             // lblMaxY
             // 
             lblMaxY.Text = "Max Y:";
-            lblMaxY.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblMaxY.Font = FontTheme.Normal();
             lblMaxY.Location = new Point(1, 114);
             lblMaxY.Size = new Size(49, 19);
             lblMaxY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -268,7 +237,7 @@ namespace TerrainMapGUILibrary.Controls
             // lblModel
             // 
             lblModel.Text = "Model:";
-            lblModel.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblModel.Font = FontTheme.Normal();
             lblModel.Location = new Point(1, 142);
             lblModel.Size = new Size(49, 19);
             lblModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -282,7 +251,7 @@ namespace TerrainMapGUILibrary.Controls
                 .Select(t => t.Name)
                 .ToArray());
             cmbModel.SelectedIndex = 0;
-            cmbModel.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            cmbModel.Font = FontTheme.Normal();
             cmbModel.Location = new Point(51, 138);
             cmbModel.Size = new Size(190, 24);
             cmbModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
@@ -20,10 +21,10 @@ namespace TerrainMapGUILibrary.Components
         private TrackValueComponent tvcValue;
 
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Watermark text for value input.")]
         [DefaultValue("")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string WatermarkText
         {
@@ -31,10 +32,10 @@ namespace TerrainMapGUILibrary.Components
             set { txbValue.WatermarkText = value; }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Max decimal length for value input.")]
         [DefaultValue(16)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
@@ -46,10 +47,10 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Value input.")]
         [DefaultValue(double.NaN)]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public double Value
         {
@@ -61,39 +62,11 @@ namespace TerrainMapGUILibrary.Components
             set { txbValue.Text = value.ToString(); }
         }
 
-        [Browsable(true)]
         [Category("Function")]
         [Description("Occurs when value changed.")]
+        [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler ValueChanged;
-
-
-        [Browsable(true)]
-        [DefaultValue(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new bool TabStop
-        {
-            get { return txbValue.TabStop; }
-            set
-            {
-                // control self tab stop always be false
-                txbValue.TabStop = value;
-                tvcValue.TabStop = value;
-            }
-        }
-
-        [Browsable(true)]
-        [DefaultValue(0)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new int TabIndex
-        {
-            get { return txbValue.TabIndex; }
-            set
-            {
-                txbValue.TabIndex = value;
-                tvcValue.TabIndex = value;
-            }
-        }
 
 
         public InputValueComponent()
@@ -125,7 +98,7 @@ namespace TerrainMapGUILibrary.Components
             // chbTrackValue
             // 
             chbTrackValue.Text = "Use Track:";
-            chbTrackValue.Font = new Font("Arial", 13f, FontStyle.Regular, GraphicsUnit.Pixel);
+            chbTrackValue.Font = FontTheme.Normal();
             chbTrackValue.Location = new Point(110, 2);
             chbTrackValue.Size = new Size(90, 18);
             chbTrackValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
