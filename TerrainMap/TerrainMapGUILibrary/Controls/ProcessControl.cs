@@ -10,7 +10,6 @@ using System.Linq;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
 using TerrainMapGUILibrary.Themes;
-using static TerrainMapGUILibrary.Controls.ProcessControl.ProcessItemCollection;
 
 namespace TerrainMapGUILibrary.Controls
 {
@@ -52,15 +51,10 @@ namespace TerrainMapGUILibrary.Controls
             set
             {
                 selectedIndex = value;
-                if (Items.Count > 1 && selectedIndex >= 0 && selectedIndex < Items.Count - 1)
-                { btnNext.Enabled = true; }
-                else { btnNext.Enabled = false; }
+                if (InnerItems.Count <= 0) { selectedIndex = -1; }
+                else if (selectedIndex < -1 || selectedIndex >= InnerItems.Count) { selectedIndex = 0; }
 
-                if (Items.Count > 1 && selectedIndex > 0 && selectedIndex < Items.Count)
-                { btnBack.Enabled = true; }
-                else { btnBack.Enabled = false; }
-
-                Items.SetSelected(selectedIndex);
+                ChangeSelect();
             }
         }
 
@@ -69,6 +63,7 @@ namespace TerrainMapGUILibrary.Controls
         {
             selectedIndex = -1;
             InnerItems = new ObservableCollection<ProcessItem>();
+            InnerItems.CollectionChanged += (sender, e) => { RefreshItems(); };
             Items = new ProcessItemCollection() { Owner = this };
 
             InitializeComponent();
@@ -127,33 +122,92 @@ namespace TerrainMapGUILibrary.Controls
             PerformLayout();
         }
 
-        internal static void RefreshItems(ControlExtension owner, ObservableCollection<object> items)
+        private void RefreshItems()
         {
-            if (owner == null || items == null) { return; }
-
-            owner.Controls.Clear();
-            foreach (var item in items)
+            cePanel.SuspendLayout();
+            ceContent.Controls.Clear();
+            cePanel.Controls.Clear();
+            foreach (var item in InnerItems)
             {
-                var processItem = item as ProcessItem;
-                processItem.Owner = owner;
-                processItem.Items = items;
-                processItem.AddToOwner();
+                // 
+                // lblDescription
+                // 
+                item.DescriptionLabel.Enabled = false;
+                item.DescriptionLabel.Visible = false;
+                cePanel.Controls.Add(item.DescriptionLabel);
             }
+            
+            int offsetY = 10;
+            if (InnerItems.Count > 0) { offsetY = InnerItems.Max(i => i.DescriptionLabel.Bounds.Bottom) + 10; }
 
-            owner.Invalidate();
+            // 
+            // ceContent
+            // 
+            ceContent.Location = new Point(185, offsetY);
+            ceContent.Size = new Size(cePanel.Width - 195, cePanel.Height - offsetY);
+            cePanel.Controls.Add(ceContent);
+
+            foreach (var item in InnerItems)
+            {
+                // 
+                // lblMark
+                // 
+                item.MarkLabel.Location = new Point(10, offsetY);
+                cePanel.Controls.Add(item.MarkLabel);
+                // 
+                // lblHeader
+                // 
+                item.HeaderLabel.Location = new Point(25, offsetY + 1);
+                cePanel.Controls.Add(item.HeaderLabel);
+                // 
+                // item
+                // 
+                item.Enabled = false;
+                item.Visible = false;
+                ceContent.Controls.Add(item);
+
+                offsetY = item.HeaderLabel.Bounds.Bottom + 10;
+            }
+            
+            // 
+            // cePanel
+            // 
+            cePanel.ResumeLayout(false);
+            cePanel.PerformLayout();
+
+            if (InnerItems.Count > 0) { SelectedIndex = 0; }
+            else { SelectedIndex = -1; }
         }
 
-
-        internal void SetSelected(int index)
+        private void ChangeSelect()
         {
-            if (Owner == null || items == null) { return; }
-
-            foreach (var item in items)
+            foreach (var item in InnerItems)
             {
-                var processItem = item as ProcessItem;
-                bool isSelected = items.IndexOf(item) == index;
-                (item as ProcessItem).SetSelected(isSelected);
+                if (InnerItems.IndexOf(item) == selectedIndex)
+                {
+                    item.MarkLabel.Text = "■";
+                    item.DescriptionLabel.Enabled = true;
+                    item.DescriptionLabel.Visible = true;
+                    item.Enabled = true;
+                    item.Visible = true;
+                }
+                else
+                {
+                    item.MarkLabel.Text = "□";
+                    item.DescriptionLabel.Enabled = false;
+                    item.DescriptionLabel.Visible = false;
+                    item.Enabled = false;
+                    item.Visible = false;
+                }
             }
+
+            if (InnerItems.Count > 1 && selectedIndex >= 0 && selectedIndex < InnerItems.Count - 1)
+            { btnNext.Enabled = true; }
+            else { btnNext.Enabled = false; }
+
+            if (InnerItems.Count > 1 && selectedIndex > 0 && selectedIndex < InnerItems.Count)
+            { btnBack.Enabled = true; }
+            else { btnBack.Enabled = false; }
         }
 
 
@@ -163,11 +217,11 @@ namespace TerrainMapGUILibrary.Controls
         [TypeConverter(typeof(ProcessItemConverter))]
         public sealed class ProcessItem : PanelExtension
         {
-            private Label lblMark;
+            internal Label MarkLabel { get; set; }
 
-            private Label lblHeader;
+            internal Label HeaderLabel { get; set; }
 
-            private Label lblDescription;
+            internal Label DescriptionLabel { get; set; }
 
 
             [Category("Function")]
@@ -177,12 +231,8 @@ namespace TerrainMapGUILibrary.Controls
             [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
             public string Header
             {
-                get { return lblHeader.Text; }
-                set
-                {
-                    lblHeader.Text = value;
-                    RefreshItems(Owner, Items);
-                }
+                get { return HeaderLabel.Text; }
+                set { HeaderLabel.Text = value; }
             }
 
             [Category("Function")]
@@ -192,12 +242,8 @@ namespace TerrainMapGUILibrary.Controls
             [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
             public string Description
             {
-                get { return lblDescription.Text; }
-                set
-                {
-                    lblDescription.Text = value;
-                    RefreshItems(Owner, Items);
-                }
+                get { return DescriptionLabel.Text; }
+                set { DescriptionLabel.Text = value; }
             }
 
 
@@ -325,8 +371,6 @@ namespace TerrainMapGUILibrary.Controls
             {
                 InitializeComponent();
 
-                Owner = null;
-                Items = null;
                 Header = header;
                 Description = description;
             }
@@ -338,104 +382,39 @@ namespace TerrainMapGUILibrary.Controls
             }
 
 
-            internal void AddToOwner(ControlExtension panel, ObservableCollection<ProcessItem> items)
+            private void InitializeComponent()
             {
-                if (panel == null || items == null) { return; }
-
-                panel.SuspendLayout();
+                MarkLabel = new Label();
+                HeaderLabel = new Label();
+                DescriptionLabel = new Label();
+                // 
+                // lblMark
+                // 
+                MarkLabel.Text = "□";
+                MarkLabel.Font = FontTheme.Normal();
+                MarkLabel.Location = new Point(10, 10);
+                MarkLabel.Size = new Size(15, 15);
+                MarkLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+                // 
+                // lblHeader
+                // 
+                HeaderLabel.Font = FontTheme.Normal();
+                HeaderLabel.Location = new Point(10, 10);
+                HeaderLabel.MaximumSize = new Size(150, 0);
+                HeaderLabel.AutoSize = true;
+                HeaderLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                 // 
                 // lblDescription
                 // 
-                lblDescription.Enabled = false;
-                lblDescription.Visible = false;
-                panel.Controls.Add(lblDescription);
+                DescriptionLabel.Font = FontTheme.Normal();
+                DescriptionLabel.Location = new Point(185, 10);
+                DescriptionLabel.MaximumSize = new Size(300, 0);
+                DescriptionLabel.AutoSize = true;
+                DescriptionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                 // 
                 // this
                 // 
-                int ceContentLocationY = Items.Max(i => (i as ProcessItem).lblDescription.Bounds.Bottom) + 10;
-                //Location = new Point(185, ceContentLocationY);
-                //Size = new Size(Owner.Width - 195, Owner.Height - ceContentLocationY);
                 Dock = DockStyle.Fill;
-                Enabled = false;
-                Visible = false;
-                Owner.Controls.Add(this);
-                // 
-                // lblMark
-                // 
-                int lblMarkOffsetLocationY = ceContentLocationY;
-                int itemIndex = Items.IndexOf(this);
-                if (itemIndex > 0)
-                { lblMarkOffsetLocationY = (Items[itemIndex - 1] as ProcessItem).lblHeader.Bounds.Bottom + 10; }
-
-                lblMark.Location = new Point(10, lblMarkOffsetLocationY);
-                Owner.Controls.Add(lblMark);
-                // 
-                // lblHeader
-                // 
-                lblHeader.Location = new Point(25, lblMarkOffsetLocationY + 1);
-                Owner.Controls.Add(lblHeader);
-                // 
-                // Owner
-                // 
-                Owner.ResumeLayout(false);
-                Owner.PerformLayout();
-            }
-
-            internal void SetSelected(bool isSelected)
-            {
-                if (isSelected == true)
-                {
-                    lblMark.Text = "■";
-                    lblDescription.Enabled = true;
-                    lblDescription.Visible = true;
-                    Enabled = true;
-                    Visible = true;
-                }
-                else
-                {
-                    lblMark.Text = "□";
-                    lblDescription.Enabled = false;
-                    lblDescription.Visible = false;
-                    Enabled = false;
-                    Visible = false;
-                }
-            }
-
-
-            private void InitializeComponent()
-            {
-                lblMark = new Label();
-                lblHeader = new Label();
-                lblDescription = new Label();
-                // 
-                // lblMark
-                // 
-                lblMark.Text = "□";
-                lblMark.Font = FontTheme.Normal();
-                lblMark.Location = new Point(10, 10);
-                lblMark.Size = new Size(15, 15);
-                lblMark.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-                // 
-                // lblHeader
-                // 
-                lblHeader.Font = FontTheme.Normal();
-                lblHeader.Location = new Point(10, 10);
-                lblHeader.MaximumSize = new Size(150, 0);
-                lblHeader.AutoSize = true;
-                lblHeader.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-                // 
-                // lblDescription
-                // 
-                lblDescription.Font = FontTheme.Normal();
-                lblDescription.Location = new Point(185, 10);
-                lblDescription.MaximumSize = new Size(300, 0);
-                lblDescription.AutoSize = true;
-                lblDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-                // 
-                // ceContent
-                // 
-                Location = new Point(180, 10);
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
             }
         }
 
