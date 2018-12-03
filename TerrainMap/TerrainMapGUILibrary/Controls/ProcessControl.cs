@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
-using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Controls
 {
@@ -22,9 +21,9 @@ namespace TerrainMapGUILibrary.Controls
     {
         private int selectedIndex;
 
-        private Button btnBack;
+        private ButtonExtension btnBack;
 
-        private Button btnNext;
+        private ButtonExtension btnNext;
 
         private ControlExtension ceContent;
 
@@ -81,8 +80,8 @@ namespace TerrainMapGUILibrary.Controls
 
         private void InitializeComponent()
         {
-            btnBack = new Button();
-            btnNext = new Button();
+            btnBack = new ButtonExtension();
+            btnNext = new ButtonExtension();
             ceContent = new ControlExtension();
             cePanel = new ControlExtension();
             SuspendLayout();
@@ -90,7 +89,6 @@ namespace TerrainMapGUILibrary.Controls
             // btnBack
             // 
             btnBack.Text = "< Back";
-            btnBack.Font = FontTheme.Normal();
             btnBack.Location = new Point(345, 267);
             btnBack.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnBack.Enabled = false;
@@ -100,7 +98,6 @@ namespace TerrainMapGUILibrary.Controls
             // btnNext
             // 
             btnNext.Text = "Next >";
-            btnNext.Font = FontTheme.Normal();
             btnNext.Location = new Point(430, 267);
             btnNext.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnNext.Enabled = false;
@@ -228,11 +225,11 @@ namespace TerrainMapGUILibrary.Controls
         [TypeConverter(typeof(ProcessItemConverter))]
         public sealed class ProcessItem : PanelExtension
         {
-            internal Label MarkLabel { get; set; }
+            internal LabelExtension MarkLabel { get; set; }
 
-            internal Label HeaderLabel { get; set; }
+            internal LabelExtension HeaderLabel { get; set; }
 
-            internal Label DescriptionLabel { get; set; }
+            internal LabelExtension DescriptionLabel { get; set; }
 
 
             [Category("Function")]
@@ -395,21 +392,19 @@ namespace TerrainMapGUILibrary.Controls
 
             private void InitializeComponent()
             {
-                MarkLabel = new Label();
-                HeaderLabel = new Label();
-                DescriptionLabel = new Label();
+                MarkLabel = new LabelExtension();
+                HeaderLabel = new LabelExtension();
+                DescriptionLabel = new LabelExtension();
                 // 
                 // lblMark
                 // 
                 MarkLabel.Text = "□";
-                MarkLabel.Font = FontTheme.Normal();
                 MarkLabel.Location = new Point(10, 10);
                 MarkLabel.Size = new Size(15, 15);
                 MarkLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                 // 
                 // lblHeader
                 // 
-                HeaderLabel.Font = FontTheme.Normal();
                 HeaderLabel.Location = new Point(10, 10);
                 HeaderLabel.MaximumSize = new Size(150, 0);
                 HeaderLabel.AutoSize = true;
@@ -417,7 +412,6 @@ namespace TerrainMapGUILibrary.Controls
                 // 
                 // lblDescription
                 // 
-                DescriptionLabel.Font = FontTheme.Normal();
                 DescriptionLabel.Location = new Point(185, 10);
                 DescriptionLabel.MaximumSize = new Size(300, 0);
                 DescriptionLabel.AutoSize = true;

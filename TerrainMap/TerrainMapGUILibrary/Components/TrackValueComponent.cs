@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
-using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
@@ -16,11 +15,11 @@ namespace TerrainMapGUILibrary.Components
     {
         private TextBoxExtension txbMinValue;
 
-        private Button btnMinMove;
+        private ButtonExtension btnMinMove;
 
         private TrackBarExtension trbValue;
 
-        private Button btnMaxMove;
+        private ButtonExtension btnMaxMove;
 
         private TextBoxExtension txbMaxValue;
 
@@ -109,6 +108,29 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
+        [Category("Behavior")]
+        [Description("Determines the index in the TAB order that the MinValue input control will occupy.")]
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int TabIndexMinValue
+        {
+            get { return txbMinValue.TabIndex; }
+            set { txbMinValue.TabIndex = value; }
+        }
+
+        [Category("Behavior")]
+        [Description("Determines the index in the TAB order that the MaxValue input control will occupy.")]
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int TabIndexMaxValue
+        {
+            get { return txbMaxValue.TabIndex; }
+            set { txbMaxValue.TabIndex = value; }
+        }
+
+
         [Category("Function")]
         [Description("Occurs when min value changed.")]
         [Browsable(true)]
@@ -138,9 +160,9 @@ namespace TerrainMapGUILibrary.Components
         private void InitializeComponent()
         {
             txbMinValue = new TextBoxExtension();
-            btnMinMove = new Button();
+            btnMinMove = new ButtonExtension();
             trbValue = new TrackBarExtension();
-            btnMaxMove = new Button();
+            btnMaxMove = new ButtonExtension();
             txbMaxValue = new TextBoxExtension();
             SuspendLayout();
             // 
@@ -152,19 +174,17 @@ namespace TerrainMapGUILibrary.Components
             txbMinValue.Location = new Point(1, 1);
             txbMinValue.Size = new Size(100, 22);
             txbMinValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            txbMinValue.TabIndex = 0;
             txbMinValue.TextChanged += (sender, e) => { SetTrackControls(sender); };
-            txbMinValue.TabStopChanged += (sender, e) => { OnTabStopChanged(e); };
             Controls.Add(txbMinValue);
             // 
             // btnMinMove
             // 
             btnMinMove.Text = "<";
-            btnMinMove.Font = FontTheme.Normal();
             btnMinMove.Location = new Point(102, 0);
             btnMinMove.Size = new Size(24, 24);
             btnMinMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             btnMinMove.Enabled = false;
-            btnMinMove.TabStop = false;
             btnMinMove.Click += (sender, e) =>
             { if (trbValue.Value - 1 >= trbValue.Minimum) { SetTrackControls(sender, trbValue.Value - 1); } };
             Controls.Add(btnMinMove);
@@ -180,7 +200,6 @@ namespace TerrainMapGUILibrary.Components
             trbValue.Size = new Size(100, 22);
             trbValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             trbValue.Enabled = false;
-            trbValue.TabStop = false;
             trbValue.ValueChanged += (sender, e) =>
             { if (TrackValueChanged != null) { TrackValueChanged.Invoke(this, new EventArgs()); } };
             Controls.Add(trbValue);
@@ -188,12 +207,10 @@ namespace TerrainMapGUILibrary.Components
             // btnMaxMove
             // 
             btnMaxMove.Text = ">";
-            btnMaxMove.Font = FontTheme.Normal();
             btnMaxMove.Location = new Point(226, 0);
             btnMaxMove.Size = new Size(24, 24);
             btnMaxMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             btnMaxMove.Enabled = false;
-            btnMaxMove.TabStop = false;
             btnMaxMove.Click += (sender, e) =>
             { if (trbValue.Value + 1 <= trbValue.Maximum) { SetTrackControls(sender, trbValue.Value + 1); } };
             Controls.Add(btnMaxMove);
@@ -206,6 +223,7 @@ namespace TerrainMapGUILibrary.Components
             txbMaxValue.Location = new Point(252, 1);
             txbMaxValue.Size = new Size(100, 22);
             txbMaxValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            txbMaxValue.TabIndex = 0;
             txbMaxValue.TextChanged += (sender, e) => { SetTrackControls(sender); };
             Controls.Add(txbMaxValue);
             // 

@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
-using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
@@ -20,9 +19,9 @@ namespace TerrainMapGUILibrary.Components
 
         private bool isFolded;
 
-        private Label lblTitle;
+        private LabelExtension lblTitle;
 
-        private Label lblArrow;
+        private LabelExtension lblArrow;
 
         private ControlExtension conTitle;
 
@@ -145,15 +144,14 @@ namespace TerrainMapGUILibrary.Components
 
         private void InitializeComponent()
         {
-            lblTitle = new Label();
-            lblArrow = new Label();
+            lblTitle = new LabelExtension();
+            lblArrow = new LabelExtension();
             conTitle = new ControlExtension();
             SuspendLayout();
             // 
             // lblTitle
             // 
             lblTitle.Text = "Title";
-            lblTitle.Font = FontTheme.Normal();
             lblTitle.Location = new Point(1, 1);
             lblTitle.AutoSize = true;
             lblTitle.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -163,7 +161,6 @@ namespace TerrainMapGUILibrary.Components
             // lblArrow
             // 
             lblArrow.Text = "▲";
-            lblArrow.Font = FontTheme.Normal();
             lblArrow.Location = new Point(80, 1);
             lblArrow.Size = new Size(20, 19);
             lblArrow.Anchor = AnchorStyles.Top | AnchorStyles.Right;

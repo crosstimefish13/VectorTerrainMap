@@ -84,6 +84,7 @@ namespace TerrainMapGUILibrary.Extensions
             }
         }
 
+
         public override string Text
         {
             get { return base.Text; }
@@ -105,7 +106,36 @@ namespace TerrainMapGUILibrary.Extensions
                         { base.Text = number.ToString($"N{maxDecimalLength}"); }
                     }
                 }
+                else { base.Text = value; }
             }
+        }
+
+        [DefaultValue(typeof(Font), FontTheme.NormalString)]
+        public override Font Font
+        {
+            get { return base.Font; }
+            set { base.Font = value; }
+        }
+
+
+        [DefaultValue(false)]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new bool TabStop
+        {
+            get { return false; }
+            set { base.TabStop = false; }
+        }
+
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public new int TabIndex
+        {
+            get { return 0; }
+            set { base.TabIndex = 0; }
         }
 
 
@@ -119,6 +149,8 @@ namespace TerrainMapGUILibrary.Extensions
             watermarkFont = FontTheme.NormalItalic();
             watermarkColor = SystemColors.GrayText;
             Font = FontTheme.Normal();
+            TabStop = false;
+            TabIndex = 0;
         }
 
 

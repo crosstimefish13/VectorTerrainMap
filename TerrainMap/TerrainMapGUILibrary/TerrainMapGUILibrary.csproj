@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\InputPathComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Components\FoldPanelComponent.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -51,16 +54,37 @@
     <Compile Include="Components\TrackValueComponent.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\KrigingDataBuildControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\KrigingSemivarianceMapControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ProcessControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Extensions\ButtonExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\CheckBoxExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\ComboBoxExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\ControlExtension.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Extensions\GroupBoxExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\LabelExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions\PanelExtension.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Extensions\PictureBoxExtension.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Extensions\TextBoxExtension.cs">

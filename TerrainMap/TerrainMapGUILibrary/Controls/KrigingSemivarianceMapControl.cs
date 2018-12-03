@@ -8,7 +8,6 @@ using System.Linq;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Components;
 using TerrainMapGUILibrary.Extensions;
-using TerrainMapGUILibrary.Themes;
 using TerrainMapLibrary.Interpolator.Kriging;
 
 namespace TerrainMapGUILibrary.Controls
@@ -26,29 +25,29 @@ namespace TerrainMapGUILibrary.Controls
 
         private Image dataImage;
 
-        private Label lblMinX;
+        private LabelExtension lblMinX;
 
         private InputValueComponent ivcMinX;
 
-        private Label lblMinY;
+        private LabelExtension lblMinY;
 
         private InputValueComponent ivcMinY;
 
-        private Label lblMaxX;
+        private LabelExtension lblMaxX;
 
         private InputValueComponent ivcMaxX;
 
-        private Label lblMaxY;
+        private LabelExtension lblMaxY;
 
         private InputValueComponent ivcMaxY;
 
-        private Label lblModel;
+        private LabelExtension lblModel;
 
-        private ComboBox cmbModel;
+        private ComboBoxExtension cmbModel;
 
         private FoldPanelComponent fpcContainer;
 
-        private PictureBox pcbImage;
+        private PictureBoxExtension pcbImage;
 
 
         [Category("Function")]
@@ -144,24 +143,23 @@ namespace TerrainMapGUILibrary.Controls
 
         private void InitializeComponent()
         {
-            lblMinX = new Label();
+            lblMinX = new LabelExtension();
             ivcMinX = new InputValueComponent();
-            lblMinY = new Label();
+            lblMinY = new LabelExtension();
             ivcMinY = new InputValueComponent();
-            lblMaxX = new Label();
+            lblMaxX = new LabelExtension();
             ivcMaxX = new InputValueComponent();
-            lblMaxY = new Label();
+            lblMaxY = new LabelExtension();
             ivcMaxY = new InputValueComponent();
-            lblModel = new Label();
-            cmbModel = new ComboBox();
+            lblModel = new LabelExtension();
+            cmbModel = new ComboBoxExtension();
             fpcContainer = new FoldPanelComponent();
-            pcbImage = new PictureBox();
+            pcbImage = new PictureBoxExtension();
             SuspendLayout();
             // 
             // lblMinX
             // 
             lblMinX.Text = "Min X:";
-            lblMinX.Font = FontTheme.Normal();
             lblMinX.Location = new Point(1, 30);
             lblMinX.Size = new Size(49, 19);
             lblMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -180,7 +178,6 @@ namespace TerrainMapGUILibrary.Controls
             // lblMinY
             // 
             lblMinY.Text = "Min Y:";
-            lblMinY.Font = FontTheme.Normal();
             lblMinY.Location = new Point(1, 58);
             lblMinY.Size = new Size(49, 19);
             lblMinY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -199,7 +196,6 @@ namespace TerrainMapGUILibrary.Controls
             // lblMaxX
             // 
             lblMaxX.Text = "Max X:";
-            lblMaxX.Font = FontTheme.Normal();
             lblMaxX.Location = new Point(1, 86);
             lblMaxX.Size = new Size(49, 19);
             lblMaxX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -218,7 +214,6 @@ namespace TerrainMapGUILibrary.Controls
             // lblMaxY
             // 
             lblMaxY.Text = "Max Y:";
-            lblMaxY.Font = FontTheme.Normal();
             lblMaxY.Location = new Point(1, 114);
             lblMaxY.Size = new Size(49, 19);
             lblMaxY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -237,7 +232,6 @@ namespace TerrainMapGUILibrary.Controls
             // lblModel
             // 
             lblModel.Text = "Model:";
-            lblModel.Font = FontTheme.Normal();
             lblModel.Location = new Point(1, 142);
             lblModel.Size = new Size(49, 19);
             lblModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -251,7 +245,6 @@ namespace TerrainMapGUILibrary.Controls
                 .Select(t => t.Name)
                 .ToArray());
             cmbModel.SelectedIndex = 0;
-            cmbModel.Font = FontTheme.Normal();
             cmbModel.Location = new Point(51, 138);
             cmbModel.Size = new Size(190, 24);
             cmbModel.Anchor = AnchorStyles.Top | AnchorStyles.Left;

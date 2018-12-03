@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
-using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
@@ -16,7 +15,7 @@ namespace TerrainMapGUILibrary.Components
     {
         private TextBoxExtension txbValue;
 
-        private CheckBox chbTrackValue;
+        private CheckBoxExtension chbTrackValue;
 
         private TrackValueComponent tvcValue;
 
@@ -62,6 +61,40 @@ namespace TerrainMapGUILibrary.Components
             set { txbValue.Text = value.ToString(); }
         }
 
+        [Category("Behavior")]
+        [Description("Determines the index in the TAB order that the MinValue input control will occupy.")]
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int TabIndexMinValue
+        {
+            get { return tvcValue.TabIndexMinValue; }
+            set { tvcValue.TabIndexMinValue = value; }
+        }
+
+        [Category("Behavior")]
+        [Description("Determines the index in the TAB order that the MaxValue input control will occupy.")]
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int TabIndexMaxValue
+        {
+            get { return tvcValue.TabIndexMaxValue; }
+            set { tvcValue.TabIndexMaxValue = value; }
+        }
+
+        [Category("Behavior")]
+        [Description("Determines the index in the TAB order that the Value input control will occupy.")]
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int TabIndexValue
+        {
+            get { return txbValue.TabIndex; }
+            set { txbValue.TabIndex = value; }
+        }
+
+
         [Category("Function")]
         [Description("Occurs when value changed.")]
         [Browsable(true)]
@@ -79,7 +112,7 @@ namespace TerrainMapGUILibrary.Components
         private void InitializeComponent()
         {
             txbValue = new TextBoxExtension();
-            chbTrackValue = new CheckBox();
+            chbTrackValue = new CheckBoxExtension();
             tvcValue = new TrackValueComponent();
             SuspendLayout();
             // 
@@ -91,6 +124,7 @@ namespace TerrainMapGUILibrary.Components
             txbValue.Location = new Point(1, 1);
             txbValue.Size = new Size(100, 22);
             txbValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            txbValue.TabIndex = 0;
             txbValue.TextChanged += (sender, e) =>
             { if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); } };
             Controls.Add(txbValue);
@@ -98,11 +132,9 @@ namespace TerrainMapGUILibrary.Components
             // chbTrackValue
             // 
             chbTrackValue.Text = "Use Track:";
-            chbTrackValue.Font = FontTheme.Normal();
             chbTrackValue.Location = new Point(110, 2);
             chbTrackValue.Size = new Size(90, 18);
             chbTrackValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            chbTrackValue.TabStop = false;
             chbTrackValue.CheckedChanged += (sender, e) =>
             {
                 txbValue.Enabled = !chbTrackValue.Checked;
@@ -119,6 +151,8 @@ namespace TerrainMapGUILibrary.Components
             tvcValue.Location = new Point(200, 0);
             tvcValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             tvcValue.Enabled = false;
+            tvcValue.TabIndexMinValue = 0;
+            tvcValue.TabIndexMaxValue = 0;
             tvcValue.TrackValueChanged += (sender, e) => { txbValue.Text = tvcValue.TrackValue.ToString(); };
             Controls.Add(tvcValue);
             // 
