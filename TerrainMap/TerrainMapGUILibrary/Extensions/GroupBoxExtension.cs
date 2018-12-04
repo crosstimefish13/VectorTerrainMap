@@ -11,7 +11,6 @@ namespace TerrainMapGUILibrary.Extensions
             Font = FontTheme.Normal();
         }
 
-
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);

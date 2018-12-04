@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Themes;
@@ -9,17 +8,7 @@ namespace TerrainMapGUILibrary.Extensions
 {
     internal class TrackBarExtension : TrackBar
     {
-        [DefaultValue(typeof(Font), FontTheme.NormalString)]
-        public override Font Font
-        {
-            get { return base.Font; }
-            set { base.Font = value; }
-        }
-
-
-        [DefaultValue(false)]
         [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool TabStop
         {
@@ -27,9 +16,7 @@ namespace TerrainMapGUILibrary.Extensions
             set { base.TabStop = false; }
         }
 
-        [DefaultValue(0)]
         [Browsable(true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new int TabIndex
         {
@@ -37,11 +24,9 @@ namespace TerrainMapGUILibrary.Extensions
             set { base.TabIndex = 0; }
         }
 
-
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new virtual bool ShowFocusCues { get; set; }
-
 
         public TrackBarExtension()
             : base()
@@ -52,10 +37,8 @@ namespace TerrainMapGUILibrary.Extensions
             TabIndex = 0;
         }
 
-
         [DllImport("user32.dll")]
         public extern static int SendMessage(IntPtr hWnd, uint msg, int wParam, int lParam);
-
 
         protected override void OnGotFocus(EventArgs e)
         {

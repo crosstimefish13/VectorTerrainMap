@@ -25,7 +25,6 @@ namespace TerrainMapGUILibrary.Components
 
         private ControlExtension conTitle;
 
-
         [Category("Function")]
         [Description("Title for header bar.")]
         [DefaultValue("Title")]
@@ -117,7 +116,6 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler IsFoldedChanged;
 
-
         public FoldPanelComponent()
            : base()
         {
@@ -127,7 +125,6 @@ namespace TerrainMapGUILibrary.Components
 
             InitializeComponent();
         }
-
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -140,7 +137,6 @@ namespace TerrainMapGUILibrary.Components
                 ClientRectangle.Width - 0.5f, ClientRectangle.Height - 0.5f);
             pen.Dispose();
         }
-
 
         private void InitializeComponent()
         {

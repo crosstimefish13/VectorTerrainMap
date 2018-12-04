@@ -72,7 +72,6 @@ namespace TerrainMapGUILibrary.Extensions
             set { base.Font = value; }
         }
 
-
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool CausesValidation
@@ -107,7 +106,6 @@ namespace TerrainMapGUILibrary.Extensions
             get { return base.Size; }
             set { base.Size = value; }
         }
-
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -207,7 +205,6 @@ namespace TerrainMapGUILibrary.Extensions
             add { base.TextChanged += value; }
             remove { base.TextChanged -= value; }
         }
-
 
         public ControlExtension()
             : base()

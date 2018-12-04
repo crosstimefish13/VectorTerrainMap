@@ -7,8 +7,6 @@ namespace TerrainMapGUILibrary.Extensions
 {
     internal class TextBoxExtension : TextBox
     {
-        private string text;
-
         private int maxDecimalLength;
 
         private bool numberInput;
@@ -18,7 +16,6 @@ namespace TerrainMapGUILibrary.Extensions
         private Font watermarkFont;
 
         private Color watermarkColor;
-
 
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -84,7 +81,6 @@ namespace TerrainMapGUILibrary.Extensions
             }
         }
 
-
         public override string Text
         {
             get { return base.Text; }
@@ -110,27 +106,15 @@ namespace TerrainMapGUILibrary.Extensions
             }
         }
 
-        [DefaultValue(typeof(Font), FontTheme.NormalString)]
-        public override Font Font
-        {
-            get { return base.Font; }
-            set { base.Font = value; }
-        }
-
-
-        [DefaultValue(false)]
         [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool TabStop
         {
-            get { return false; }
-            set { base.TabStop = false; }
+            get { return true; }
+            set { base.TabStop = true; }
         }
 
-        [DefaultValue(0)]
         [Browsable(true)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public new int TabIndex
         {
@@ -138,21 +122,18 @@ namespace TerrainMapGUILibrary.Extensions
             set { base.TabIndex = 0; }
         }
 
-
         public TextBoxExtension()
             : base()
         {
-            text = string.Empty;
             maxDecimalLength = 16;
             numberInput = false;
             watermarkText = "";
             watermarkFont = FontTheme.NormalItalic();
             watermarkColor = SystemColors.GrayText;
             Font = FontTheme.Normal();
-            TabStop = false;
+            TabStop = true;
             TabIndex = 0;
         }
-
 
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
