@@ -19,7 +19,6 @@ namespace TerrainMapGUILibrary.Components
 
         private TrackValueComponent tvcValue;
 
-
         [Category("Function")]
         [Description("Watermark text for value input.")]
         [DefaultValue("")]
@@ -61,39 +60,20 @@ namespace TerrainMapGUILibrary.Components
             set { txbValue.Text = value.ToString(); }
         }
 
-        [Category("Behavior")]
-        [Description("Determines the index in the TAB order that the MinValue input control will occupy.")]
+        [Category("Function")]
+        [Description("Determines the index in the TAB order that the input control(s) will occupy. There are 3 controls index would be set.")]
         [DefaultValue(0)]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int TabIndexMinValue
-        {
-            get { return tvcValue.TabIndexMinValue; }
-            set { tvcValue.TabIndexMinValue = value; }
-        }
-
-        [Category("Behavior")]
-        [Description("Determines the index in the TAB order that the MaxValue input control will occupy.")]
-        [DefaultValue(0)]
-        [Browsable(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int TabIndexMaxValue
-        {
-            get { return tvcValue.TabIndexMaxValue; }
-            set { tvcValue.TabIndexMaxValue = value; }
-        }
-
-        [Category("Behavior")]
-        [Description("Determines the index in the TAB order that the Value input control will occupy.")]
-        [DefaultValue(0)]
-        [Browsable(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int TabIndexValue
+        public int StartTabIndex
         {
             get { return txbValue.TabIndex; }
-            set { txbValue.TabIndex = value; }
+            set
+            {
+                txbValue.TabIndex = value;
+                tvcValue.StartTabIndex = value + 1;
+            }
         }
-
 
         [Category("Function")]
         [Description("Occurs when value changed.")]
@@ -101,13 +81,11 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler ValueChanged;
 
-
         public InputValueComponent()
            : base()
         {
             InitializeComponent();
         }
-
 
         private void InitializeComponent()
         {
@@ -151,8 +129,6 @@ namespace TerrainMapGUILibrary.Components
             tvcValue.Location = new Point(200, 0);
             tvcValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             tvcValue.Enabled = false;
-            tvcValue.TabIndexMinValue = 0;
-            tvcValue.TabIndexMaxValue = 0;
             tvcValue.TrackValueChanged += (sender, e) => { txbValue.Text = tvcValue.TrackValue.ToString(); };
             Controls.Add(tvcValue);
             // 
@@ -160,6 +136,7 @@ namespace TerrainMapGUILibrary.Components
             // 
             Size = new Size(553, 24);
             ValueChanged = null;
+            StartTabIndex = 0;
             ResumeLayout(false);
             PerformLayout();
         }

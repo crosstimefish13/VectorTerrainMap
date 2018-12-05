@@ -18,7 +18,6 @@ namespace TerrainMapGUILibrary.Components
 
         private ButtonExtension btnPath;
 
-
         [Category("Function")]
         [Description("Watermark text for value input.")]
         [DefaultValue("")]
@@ -65,17 +64,16 @@ namespace TerrainMapGUILibrary.Components
             remove { txbPath.TextChanged -= value; }
         }
 
-
+        [Category("Function")]
+        [Description("Determines the index in the TAB order that the input control(s) will occupy. There is 1 control index would be set.")]
         [DefaultValue(0)]
         [Browsable(true)]
-        [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public new int TabIndex
+        public int StartTabIndex
         {
             get { return txbPath.TabIndex; }
             set { txbPath.TabIndex = value; }
         }
-
 
         public InputPathComponent()
            : base()
@@ -85,7 +83,6 @@ namespace TerrainMapGUILibrary.Components
 
             InitializeComponent();
         }
-
 
         private void InitializeComponent()
         {
@@ -98,7 +95,6 @@ namespace TerrainMapGUILibrary.Components
             txbPath.Location = new Point(1, 1);
             txbPath.Size = new Size(100, 22);
             txbPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txbPath.TabIndex = 0;
             Controls.Add(txbPath);
             // 
             // btnPath
@@ -113,6 +109,7 @@ namespace TerrainMapGUILibrary.Components
             // this
             // 
             Size = new Size(127, 24);
+            StartTabIndex = 0;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -146,7 +143,6 @@ namespace TerrainMapGUILibrary.Components
                 { txbPath.Text = dialog.SelectedPath; }
             }
         }
-
 
         public enum PathType
         {

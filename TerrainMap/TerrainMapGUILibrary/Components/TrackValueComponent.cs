@@ -23,7 +23,6 @@ namespace TerrainMapGUILibrary.Components
 
         private TextBoxExtension txbMaxValue;
 
-
         [Category("Function")]
         [Description("Max decimal length for min max value input.")]
         [DefaultValue(16)]
@@ -108,28 +107,20 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [Category("Behavior")]
-        [Description("Determines the index in the TAB order that the MinValue input control will occupy.")]
+        [Category("Function")]
+        [Description("Determines the index in the TAB order that the input control(s) will occupy. There are 2 controls index would be set.")]
         [DefaultValue(0)]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int TabIndexMinValue
+        public int StartTabIndex
         {
             get { return txbMinValue.TabIndex; }
-            set { txbMinValue.TabIndex = value; }
+            set
+            {
+                txbMinValue.TabIndex = value;
+                txbMaxValue.TabIndex = value + 1;
+            }
         }
-
-        [Category("Behavior")]
-        [Description("Determines the index in the TAB order that the MaxValue input control will occupy.")]
-        [DefaultValue(0)]
-        [Browsable(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int TabIndexMaxValue
-        {
-            get { return txbMaxValue.TabIndex; }
-            set { txbMaxValue.TabIndex = value; }
-        }
-
 
         [Category("Function")]
         [Description("Occurs when min value changed.")]
@@ -149,13 +140,11 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler TrackValueChanged;
 
-
         public TrackValueComponent()
             : base()
         {
             InitializeComponent();
         }
-
 
         private void InitializeComponent()
         {
@@ -233,6 +222,7 @@ namespace TerrainMapGUILibrary.Components
             MinValueChanged = null;
             MaxValueChanged = null;
             TrackValueChanged = null;
+            StartTabIndex = 0;
             ResumeLayout(false);
             PerformLayout();
         }

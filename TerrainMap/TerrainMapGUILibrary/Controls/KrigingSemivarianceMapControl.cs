@@ -49,7 +49,6 @@ namespace TerrainMapGUILibrary.Controls
 
         private PictureBoxExtension pcbImage;
 
-
         [Category("Function")]
         [Description("Max decimal length for value input.")]
         [DefaultValue(16)]
@@ -102,11 +101,27 @@ namespace TerrainMapGUILibrary.Controls
         }
 
         [Category("Function")]
+        [Description("Determines the index in the TAB order that the input control(s) will occupy. There are 12 controls index would be set.")]
+        [DefaultValue(0)]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int StartTabIndex
+        {
+            get { return ivcMinX.TabIndex; }
+            set
+            {
+                ivcMinX.TabIndex = value;
+                ivcMinY.TabIndex = value + 3;
+                ivcMaxX.TabIndex = value + 6;
+                ivcMaxY.TabIndex = value + 9;
+            }
+        }
+
+        [Category("Function")]
         [Description("Occurs when value changed.")]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler ValueChanged;
-
 
         public KrigingSemivarianceMapControl()
         {
@@ -116,7 +131,6 @@ namespace TerrainMapGUILibrary.Controls
 
             InitializeComponent();
         }
-
 
         public void LoadData(SemivarianceMap map)
         {
@@ -139,7 +153,6 @@ namespace TerrainMapGUILibrary.Controls
             double maxY = chart.MaxVector.Semivariance;
             Value = new MapValue(minX, minY, maxX, maxY);
         }
-
 
         private void InitializeComponent()
         {
@@ -281,10 +294,10 @@ namespace TerrainMapGUILibrary.Controls
             Value = new MapValue(0, 0, 0, 0);
             Size = new Size(650, 200);
             ValueChanged = null;
+            StartTabIndex = 0;
             ResumeLayout(false);
             PerformLayout();
         }
-
 
         private void UpdateCurve(object sender = null, EventArgs e = null)
         {
@@ -310,7 +323,6 @@ namespace TerrainMapGUILibrary.Controls
             if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); }
         }
 
-
         [TypeConverter(typeof(MapValueConverter))]
         public sealed class MapValue
         {
@@ -322,7 +334,6 @@ namespace TerrainMapGUILibrary.Controls
 
             public double MaxY { get; set; }
 
-
             public MapValue(double minX = 0, double minY = 0, double maxX = 0, double maxY = 0)
             {
                 MinX = minX;
@@ -330,7 +341,6 @@ namespace TerrainMapGUILibrary.Controls
                 MaxX = maxX;
                 MaxY = maxY;
             }
-
 
             public bool IsValid()
             {
@@ -341,7 +351,6 @@ namespace TerrainMapGUILibrary.Controls
 
                 return !isInvalid;
             }
-
 
             public static bool operator ==(MapValue left, MapValue right)
             {
@@ -361,7 +370,6 @@ namespace TerrainMapGUILibrary.Controls
                 return !(left == right);
             }
 
-
             public override bool Equals(object obj)
             {
                 if (obj == null || !(obj is MapValue)) { return false; }
@@ -380,12 +388,10 @@ namespace TerrainMapGUILibrary.Controls
             }
         }
 
-
         public sealed class MapValueConverter : TypeConverter
         {
             public MapValueConverter()
             { }
-
 
             public override bool GetCreateInstanceSupported(ITypeDescriptorContext context)
             {
