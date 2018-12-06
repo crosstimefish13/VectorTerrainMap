@@ -29,9 +29,7 @@ namespace TerrainMapGUILibrary.Controls
 
         private ControlExtension cePanel;
 
-
         internal ObservableCollection<ProcessItem> InnerItems { get; private set; }
-
 
         [Category("Function")]
         [Description("The process items.")]
@@ -58,13 +56,11 @@ namespace TerrainMapGUILibrary.Controls
             }
         }
 
-
         [Category("Function")]
         [Description("Occurs when select changed.")]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler SelectChanged;
-
 
         public ProcessControl()
         {
@@ -76,7 +72,6 @@ namespace TerrainMapGUILibrary.Controls
 
             InitializeComponent();
         }
-
 
         private void InitializeComponent()
         {
@@ -218,7 +213,6 @@ namespace TerrainMapGUILibrary.Controls
             if (SelectChanged != null) { SelectChanged.Invoke(this, new EventArgs()); }
         }
 
-
         [DefaultProperty("Header")]
         [DesignTimeVisible(false)]
         [ToolboxItem(false)]
@@ -230,7 +224,6 @@ namespace TerrainMapGUILibrary.Controls
             internal LabelExtension HeaderLabel { get; set; }
 
             internal LabelExtension DescriptionLabel { get; set; }
-
 
             [Category("Function")]
             [Description("Header displays on left steps panel.")]
@@ -253,7 +246,6 @@ namespace TerrainMapGUILibrary.Controls
                 get { return DescriptionLabel.Text; }
                 set { DescriptionLabel.Text = value; }
             }
-
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
@@ -297,7 +289,6 @@ namespace TerrainMapGUILibrary.Controls
                 set { base.MinimumSize = value; }
             }
 
-
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new bool Enabled
@@ -328,7 +319,6 @@ namespace TerrainMapGUILibrary.Controls
                 get { return base.Visible; }
                 set { base.Visible = value; }
             }
-
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
@@ -370,7 +360,6 @@ namespace TerrainMapGUILibrary.Controls
                 remove { base.VisibleChanged -= value; }
             }
 
-
             public ProcessItem()
                 : this("", "")
             { }
@@ -383,12 +372,10 @@ namespace TerrainMapGUILibrary.Controls
                 Description = description;
             }
 
-
             public override string ToString()
             {
                 return $"ProcessItem: {{{Header}}}";
             }
-
 
             private void InitializeComponent()
             {
@@ -423,12 +410,10 @@ namespace TerrainMapGUILibrary.Controls
             }
         }
 
-
         public sealed class ProcessItemConverter : ExpandableObjectConverter
         {
             public ProcessItemConverter()
             { }
-
 
             public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
             {
@@ -463,7 +448,6 @@ namespace TerrainMapGUILibrary.Controls
             }
         }
 
-
         [ListBindable(false)]
         public sealed class ProcessItemCollection : IList, ICollection, IEnumerable
         {
@@ -488,9 +472,7 @@ namespace TerrainMapGUILibrary.Controls
                 get { return true; }
             }
 
-
             internal ProcessControl Owner { get; set; }
-
 
             public ProcessItem this[int index]
             {
@@ -508,12 +490,10 @@ namespace TerrainMapGUILibrary.Controls
                 get { return Owner.InnerItems.Count; }
             }
 
-
             public ProcessItemCollection()
             {
                 Owner = null;
             }
-
 
             public int Add(ProcessItem value)
             {
@@ -560,7 +540,6 @@ namespace TerrainMapGUILibrary.Controls
             {
                 Owner.InnerItems.RemoveAt(index);
             }
-
 
             int IList.Add(object value)
             {

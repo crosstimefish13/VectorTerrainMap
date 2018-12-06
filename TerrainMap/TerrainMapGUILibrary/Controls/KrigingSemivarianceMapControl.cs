@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Components;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapGUILibrary.Themes;
 using TerrainMapLibrary.Interpolator.Kriging;
 
 namespace TerrainMapGUILibrary.Controls
@@ -19,11 +20,7 @@ namespace TerrainMapGUILibrary.Controls
     [ToolboxItemFilter("TerrainMapGUILibrary.Controls")]
     public sealed class KrigingSemivarianceMapControl : ControlExtension
     {
-        private SemivarianceMap map;
-
-        private SemivarianceMap.Chart chart;
-
-        private Image dataImage;
+        private SemivarianceMapChart chart;
 
         private LabelExtension lblMinX;
 
@@ -51,7 +48,7 @@ namespace TerrainMapGUILibrary.Controls
 
         [Category("Function")]
         [Description("Max decimal length for value input.")]
-        [DefaultValue(16)]
+        [DefaultValue(8)]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
@@ -125,9 +122,7 @@ namespace TerrainMapGUILibrary.Controls
 
         public KrigingSemivarianceMapControl()
         {
-            map = null;
             chart = null;
-            dataImage = null;
 
             InitializeComponent();
         }
@@ -135,16 +130,10 @@ namespace TerrainMapGUILibrary.Controls
         public void LoadData(SemivarianceMap map)
         {
             if (map == null) { return; }
-            if (dataImage != null) { dataImage.Dispose(); }
+            if (pcbImage.Image != null) { pcbImage.Image.Dispose(); }
 
-            this.map = map;
-            chart = map.GetChart(Size.Width, Size.Height, 40f);
-            dataImage = new Bitmap(Size.Width, Size.Height);
-
-            // draw data
-            var g = Graphics.FromImage(dataImage);
-            map.DrawData(g, chart);
-            g.Dispose();
+            chart = SemivarianceMapChart.Create(map, new KrigingSemivarianceMapTheme(Size.Width, Size.Height));
+            pcbImage.Image = chart.DrawData();
 
             // update value, it would draw curve
             double minX = chart.MinVector.EuclidDistance;
@@ -181,7 +170,7 @@ namespace TerrainMapGUILibrary.Controls
             // ivcMinX
             // 
             ivcMinX.Value = 0;
-            ivcMinX.MaxDecimalLength = 16;
+            ivcMinX.MaxDecimalLength = 8;
             ivcMinX.WatermarkText = "Min X";
             ivcMinX.Location = new Point(50, 26);
             ivcMinX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -199,7 +188,7 @@ namespace TerrainMapGUILibrary.Controls
             // ivcMinY
             // 
             ivcMinY.Value = 0;
-            ivcMinY.MaxDecimalLength = 16;
+            ivcMinY.MaxDecimalLength = 8;
             ivcMinY.WatermarkText = "Min Y";
             ivcMinY.Location = new Point(50, 54);
             ivcMinY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -217,7 +206,7 @@ namespace TerrainMapGUILibrary.Controls
             // ivcMaxX
             // 
             ivcMaxX.Value = 0;
-            ivcMaxX.MaxDecimalLength = 16;
+            ivcMaxX.MaxDecimalLength = 8;
             ivcMaxX.WatermarkText = "Max X";
             ivcMaxX.Location = new Point(50, 82);
             ivcMaxX.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -235,7 +224,7 @@ namespace TerrainMapGUILibrary.Controls
             // ivcMaxY
             // 
             ivcMaxY.Value = 0;
-            ivcMaxY.MaxDecimalLength = 16;
+            ivcMaxY.MaxDecimalLength = 8;
             ivcMaxY.WatermarkText = "Max Y";
             ivcMaxY.Location = new Point(50, 110);
             ivcMaxY.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -301,7 +290,7 @@ namespace TerrainMapGUILibrary.Controls
 
         private void UpdateCurve(object sender = null, EventArgs e = null)
         {
-            if (dataImage == null || chart == null || map == null || Value.IsValid() == false) { return; }
+            if (chart == null || Value.IsValid() == false) { return; }
 
             // get drawing model
             var modelType = typeof(Model).Assembly.GetTypes()
@@ -310,15 +299,8 @@ namespace TerrainMapGUILibrary.Controls
             var model = Activator.CreateInstance(modelType, Value.MinX, Value.MinY, Value.MaxX, Value.MaxY) as Model;
 
             // draw curve
-            var image = (Image)dataImage.Clone();
-            var g = Graphics.FromImage(image);
-            map.DrawModelCurve(g, chart, model);
-            g.Dispose();
-
-            // update image
-            var oldImage = pcbImage.Image;
-            pcbImage.Image = image;
-            if (oldImage != null) { oldImage.Dispose(); }
+            if (pcbImage.Image != null) { pcbImage.Image.Dispose(); }
+            pcbImage.Image = chart.DrawModelCurve(model);
 
             if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); }
         }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -33,117 +31,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         public void Close()
         {
             vectors.Close();
-        }
-
-        public Chart GetChart(int width = 800, int height = 600, float margin = 10f)
-        {
-            // CanvasWidth CanvasHeight Margin
-            var chart = new Chart()
-            {
-                CanvasWidth = width,
-                CanvasHeight = height,
-                Margin = margin
-            };
-
-            // VectorsCanvasClient
-            chart.VectorsCanvasClient = new RectangleF(margin * 2f + 12f, margin * 2f + 20f,
-                width - margin * 4f - 18f, height - margin * 4f - 72f);
-
-            // MinVector MaxVector
-            chart.MinVector = new Vector(double.MaxValue, double.MaxValue);
-            chart.MaxVector = new Vector(double.MinValue, double.MinValue);
-            for (long index = 0; index < vectors.Count; index++)
-            {
-                if (Common.DoubleCompare(vectors[index].EuclidDistance, chart.MinVector.EuclidDistance) < 0)
-                { chart.MinVector.EuclidDistance = vectors[index].EuclidDistance; }
-
-                if (Common.DoubleCompare(vectors[index].Semivariance, chart.MinVector.Semivariance) < 0)
-                { chart.MinVector.Semivariance = vectors[index].Semivariance; }
-
-                if (Common.DoubleCompare(vectors[index].EuclidDistance, chart.MaxVector.EuclidDistance) > 0)
-                { chart.MaxVector.EuclidDistance = vectors[index].EuclidDistance; }
-
-                if (Common.DoubleCompare(vectors[index].Semivariance, chart.MaxVector.Semivariance) > 0)
-                { chart.MaxVector.Semivariance = vectors[index].Semivariance; }
-            }
-
-            // VectorToCanvasScaleX VectorToCanvasScaleY
-            chart.VectorToCanvasScaleX = chart.VectorsCanvasClient.Width /
-                (chart.MaxVector.EuclidDistance - chart.MinVector.EuclidDistance);
-            chart.VectorToCanvasScaleY = chart.VectorsCanvasClient.Height /
-                (chart.MaxVector.Semivariance - chart.MinVector.Semivariance);
-
-            return chart;
-        }
-
-        public void DrawData(Graphics g, Chart chart)
-        {
-            g.Clear(Color.White);
-
-            // draw vectors
-            for (long index = 0; index < vectors.Count; index++)
-            {
-                double offsetX = (vectors[index].EuclidDistance - chart.MinVector.EuclidDistance)
-                    * chart.VectorToCanvasScaleX;
-                double offsetY = (vectors[index].Semivariance - chart.MinVector.EuclidDistance)
-                    * chart.VectorToCanvasScaleY;
-
-                float drawX = chart.VectorsCanvasClient.Left + (float)offsetX;
-                float drawY = chart.VectorsCanvasClient.Bottom - (float)offsetY;
-                g.DrawPoint(Color.Red, Color.Black, 4f, 1f, drawX, drawY);
-            }
-
-            // draw left and bottom arrow
-            var client = new RectangleF(chart.VectorsCanvasClient.Left - chart.Margin - 12f,
-                chart.VectorsCanvasClient.Top - chart.Margin,
-                chart.VectorsCanvasClient.Width + chart.Margin * 2 + 12f,
-                chart.VectorsCanvasClient.Height + chart.Margin * 2 + 12f);
-            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Right, client.Bottom - 6f);
-            g.DrawRoundedLine(Color.Black, 3f,
-                client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom - 12f);
-            g.DrawRoundedLine(Color.Black, 3f, client.Right, client.Bottom - 6f, client.Right - 6f, client.Bottom);
-            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Bottom - 6f, client.Left + 6f, client.Top);
-            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left, client.Top + 6f);
-            g.DrawRoundedLine(Color.Black, 3f, client.Left + 6f, client.Top, client.Left + 12f, client.Top + 6f);
-
-            // draw top and bottom text
-            client = new RectangleF(client.X, client.Y - 20f, client.Width, client.Height + 40f);
-            g.DrawText($"Semivariance    min = {chart.MinVector.Semivariance.ToString("N16")}    max = {chart.MaxVector.Semivariance.ToString("N16")}",
-                Color.Black, client.Left, client.Top);
-            g.DrawText($"Euclid Distance    min = {chart.MinVector.EuclidDistance.ToString("N16")}    max = {chart.MaxVector.EuclidDistance.ToString("N16")}                lag bins = {LagBins.ToString("N16")}    vector count = {vectors.Count}",
-                Color.Black, client.Left, client.Bottom - 20f);
-        }
-
-        public void DrawModelCurve(Graphics g, Chart chart, Model model)
-        {
-            // get the curve points
-            double rangeX = chart.MaxVector.EuclidDistance - chart.MinVector.EuclidDistance;
-            var points = new List<PointF>();
-            for (int i = 0; i < chart.CanvasWidth; i++)
-            {
-                double valueX = rangeX * i / chart.CanvasWidth;
-                double valueY = model.Map(valueX);
-
-                float drawX = chart.VectorsCanvasClient.Left + (float)(valueX * chart.VectorToCanvasScaleX);
-                float drawY = chart.VectorsCanvasClient.Bottom - (float)(valueY * chart.VectorToCanvasScaleY);
-                points.Add(new PointF(drawX, drawY));
-            }
-
-            // draw curve
-            var pen = new Pen(Color.DarkGreen, 3f);
-            var path = new GraphicsPath();
-            path.AddCurve(points.ToArray());
-
-            g.DrawPath(pen, path);
-
-            path.Dispose();
-            pen.Dispose();
-
-            // draw bottom text
-            var location = new PointF(chart.VectorsCanvasClient.Left - chart.Margin - 12f,
-                chart.VectorsCanvasClient.Bottom + chart.Margin + 32f);
-            g.DrawText($"{model.GetType().Name}    minX = {model.MinX.ToString("N16")}    minY = {model.MinY.ToString("N16")}    maxX = {model.MaxX.ToString("N16")}    maxY = {model.MaxY.ToString("N16")}",
-                Color.Black, location.X, location.Y);
         }
 
 
@@ -385,57 +272,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 list.AddRange(BitConverter.GetBytes(Semivariance));
 
                 return list.ToArray();
-            }
-        }
-
-
-        public class Chart
-        {
-            public int CanvasWidth { get; set; }
-
-            public int CanvasHeight { get; set; }
-
-            public float Margin { get; set; }
-
-            public RectangleF VectorsCanvasClient { get; set; }
-
-            public Vector MinVector { get; set; }
-
-            public Vector MaxVector { get; set; }
-
-            public double VectorToCanvasScaleX { get; set; }
-
-            public double VectorToCanvasScaleY { get; set; }
-
-
-            public Chart()
-            {
-                CanvasWidth = 0;
-                CanvasHeight = 0;
-                Margin = 0;
-                VectorsCanvasClient = RectangleF.Empty;
-                MinVector = new Vector();
-                MaxVector = new Vector();
-                VectorToCanvasScaleX = 0;
-                VectorToCanvasScaleY = 0;
-            }
-
-
-            public override bool Equals(object obj)
-            {
-                throw new NotSupportedException();
-            }
-
-            public override int GetHashCode()
-            {
-                return CanvasWidth.GetHashCode() + CanvasHeight.GetHashCode() + Margin.GetHashCode()
-                    + VectorsCanvasClient.GetHashCode() + MinVector.GetHashCode() + MaxVector.GetHashCode()
-                    + VectorToCanvasScaleX.GetHashCode() + VectorToCanvasScaleY.GetHashCode();
-            }
-
-            public override string ToString()
-            {
-                return $"Width:{CanvasWidth}, Height:{CanvasHeight}, Margin:{Margin}";
             }
         }
     }

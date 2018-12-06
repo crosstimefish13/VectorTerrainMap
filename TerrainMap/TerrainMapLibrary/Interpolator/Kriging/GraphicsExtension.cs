@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using TerrainMapLibrary.Mathematics;
 
 namespace TerrainMapLibrary.Interpolator.Kriging
@@ -45,21 +47,48 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             float radius = size / 2f;
             g.FillEllipse(brush, x - radius, y - radius, size, size);
-            g.DrawEllipse(pen, x - radius, y -radius, size, size);
+            g.DrawEllipse(pen, x - radius, y - radius, size, size);
 
             pen.Dispose();
             brush.Dispose();
         }
 
-        public static void DrawText(this Graphics g, string text, Color color, float x, float y)
+        public static void DrawText(this Graphics g, string text, Font font, Color color, float x, float y)
         {
             var brush = new SolidBrush(color);
-            var font = new Font("Arial", 12f, FontStyle.Regular);
             g.DrawString(text, font, brush, x, y);
             font.Dispose();
             brush.Dispose();
         }
 
+        public static string ToNumberString(this Graphics g, double number, int decimalDigits = 0, bool fillZero = false)
+        {
+            string result = number.ToString();
+            int dotIndex = result.IndexOf('.');
+            var leftParts = new List<char>();
+            var rightParts = new List<char>();
+            if (dotIndex < 0) { leftParts = result.ToCharArray().ToList(); }
+            else
+            {
+                var parts = result.Split('.');
+                leftParts = parts.First().ToCharArray().ToList();
+                rightParts = parts.Last().ToCharArray().ToList();
+            }
+
+            if (rightParts.Count > decimalDigits) { rightParts = rightParts.Take(decimalDigits).ToList(); }
+            if (fillZero == true)
+            {
+                while (rightParts.Count < decimalDigits) { rightParts.Add('0'); }
+            }
+
+            result = string.Join(string.Empty, leftParts.ToArray());
+            if (rightParts.Count > 0)
+            {
+                result = $"{result}.{string.Join(string.Empty, rightParts.ToArray())}";
+            }
+
+            return result;
+        }
 
         private static float GetRoundedLineStartAngle(float x1, float y1, float x2, float y2)
         {

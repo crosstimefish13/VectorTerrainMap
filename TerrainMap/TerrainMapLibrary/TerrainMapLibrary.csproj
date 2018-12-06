@@ -48,6 +48,7 @@
     <Compile Include="Interpolator\Kriging\KrigingInterpolator.cs" />
     <Compile Include="Interpolator\Kriging\Model.cs" />
     <Compile Include="Interpolator\Kriging\SemivarianceMap.cs" />
+    <Compile Include="Interpolator\Kriging\SemivarianceMapChart.cs" />
     <Compile Include="Mathematics\Common.cs" />
     <Compile Include="Utils\Sequence\HeapSequencer.cs" />
     <Compile Include="Utils\Sequence\IElement.cs" />
