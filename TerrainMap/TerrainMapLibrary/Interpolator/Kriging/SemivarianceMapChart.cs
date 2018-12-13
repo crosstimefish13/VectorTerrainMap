@@ -38,15 +38,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             // draw vectors
             for (long index = 0; index < Map.VectorCount; index++)
             {
-                double offsetX = (
-                            Map[index].EuclidDistance * vectorValueScaleX -
-                            MinVector.EuclidDistance
-                        ) * vectorToCanvasScaleX;
-                double offsetY = (
-                            Map[index].Semivariance * vectorValueScaleY -
-                            MinVector.EuclidDistance
-                        ) * vectorToCanvasScaleY;
-
+                double offsetX = (Map[index].EuclidDistance * vectorValueScaleX - MinVector.EuclidDistance) * vectorToCanvasScaleX;
+                double offsetY = (Map[index].Semivariance * vectorValueScaleY - MinVector.EuclidDistance) * vectorToCanvasScaleY;
                 float drawPointX = vectorsCanvasClient.Left + (float)offsetX;
                 float drawPointY = vectorsCanvasClient.Bottom - (float)offsetY;
                 g.DrawPoint(
@@ -112,16 +105,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             );
 
             // draw top text
-            string topMinValue = g.ToNumberString(
-                MinVector.Semivariance,
-                Style.TextDecimalDigits,
-                true
-            );
-            string topMaxValue = g.ToNumberString(
-               MaxVector.Semivariance,
-               Style.TextDecimalDigits,
-               true
-            );
+            string topMinValue = Common.ToNumberString(MinVector.Semivariance, Style.TextDecimalDigits, true);
+            string topMaxValue = Common.ToNumberString(MaxVector.Semivariance, Style.TextDecimalDigits, true);
             string topText = $"Semivariance Min={topMinValue} Max={topMaxValue} Scale={vectorValueScaleY}";
             g.DrawText(
                 topText,
@@ -132,21 +117,9 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             );
 
             // draw bottom text
-            string bottomMinValue = g.ToNumberString(
-               MinVector.EuclidDistance,
-               Style.TextDecimalDigits,
-               true
-            );
-            string bottomMaxValue = g.ToNumberString(
-               MaxVector.EuclidDistance,
-               Style.TextDecimalDigits,
-               true
-            );
-            string lagBins = g.ToNumberString(
-               Map.LagBins * vectorValueScaleX,
-               Style.TextDecimalDigits,
-               true
-            );
+            string bottomMinValue = Common.ToNumberString(MinVector.EuclidDistance, Style.TextDecimalDigits, true);
+            string bottomMaxValue = Common.ToNumberString(MaxVector.EuclidDistance, Style.TextDecimalDigits, true);
+            string lagBins = Common.ToNumberString(Map.LagBins * vectorValueScaleX, Style.TextDecimalDigits, true);
             string bottomText = $"EuclidDistance Min={bottomMinValue} Max={bottomMaxValue} Scale={vectorValueScaleX} LagBins={lagBins} VectorCount={Map.VectorCount}";
             g.DrawText(
                 bottomText,
@@ -173,7 +146,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             {
                 double valueX = rangeX * i / Style.Width;
                 double valueY = model.Map(valueX);
-
                 float drawX = vectorsCanvasClient.Left + (float)(valueX * vectorToCanvasScaleX);
                 float drawY = vectorsCanvasClient.Bottom - (float)(valueY * vectorToCanvasScaleY);
                 points.Add(new PointF(drawX, drawY));
@@ -188,10 +160,10 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             pen.Dispose();
 
             // draw bottom text
-            string minXValue = g.ToNumberString(model.MinX, Style.TextDecimalDigits, true);
-            string minYValue = g.ToNumberString(model.MinY, Style.TextDecimalDigits, true);
-            string maxXValue = g.ToNumberString(model.MaxX, Style.TextDecimalDigits, true);
-            string maxYValue = g.ToNumberString(model.MaxY, Style.TextDecimalDigits, true);
+            string minXValue = Common.ToNumberString(model.MinX, Style.TextDecimalDigits, true);
+            string minYValue = Common.ToNumberString(model.MinY, Style.TextDecimalDigits, true);
+            string maxXValue = Common.ToNumberString(model.MaxX, Style.TextDecimalDigits, true);
+            string maxYValue = Common.ToNumberString(model.MaxY, Style.TextDecimalDigits, true);
             g.DrawText(
                 $"{model.GetType().Name} MinX={minXValue} MinY={minYValue} MaxX={maxXValue} MaxY={maxYValue}",
                 Style.TextFont,
@@ -230,8 +202,7 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             );
             var vectorsCanvasClientSize = new SizeF(
                 style.Width - vectorsCanvasClientLocation.X - style.Margin * 2f,
-                style.Height - vectorsCanvasClientLocation.Y - style.Margin * 2f -
-                    chart.textHeight * 2f - style.AxisLineWidth * 4f
+                style.Height - vectorsCanvasClientLocation.Y - style.Margin * 2f - chart.textHeight * 2f - style.AxisLineWidth * 4f
             );
             chart.vectorsCanvasClient = new RectangleF(
                 vectorsCanvasClientLocation,
@@ -244,16 +215,24 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             for (long index = 0; index < map.VectorCount; index++)
             {
                 if (Common.DoubleCompare(map[index].EuclidDistance, chart.MinVector.EuclidDistance) < 0)
-                { chart.MinVector.EuclidDistance = map[index].EuclidDistance; }
+                {
+                    chart.MinVector.EuclidDistance = map[index].EuclidDistance;
+                }
 
                 if (Common.DoubleCompare(map[index].Semivariance, chart.MinVector.Semivariance) < 0)
-                { chart.MinVector.Semivariance = map[index].Semivariance; }
+                {
+                    chart.MinVector.Semivariance = map[index].Semivariance;
+                }
 
                 if (Common.DoubleCompare(map[index].EuclidDistance, chart.MaxVector.EuclidDistance) > 0)
-                { chart.MaxVector.EuclidDistance = map[index].EuclidDistance; }
+                {
+                    chart.MaxVector.EuclidDistance = map[index].EuclidDistance;
+                }
 
                 if (Common.DoubleCompare(map[index].Semivariance, chart.MaxVector.Semivariance) > 0)
-                { chart.MaxVector.Semivariance = map[index].Semivariance; }
+                {
+                    chart.MaxVector.Semivariance = map[index].Semivariance;
+                }
             }
 
             // VectorValueScaleX VectorValueScaleY
@@ -280,12 +259,8 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             chart.MaxVector.Semivariance *= chart.vectorValueScaleY;
 
             // VectorToCanvasScaleX VectorToCanvasScaleY
-            chart.vectorToCanvasScaleX =
-                chart.vectorsCanvasClient.Width /
-                (chart.MaxVector.EuclidDistance - chart.MinVector.EuclidDistance);
-            chart.vectorToCanvasScaleY =
-                chart.vectorsCanvasClient.Height /
-                (chart.MaxVector.Semivariance - chart.MinVector.Semivariance);
+            chart.vectorToCanvasScaleX = chart.vectorsCanvasClient.Width / (chart.MaxVector.EuclidDistance - chart.MinVector.EuclidDistance);
+            chart.vectorToCanvasScaleY = chart.vectorsCanvasClient.Height / (chart.MaxVector.Semivariance - chart.MinVector.Semivariance);
 
             return chart;
         }

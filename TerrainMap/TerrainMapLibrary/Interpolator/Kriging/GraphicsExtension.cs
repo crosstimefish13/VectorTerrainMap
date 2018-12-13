@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using TerrainMapLibrary.Mathematics;
 
 namespace TerrainMapLibrary.Interpolator.Kriging
 {
     public static class GraphicsExtension
     {
-        public static void DrawRoundedLine(this Graphics g, Color color, float width,
-            float x1, float y1, float x2, float y2)
+        public static void DrawRoundedLine(this Graphics g, Color color, float width, float x1, float y1, float x2, float y2)
         {
             // title of line head
             float radius = width / 2f;
@@ -32,15 +29,13 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
                 var brush = new SolidBrush(color);
                 g.FillPath(brush, path);
-
                 brush.Dispose();
 
                 path.Dispose();
             }
         }
 
-        public static void DrawPoint(this Graphics g, Color fill, Color outline, float size, float outlineWidth,
-            float x, float y)
+        public static void DrawPoint(this Graphics g, Color fill, Color outline, float size, float outlineWidth, float x, float y)
         {
             var brush = new SolidBrush(fill);
             var pen = new Pen(outline, outlineWidth);
@@ -61,35 +56,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             brush.Dispose();
         }
 
-        public static string ToNumberString(this Graphics g, double number, int decimalDigits = 0, bool fillZero = false)
-        {
-            string result = number.ToString();
-            int dotIndex = result.IndexOf('.');
-            var leftParts = new List<char>();
-            var rightParts = new List<char>();
-            if (dotIndex < 0) { leftParts = result.ToCharArray().ToList(); }
-            else
-            {
-                var parts = result.Split('.');
-                leftParts = parts.First().ToCharArray().ToList();
-                rightParts = parts.Last().ToCharArray().ToList();
-            }
-
-            if (rightParts.Count > decimalDigits) { rightParts = rightParts.Take(decimalDigits).ToList(); }
-            if (fillZero == true)
-            {
-                while (rightParts.Count < decimalDigits) { rightParts.Add('0'); }
-            }
-
-            result = string.Join(string.Empty, leftParts.ToArray());
-            if (rightParts.Count > 0)
-            {
-                result = $"{result}.{string.Join(string.Empty, rightParts.ToArray())}";
-            }
-
-            return result;
-        }
-
         private static float GetRoundedLineStartAngle(float x1, float y1, float x2, float y2)
         {
             float startAngle = 0f;
@@ -97,28 +63,55 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             int compareY = Common.FloatCompare(y1, y2);
 
             // not need to draw a line
-            if (compareX == 0 && compareY == 0) { return float.NaN; }
+            if (compareX == 0 && compareY == 0)
+            {
+                return float.NaN;
+            }
 
             if (compareX == 0)
             {
                 // vertical line
-                if (compareY < 0) { startAngle = 180f; }
-                else { startAngle = 0f; }
+                if (compareY < 0)
+                {
+                    startAngle = 180f;
+                }
+                else
+                {
+                    startAngle = 0f;
+                }
             }
             else if (compareY == 0)
             {
                 // horizontal line
-                if (compareX < 0) { startAngle = 90f; }
-                else { startAngle = 270f; }
+                if (compareX < 0)
+                {
+                    startAngle = 90f;
+                }
+                else
+                {
+                    startAngle = 270f;
+                }
             }
             else
             {
                 // calcualte the start angle
                 startAngle = (float)(Math.Atan2(y2 - y1, x2 - x1) * 180d / Math.PI);
-                if (compareX < 0 && compareY > 0) { startAngle = 90f + startAngle; }
-                else if (compareX > 0 && compareY > 0) { startAngle = 180f - startAngle; }
-                else if (compareX > 0 && compareY < 0) { startAngle = 90f + startAngle; }
-                else { startAngle = 90f + startAngle; }
+                if (compareX < 0 && compareY > 0)
+                {
+                    startAngle = 90f + startAngle;
+                }
+                else if (compareX > 0 && compareY > 0)
+                {
+                    startAngle = 180f - startAngle;
+                }
+                else if (compareX > 0 && compareY < 0)
+                {
+                    startAngle = 90f + startAngle;
+                }
+                else
+                {
+                    startAngle = 90f + startAngle;
+                }
             }
 
             return startAngle;

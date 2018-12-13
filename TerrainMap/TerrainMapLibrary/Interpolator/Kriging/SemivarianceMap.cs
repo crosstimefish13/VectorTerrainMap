@@ -14,33 +14,41 @@ namespace TerrainMapLibrary.Interpolator.Kriging
     {
         private FileSequence<Vector> vectors;
 
-
         public double LagBins { get; private set; }
 
         public long VectorCount
         {
-            get { return vectors.Count; }
+            get
+            {
+                return vectors.Count;
+            }
         }
 
         public Vector this[long index]
         {
-            get { return vectors[index]; }
+            get
+            {
+                return vectors[index];
+            }
         }
-
 
         public void Close()
         {
             vectors.Close();
         }
 
-
         public static SemivarianceMap BuildOriginal(MapPointList data, string root = null, StepCounter counter = null)
         {
             // validate the data
             if (data == null || data.Count < 2)
-            { throw new Exception("the count of data must be more than or equal with 2."); }
+            {
+                throw new Exception("the count of data must be more than or equal with 2.");
+            }
 
-            if (root == null) { root = GetDefaultRoot(); }
+            if (root == null)
+            {
+                root = GetDefaultRoot();
+            }
 
             // element size is 16 B, each file size is 4 GB and memory size is 16 MB
             var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, 0), 16, 67108864, 262144);
@@ -48,7 +56,10 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             // do not use memory cache while adding elements
             vectors.EnableMemoryCache = false;
 
-            if (counter != null) { counter.Reset((long)(data.Count - 1) * data.Count / 2, 0, "Calculating"); }
+            if (counter != null)
+            {
+                counter.Reset((long)(data.Count - 1) * data.Count / 2, 0, "Calculating");
+            }
 
             // calculate each map point
             for (int i = 0; i < data.Count; i++)
@@ -64,11 +75,17 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     var vector = new Vector(euclidDistance, semivariance);
                     vectors.Add(vector);
 
-                    if (counter != null) { counter.AddStep(); }
+                    if (counter != null)
+                    {
+                        counter.AddStep();
+                    }
                 }
             }
 
-            if (counter != null) { counter.Reset(counter.StepLength, counter.StepLength, "Calculating"); }
+            if (counter != null)
+            {
+                counter.Reset(counter.StepLength, counter.StepLength, "Calculating");
+            }
 
             vectors.Flush();
 
@@ -76,11 +93,14 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             vectors.EnableMemoryCache = true;
 
             // use heap sequencer to sort the sequence
-            var sequencer = new HeapSequencer<Vector>(vectors, (left, right) =>
-            {
-                // compare the Euclid distance
-                return Common.DoubleCompare(left.EuclidDistance, right.EuclidDistance);
-            }, counter);
+            var sequencer = new HeapSequencer<Vector>(
+                vectors,
+                (left, right) =>
+                    {
+                        // compare the Euclid distance
+                        return Common.DoubleCompare(left.EuclidDistance, right.EuclidDistance);
+                    },
+                counter);
 
             sequencer.Sort();
 
@@ -93,18 +113,28 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         public static SemivarianceMap Build(double lagBins, string root = null, StepCounter counter = null)
         {
             if (lagBins < 0 || Common.DoubleCompare(lagBins, 0) <= 0)
-            { throw new Exception("lagBins must be more than 0"); }
+            {
+                throw new Exception("lagBins must be more than 0");
+            }
 
-            if (root == null) { root = GetDefaultRoot(); }
+            if (root == null)
+            {
+                root = GetDefaultRoot();
+            }
 
             // load original sequence and generate new sequence by using lag bins
             var originalVectors = FileSequence<Vector>.Load(GetLagBinsPath(root, 0));
-            var vectors = FileSequence<Vector>.Generate(GetLagBinsPath(root, lagBins),
+            var vectors = FileSequence<Vector>.Generate(
+                GetLagBinsPath(root, lagBins),
                 originalVectors.ElementLength,
                 originalVectors.FileElement,
-                originalVectors.MemoryElement);
+                originalVectors.MemoryElement
+            );
 
-            if (counter != null) { counter.Reset(originalVectors.Count, 0, "Building"); }
+            if (counter != null)
+            {
+                counter.Reset(originalVectors.Count, 0, "Building");
+            }
 
             // check each original elements
             var vectorGroup = new List<Vector>();
@@ -140,13 +170,19 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                     vectors.Add(avgVector);
                 }
 
-                if (counter != null) { counter.AddStep(); }
+                if (counter != null)
+                {
+                    counter.AddStep();
+                }
             }
 
             vectors.Flush();
             vectors.Close();
 
-            if (counter != null) { counter.Reset(counter.StepLength, counter.StepLength, "Building"); }
+            if (counter != null)
+            {
+                counter.Reset(counter.StepLength, counter.StepLength, "Building");
+            }
 
             var map = Load(lagBins, root);
             return map;
@@ -154,30 +190,41 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
         public static SemivarianceMap Load(double lagBins, string root = null)
         {
-            if (root == null) { root = GetDefaultRoot(); }
+            if (root == null)
+            {
+                root = GetDefaultRoot();
+            }
 
             var vectors = FileSequence<Vector>.Load(GetLagBinsPath(root, lagBins));
-            var map = new SemivarianceMap() { vectors = vectors, LagBins = lagBins };
+            var map = new SemivarianceMap()
+            {
+                vectors = vectors,
+                LagBins = lagBins
+            };
 
             return map;
         }
 
         public static List<double> GetALlLagBins(string root = null)
         {
-            if (root == null) { root = GetDefaultRoot(); }
+            if (root == null)
+            {
+                root = GetDefaultRoot();
+            }
 
             var lagBins = new List<double>();
             var entries = Directory.GetFileSystemEntries(root);
             foreach (var entry in entries)
             {
-                if (Directory.Exists(entry) == true
-                    && double.TryParse(Path.GetFileName(entry), out double lagBin) == true)
-                { lagBins.Add(lagBin); }
+                if (Directory.Exists(entry) == true &&
+                    double.TryParse(Path.GetFileName(entry), out double lagBin) == true)
+                {
+                    lagBins.Add(lagBin);
+                }
             }
 
             return lagBins;
         }
-
 
         private SemivarianceMap()
         {
@@ -185,12 +232,13 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             LagBins = 0;
         }
 
-
         private static string GetDefaultRoot()
         {
             var assemblyLocation = Assembly.GetExecutingAssembly().Location;
-            string root = Path.Combine(Path.GetDirectoryName(assemblyLocation),
-                Path.GetFileNameWithoutExtension(assemblyLocation));
+            string root = Path.Combine(
+                Path.GetDirectoryName(assemblyLocation),
+                Path.GetFileNameWithoutExtension(assemblyLocation)
+            );
             return root;
         }
 
@@ -200,7 +248,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             return path;
         }
 
-
         public class Vector : IElement
         {
             public double EuclidDistance { get; set; }
@@ -209,9 +256,11 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
             public int ArrayLength
             {
-                get { return 16; }
+                get
+                {
+                    return 16;
+                }
             }
-
 
             public Vector()
                 : this(0, 0)
@@ -223,29 +272,53 @@ namespace TerrainMapLibrary.Interpolator.Kriging
                 Semivariance = semivariance;
             }
 
-
             public static bool operator ==(Vector left, Vector right)
             {
-                // compare object reference
-                if (left is null && right is null) { return true; }
-                else if (left is null || right is null) { return false; }
-                // compare values
-                else if (Common.DoubleCompare(left.EuclidDistance, right.EuclidDistance) != 0) { return false; }
-                else if (Common.DoubleCompare(left.Semivariance, right.Semivariance) != 0) { return false; }
-                else { return true; }
+                // compare object reference, then compare values
+                if (left is null && right is null)
+                {
+                    return true;
+                }
+                else if (left is null || right is null)
+                {
+                    return false;
+                }
+                else if (Common.DoubleCompare(left.EuclidDistance, right.EuclidDistance) != 0)
+                {
+                    return false;
+                }
+                else if (Common.DoubleCompare(left.Semivariance, right.Semivariance) != 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
 
             public static bool operator !=(Vector left, Vector right)
             {
-                return !(left == right);
+                if (left == right)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
-
 
             public override bool Equals(object obj)
             {
-                if (obj == null || !(obj is Vector)) { return false; }
-
-                return this == (obj as Vector);
+                if (obj == null || (obj is Vector) == false)
+                {
+                    return false;
+                }
+                else
+                {
+                    return this == (obj as Vector);
+                }
             }
 
             public override int GetHashCode()
@@ -257,7 +330,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             {
                 return $"EuclidDistance:{EuclidDistance}, Semivariance:{Semivariance}";
             }
-
 
             public void Initialize(byte[] array)
             {

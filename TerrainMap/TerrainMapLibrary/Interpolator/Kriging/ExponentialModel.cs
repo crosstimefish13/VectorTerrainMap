@@ -9,11 +9,13 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             : base(minX, minY, maxX, maxY)
         { }
 
-
         public override double Map(double x)
         {
             double fx = x - MinX;
-            if (Common.DoubleCompare(fx, 0) <= 0) { return MinY; }
+            if (Common.DoubleCompare(fx, 0) <= 0)
+            {
+                return MinY;
+            }
 
             double y = MinY + (MaxY - MinY) * (1 - Math.Exp((-fx) / (MaxX - MinX)));
             return y;

@@ -25,12 +25,15 @@ namespace TerrainMapGUILibrary.Components
 
         [Category("Function")]
         [Description("Max decimal length for min max value input.")]
-        [DefaultValue(16)]
+        [DefaultValue(8)]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
-            get { return txbMinValue.MaxDecimalLength; }
+            get
+            {
+                return txbMinValue.MaxDecimalLength;
+            }
             set
             {
                 txbMinValue.MaxDecimalLength = value;
@@ -47,10 +50,19 @@ namespace TerrainMapGUILibrary.Components
         {
             get
             {
-                if (string.IsNullOrEmpty(txbMinValue.Text) == true) { return double.NaN; }
-                else { return double.Parse(txbMinValue.Text); }
+                if (string.IsNullOrEmpty(txbMinValue.Text) == true)
+                {
+                    return double.NaN;
+                }
+                else
+                {
+                    return double.Parse(txbMinValue.Text);
+                }
             }
-            set { txbMinValue.Text = value.ToString(); }
+            set
+            {
+                txbMinValue.Text = value.ToString();
+            }
         }
 
         [Category("Function")]
@@ -62,10 +74,19 @@ namespace TerrainMapGUILibrary.Components
         {
             get
             {
-                if (string.IsNullOrEmpty(txbMaxValue.Text) == true) { return double.NaN; }
-                else { return double.Parse(txbMaxValue.Text); }
+                if (string.IsNullOrEmpty(txbMaxValue.Text) == true)
+                {
+                    return double.NaN;
+                }
+                else
+                {
+                    return double.Parse(txbMaxValue.Text);
+                }
             }
-            set { txbMaxValue.Text = value.ToString(); }
+            set
+            {
+                txbMaxValue.Text = value.ToString();
+            }
         }
 
         [Category("Function")]
@@ -83,12 +104,21 @@ namespace TerrainMapGUILibrary.Components
                     double minValue = MinValue;
                     double maxValue = MaxValue;
                     double trackValue = minValue + (maxValue - minValue) / 99 * trbValue.Value;
-                    if (trackValue < minValue) { trackValue = minValue; }
-                    else if (trackValue > maxValue) { trackValue = maxValue; }
+                    if (trackValue < minValue)
+                    {
+                        trackValue = minValue;
+                    }
+                    else if (trackValue > maxValue)
+                    {
+                        trackValue = maxValue;
+                    }
 
                     return trackValue;
                 }
-                else { return double.NaN; }
+                else
+                {
+                    return double.NaN;
+                }
             }
             set
             {
@@ -98,9 +128,18 @@ namespace TerrainMapGUILibrary.Components
                     double minValue = MinValue;
                     double maxValue = MaxValue;
                     int trackValue = 49;
-                    if (value <= minValue) { trackValue = trbValue.Minimum; }
-                    else if (value >= maxValue) { trackValue = trbValue.Maximum; }
-                    else { trackValue = (int)((value - minValue) / (maxValue - minValue) * 99); }
+                    if (value <= minValue)
+                    {
+                        trackValue = trbValue.Minimum;
+                    }
+                    else if (value >= maxValue)
+                    {
+                        trackValue = trbValue.Maximum;
+                    }
+                    else
+                    {
+                        trackValue = (int)((value - minValue) / (maxValue - minValue) * 99);
+                    }
 
                     trbValue.Value = trackValue;
                 }
@@ -114,7 +153,10 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int StartTabIndex
         {
-            get { return txbMinValue.TabIndex; }
+            get
+            {
+                return txbMinValue.TabIndex;
+            }
             set
             {
                 txbMinValue.TabIndex = value;
@@ -141,7 +183,6 @@ namespace TerrainMapGUILibrary.Components
         public event EventHandler TrackValueChanged;
 
         public TrackValueComponent()
-            : base()
         {
             InitializeComponent();
         }
@@ -159,12 +200,15 @@ namespace TerrainMapGUILibrary.Components
             // 
             txbMinValue.WatermarkText = "Min Value";
             txbMinValue.NumberInput = true;
-            txbMinValue.MaxDecimalLength = 16;
+            txbMinValue.MaxDecimalLength = 8;
             txbMinValue.Location = new Point(1, 1);
             txbMinValue.Size = new Size(100, 22);
             txbMinValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             txbMinValue.TabIndex = 0;
-            txbMinValue.TextChanged += (sender, e) => { SetTrackControls(sender); };
+            txbMinValue.TextChanged += (sender, e) => 
+            {
+                SetTrackControls(sender);
+            };
             Controls.Add(txbMinValue);
             // 
             // btnMinMove
@@ -175,7 +219,12 @@ namespace TerrainMapGUILibrary.Components
             btnMinMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             btnMinMove.Enabled = false;
             btnMinMove.Click += (sender, e) =>
-            { if (trbValue.Value - 1 >= trbValue.Minimum) { SetTrackControls(sender, trbValue.Value - 1); } };
+            {
+                if (trbValue.Value - 1 >= trbValue.Minimum)
+                {
+                    SetTrackControls(sender, trbValue.Value - 1);
+                }
+            };
             Controls.Add(btnMinMove);
             // 
             // trbValue
@@ -190,7 +239,12 @@ namespace TerrainMapGUILibrary.Components
             trbValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             trbValue.Enabled = false;
             trbValue.ValueChanged += (sender, e) =>
-            { if (TrackValueChanged != null) { TrackValueChanged.Invoke(this, new EventArgs()); } };
+            {
+                if (TrackValueChanged != null)
+                {
+                    TrackValueChanged.Invoke(this, new EventArgs());
+                }
+            };
             Controls.Add(trbValue);
             // 
             // btnMaxMove
@@ -201,19 +255,27 @@ namespace TerrainMapGUILibrary.Components
             btnMaxMove.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             btnMaxMove.Enabled = false;
             btnMaxMove.Click += (sender, e) =>
-            { if (trbValue.Value + 1 <= trbValue.Maximum) { SetTrackControls(sender, trbValue.Value + 1); } };
+            {
+                if (trbValue.Value + 1 <= trbValue.Maximum)
+                {
+                    SetTrackControls(sender, trbValue.Value + 1);
+                }
+            };
             Controls.Add(btnMaxMove);
             // 
             // txbMaxValue
             // 
             txbMaxValue.WatermarkText = "Max Value";
             txbMaxValue.NumberInput = true;
-            txbMaxValue.MaxDecimalLength = 16;
+            txbMaxValue.MaxDecimalLength = 8;
             txbMaxValue.Location = new Point(252, 1);
             txbMaxValue.Size = new Size(100, 22);
             txbMaxValue.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             txbMaxValue.TabIndex = 0;
-            txbMaxValue.TextChanged += (sender, e) => { SetTrackControls(sender); };
+            txbMaxValue.TextChanged += (sender, e) =>
+            {
+                SetTrackControls(sender);
+            };
             Controls.Add(txbMaxValue);
             // 
             // this
@@ -241,7 +303,10 @@ namespace TerrainMapGUILibrary.Components
 
                 // need to reset trb value
                 trbValue.Value = value;
-                if (TrackValueChanged != null) { TrackValueChanged.Invoke(this, new EventArgs()); }
+                if (TrackValueChanged != null)
+                {
+                    TrackValueChanged.Invoke(this, new EventArgs());
+                }
             }
             else
             {
@@ -255,9 +320,13 @@ namespace TerrainMapGUILibrary.Components
             {
                 // invoke min max value changed
                 if (sender == txbMinValue && MinValueChanged != null)
-                { MinValueChanged.Invoke(this, new EventArgs()); }
+                {
+                    MinValueChanged.Invoke(this, new EventArgs());
+                }
                 else if (sender == txbMaxValue && MaxValueChanged != null)
-                { MaxValueChanged.Invoke(this, new EventArgs()); }
+                {
+                    MaxValueChanged.Invoke(this, new EventArgs());
+                }
             }
         }
     }

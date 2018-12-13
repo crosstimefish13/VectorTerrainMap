@@ -10,7 +10,10 @@ namespace TerrainMapLibrary.Interpolator.Data
         public static MapPointList Read(string filePath, Indicator indicator = null)
         {
             var mapPoints = new MapPointList();
-            if (indicator == null) { indicator = new Indicator(); }
+            if (indicator == null)
+            {
+                indicator = new Indicator();
+            }
 
             // read to end, read each fields, these fields are splited with comma
             var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read));
@@ -22,27 +25,38 @@ namespace TerrainMapLibrary.Interpolator.Data
                 string line = reader.ReadLine();
 
                 // continue if it is invalid row index
-                if (indicator.ExcludeRows.Contains(rowCount) == true) { continue; }
+                if (indicator.ExcludeRows.Contains(rowCount) == true)
+                {
+                    continue;
+                }
 
                 // default values
-                var mapPoint = new MapPointList.MapPoint(indicator.InvalidField,
+                var mapPoint = new MapPointList.MapPoint(
                     indicator.InvalidField,
-                    indicator.InvalidField);
+                    indicator.InvalidField,
+                    indicator.InvalidField
+                );
 
                 // read each xyz
                 var fields = line.Split(',').ToList();
 
-                if (indicator.XColumn < fields.Count
-                    && double.TryParse(fields[indicator.XColumn].Trim(), out double x))
-                { mapPoint.X = x; }
+                if (indicator.XColumn < fields.Count &&
+                    double.TryParse(fields[indicator.XColumn].Trim(), out double x))
+                {
+                    mapPoint.X = x;
+                }
 
-                if (indicator.YColumn < fields.Count
-                    && double.TryParse(fields[indicator.YColumn].Trim(), out double y))
-                { mapPoint.Y = y; }
+                if (indicator.YColumn < fields.Count &&
+                    double.TryParse(fields[indicator.YColumn].Trim(), out double y))
+                {
+                    mapPoint.Y = y;
+                }
 
-                if (indicator.ZColumn < fields.Count
-                    && double.TryParse(fields[indicator.ZColumn].Trim(), out double z))
-                { mapPoint.Z = z; }
+                if (indicator.ZColumn < fields.Count &&
+                    double.TryParse(fields[indicator.ZColumn].Trim(), out double z))
+                {
+                    mapPoint.Z = z;
+                }
 
                 mapPoints.Add(mapPoint);
             }
@@ -53,7 +67,6 @@ namespace TerrainMapLibrary.Interpolator.Data
             return mapPoints;
         }
 
-
         public class Indicator
         {
             private int xColumnl;
@@ -62,14 +75,18 @@ namespace TerrainMapLibrary.Interpolator.Data
 
             private int zColumnl;
 
-
             public int XColumn
             {
-                get { return xColumnl; }
+                get
+                {
+                    return xColumnl;
+                }
                 set
                 {
                     if (value < 0)
-                    { throw new Exception("value must be more than or equal with 0."); }
+                    {
+                        throw new Exception("value must be more than or equal with 0.");
+                    }
 
                     xColumnl = value;
                 }
@@ -77,11 +94,16 @@ namespace TerrainMapLibrary.Interpolator.Data
 
             public int YColumn
             {
-                get { return yColumnl; }
+                get
+                {
+                    return yColumnl;
+                }
                 set
                 {
                     if (value < 0)
-                    { throw new Exception("value must be more than or equal with 0."); }
+                    {
+                        throw new Exception("value must be more than or equal with 0.");
+                    }
 
                     yColumnl = value;
                 }
@@ -89,11 +111,16 @@ namespace TerrainMapLibrary.Interpolator.Data
 
             public int ZColumn
             {
-                get { return zColumnl; }
+                get
+                {
+                    return zColumnl;
+                }
                 set
                 {
                     if (value < 0)
-                    { throw new Exception("value must be more than or equal with 0."); }
+                    {
+                        throw new Exception("value must be more than or equal with 0.");
+                    }
 
                     zColumnl = value;
                 }
@@ -102,7 +129,6 @@ namespace TerrainMapLibrary.Interpolator.Data
             public IndexList ExcludeRows { get; private set; }
 
             public double InvalidField { get; set; }
-
 
             public Indicator()
             {
@@ -113,7 +139,6 @@ namespace TerrainMapLibrary.Interpolator.Data
                 InvalidField = double.NaN;
             }
 
-
             public override bool Equals(object obj)
             {
                 throw new NotSupportedException();
@@ -121,8 +146,13 @@ namespace TerrainMapLibrary.Interpolator.Data
 
             public override int GetHashCode()
             {
-                return XColumn.GetHashCode() + YColumn.GetHashCode() + ZColumn.GetHashCode()
-                     + ExcludeRows.GetHashCode() + InvalidField.GetHashCode();
+                int hashCode =
+                    XColumn.GetHashCode() +
+                    YColumn.GetHashCode() +
+                    ZColumn.GetHashCode() +
+                    ExcludeRows.GetHashCode() +
+                    InvalidField.GetHashCode();
+                return hashCode;
             }
 
             public override string ToString()
@@ -130,30 +160,31 @@ namespace TerrainMapLibrary.Interpolator.Data
                 return $"XColumn: {XColumn}, XColumn: {YColumn}, XColumn: {ZColumn}, ExcludeRows: {ExcludeRows.ToString()}, InvalidField: {InvalidField}";
             }
 
-
             public class IndexList
             {
                 private List<int> indexes;
 
-
                 public int this[int index]
                 {
-                    get { return indexes[index]; }
+                    get
+                    {
+                        return indexes[index];
+                    }
                     set
                     {
                         if (value < 0)
-                        { throw new Exception("index value must be more than or equal with 0."); }
+                        {
+                            throw new Exception("index value must be more than or equal with 0.");
+                        }
 
                         indexes[index] = value;
                     }
                 }
 
-
                 public IndexList()
                 {
                     indexes = new List<int>();
                 }
-
 
                 public override bool Equals(object obj)
                 {
@@ -170,11 +201,12 @@ namespace TerrainMapLibrary.Interpolator.Data
                     return $"Count: {indexes.Count}";
                 }
 
-
                 public void Add(int item)
                 {
                     if (item < 0)
-                    { throw new Exception("index value must be more than or equal with 0."); }
+                    {
+                        throw new Exception("index value must be more than or equal with 0.");
+                    }
 
                     indexes.Add(item);
                 }

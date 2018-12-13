@@ -12,7 +12,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
 
         public double MaxY { get; set; }
 
-
         public Model(double minX = 0, double minY = 0, double maxX = 1, double maxY = 1)
         {
             MinX = minX;
@@ -20,7 +19,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
             MaxX = maxX;
             MaxY = maxY;
         }
-
 
         public override bool Equals(object obj)
         {
@@ -36,7 +34,6 @@ namespace TerrainMapLibrary.Interpolator.Kriging
         {
             return $"MinX:{MinX}, MinY:{MinY}, MaxX:{MaxX}, MaxY:{MaxY}";
         }
-
 
         public abstract double Map(double x);
     }
