@@ -10,16 +10,17 @@ namespace TerrainMapLibrary.Utils.Sequence
 
         public StepCounter Counter { get; set; }
 
-
         public Sequencer(ISequence<T> sequence, Func<T, T, int> comparer, StepCounter counter = null)
         {
-            if (sequence == null || comparer == null) { throw new ArgumentNullException(); }
+            if (sequence == null || comparer == null)
+            {
+                throw new ArgumentNullException();
+            }
 
             Sequence = sequence;
             Comparer = comparer;
             Counter = counter;
         }
-
 
         public override bool Equals(object obj)
         {
@@ -35,7 +36,6 @@ namespace TerrainMapLibrary.Utils.Sequence
         {
             return $"Sequencer: {GetType().FullName}, Sequence: {Sequence.GetType().FullName}";
         }
-
 
         public abstract void Sort();
 

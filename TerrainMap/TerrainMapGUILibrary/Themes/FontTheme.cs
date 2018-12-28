@@ -29,7 +29,10 @@ namespace TerrainMapGUILibrary.Themes
             if (textWidth >= width)
             {
                 float testWidth = g.MeasureString("...", font).Width;
-                if (testWidth >= width) { result = string.Empty; }
+                if (testWidth >= width)
+                {
+                    result = string.Empty;
+                }
                 else
                 {
                     result = "...";
@@ -38,8 +41,14 @@ namespace TerrainMapGUILibrary.Themes
                     {
                         string testText = $"{string.Join(" ", textParts.Take(i + 1))} ...";
                         testWidth = g.MeasureString(testText, font).Width;
-                        if (testWidth >= width) { break; }
-                        else { result = testText; }
+                        if (testWidth >= width)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            result = testText;
+                        }
                     }
                 }
             }

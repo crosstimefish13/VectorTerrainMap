@@ -11,67 +11,106 @@ namespace TerrainMapGUILibrary.Themes
 
         public float Margin
         {
-            get { return 40f; }
+            get
+            {
+                return 40f;
+            }
         }
 
         public Color BackColor
         {
-            get { return Color.FromArgb(255, 255, 255); }
+            get
+            {
+                return Color.FromArgb(255, 255, 255);
+            }
         }
 
         public float PointSize
         {
-            get { return 4f; }
+            get
+            {
+                return 4f;
+            }
         }
 
         public Color PointFillColor
         {
-            get { return Color.FromArgb(153, 170, 181); }
+            get
+            {
+                return Color.FromArgb(153, 170, 181);
+            }
         }
 
         public float PointOutlinWidth
         {
-            get { return 1f; }
+            get
+            {
+                return 1f;
+            }
         }
 
         public Color PointOutlineColor
         {
-            get { return Color.FromArgb(44, 47, 51); }
+            get
+            {
+                return Color.FromArgb(44, 47, 51);
+            }
         }
 
         public float AxisLineWidth
         {
-            get { return 3f; }
+            get
+            {
+                return 3f;
+            }
         }
 
         public Color AxisLineColor
         {
-            get { return Color.FromArgb(35, 39, 42); }
+            get
+            {
+                return Color.FromArgb(35, 39, 42);
+            }
         }
 
         public Font TextFont
         {
-            get { return FontTheme.Normal(); }
+            get
+            {
+                return FontTheme.Normal();
+            }
         }
 
         public Color TextColor
         {
-            get { return Color.FromArgb(35, 39, 42); }
+            get
+            {
+                return Color.FromArgb(35, 39, 42);
+            }
         }
 
         public int TextDecimalDigits
         {
-            get { return 8; }
+            get
+            {
+                return 8;
+            }
         }
 
         public float CurveLineWidth
         {
-            get { return 3f; }
+            get
+            {
+                return 3f;
+            }
         }
 
         public Color CurveLineColor
         {
-            get { return Color.FromArgb(114, 137, 218); }
+            get
+            {
+                return Color.FromArgb(114, 137, 218);
+            }
         }
 
         public KrigingSemivarianceMapTheme(int width, int height)

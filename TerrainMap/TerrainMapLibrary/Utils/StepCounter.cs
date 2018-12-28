@@ -9,7 +9,6 @@ namespace TerrainMapLibrary.Utils
 
         private long stepPerRefresh;
 
-
         public string Name { get; private set; }
 
         public long Step { get; private set; }
@@ -24,15 +23,17 @@ namespace TerrainMapLibrary.Utils
 
         public Action<StepCounter> RefreshAction { get; set; }
 
-
-        public StepCounter(Action<StepCounter> refreshAction = null,
-            long refreshInterval = 500, long scopeInterval = 5000)
+        public StepCounter(Action<StepCounter> refreshAction = null, long refreshInterval = 500, long scopeInterval = 5000)
         {
             if (refreshInterval <= 0)
-            { throw new Exception("refreshInterval must be more than 0."); }
+            {
+                throw new Exception("refreshInterval must be more than 0.");
+            }
 
             if (scopeInterval <= 0)
-            { throw new Exception("scopeInterval must be more than 0."); }
+            {
+                throw new Exception("scopeInterval must be more than 0.");
+            }
 
             refreshTimer = new Stopwatch();
             stepPerRefresh = 0;
@@ -45,7 +46,6 @@ namespace TerrainMapLibrary.Utils
             ScopeInterval = scopeInterval;
         }
 
-
         public override bool Equals(object obj)
         {
             throw new NotSupportedException();
@@ -53,16 +53,20 @@ namespace TerrainMapLibrary.Utils
 
         public override int GetHashCode()
         {
-            return refreshTimer.GetHashCode() + stepPerRefresh.GetHashCode() 
-                + Step.GetHashCode() + StepLength.GetHashCode() + TicksLeft.GetHashCode() 
-                + RefreshInterval.GetHashCode() + ScopeInterval.GetHashCode();
+            int hashCode = refreshTimer.GetHashCode() +
+                stepPerRefresh.GetHashCode() +
+                Step.GetHashCode() +
+                StepLength.GetHashCode() +
+                TicksLeft.GetHashCode() +
+                RefreshInterval.GetHashCode() +
+                ScopeInterval.GetHashCode();
+            return hashCode;
         }
 
         public override string ToString()
         {
             return $"Step: {Step}, StepLength: {StepLength}";
         }
-
 
         public void Reset(long stepLength = 0, long step = 0, string name = null)
         {
@@ -73,7 +77,10 @@ namespace TerrainMapLibrary.Utils
             StepLength = stepLength;
             TicksLeft = 0;
 
-            if (RefreshAction != null) { RefreshAction.Invoke(this); }
+            if (RefreshAction != null)
+            {
+                RefreshAction.Invoke(this);
+            }
         }
 
         public bool AddStep()
@@ -88,7 +95,10 @@ namespace TerrainMapLibrary.Utils
             }
 
             // start refresh timer if needed
-            if (refreshTimer.IsRunning == false) { refreshTimer.Restart(); }
+            if (refreshTimer.IsRunning == false)
+            {
+                refreshTimer.Restart();
+            }
 
             stepPerRefresh += 1;
 
@@ -103,16 +113,27 @@ namespace TerrainMapLibrary.Utils
 
                 // update ticks left if needed
                 if (TicksLeft == 0 || Math.Abs(TicksLeft - newTicksLeft) >= scopeTicks)
-                { TicksLeft = newTicksLeft; }
-                else { TicksLeft -= refreshTicks; }
+                {
+                    TicksLeft = newTicksLeft;
+                }
+                else
+                {
+                    TicksLeft -= refreshTicks;
+                }
 
-                if (TicksLeft < refreshTicks) { TicksLeft = refreshTicks; }
+                if (TicksLeft < refreshTicks)
+                {
+                    TicksLeft = refreshTicks;
+                }
 
                 stepPerRefresh = 0;
                 refreshTimer.Restart();
             }
 
-            if (RefreshAction != null) { RefreshAction.Invoke(this); }
+            if (RefreshAction != null)
+            {
+                RefreshAction.Invoke(this);
+            }
 
             return true;
         }
@@ -121,7 +142,10 @@ namespace TerrainMapLibrary.Utils
         {
             var timeSpan = new TimeSpan(TicksLeft);
             string content = $"{timeSpan.Hours.ToString().PadLeft(2, '0')}:{timeSpan.Minutes.ToString().PadLeft(2, '0')}:{timeSpan.Seconds.ToString().PadLeft(2, '0')}";
-            if (timeSpan.Days > 0) { content = $"{timeSpan.Days} days {content}"; }
+            if (timeSpan.Days > 0)
+            {
+                content = $"{timeSpan.Days} days {content}";
+            }
 
             return content;
         }

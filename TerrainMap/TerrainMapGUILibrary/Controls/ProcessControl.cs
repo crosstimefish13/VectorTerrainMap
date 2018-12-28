@@ -45,12 +45,21 @@ namespace TerrainMapGUILibrary.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int SelectedIndex
         {
-            get { return selectedIndex; }
+            get
+            {
+                return selectedIndex;
+            }
             set
             {
                 selectedIndex = value;
-                if (InnerItems.Count <= 0) { selectedIndex = -1; }
-                else if (selectedIndex < -1 || selectedIndex >= InnerItems.Count) { selectedIndex = 0; }
+                if (InnerItems.Count <= 0)
+                {
+                    selectedIndex = -1;
+                }
+                else if (selectedIndex < -1 || selectedIndex >= InnerItems.Count)
+                {
+                    selectedIndex = 0;
+                }
 
                 ChangeSelect();
             }
@@ -66,8 +75,15 @@ namespace TerrainMapGUILibrary.Controls
         {
             selectedIndex = -1;
             InnerItems = new ObservableCollection<ProcessItem>();
-            InnerItems.CollectionChanged += (sender, e) => { RefreshItems(); };
-            Items = new ProcessItemCollection() { Owner = this };
+            InnerItems.CollectionChanged += (sender, e) =>
+            {
+                RefreshItems();
+            };
+            Items = new ProcessItemCollection()
+            {
+                Owner = this
+            };
+
             SelectChanged = null;
 
             InitializeComponent();
@@ -87,7 +103,10 @@ namespace TerrainMapGUILibrary.Controls
             btnBack.Location = new Point(345, 267);
             btnBack.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnBack.Enabled = false;
-            btnBack.Click += (sender, e) => { SelectedIndex -= 1; };
+            btnBack.Click += (sender, e) =>
+            {
+                SelectedIndex -= 1;
+            };
             Controls.Add(btnBack);
             // 
             // btnNext
@@ -96,7 +115,10 @@ namespace TerrainMapGUILibrary.Controls
             btnNext.Location = new Point(430, 267);
             btnNext.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnNext.Enabled = false;
-            btnNext.Click += (sender, e) => { SelectedIndex += 1; };
+            btnNext.Click += (sender, e) =>
+            {
+                SelectedIndex += 1;
+            };
             Controls.Add(btnNext);
             // 
             // ceContent
@@ -139,7 +161,10 @@ namespace TerrainMapGUILibrary.Controls
             }
 
             int offsetY = 10;
-            if (InnerItems.Count > 0) { offsetY = InnerItems.Max(i => i.DescriptionLabel.Bounds.Bottom) + 10; }
+            if (InnerItems.Count > 0)
+            {
+                offsetY = InnerItems.Max(i => i.DescriptionLabel.Bounds.Bottom) + 10;
+            }
 
             // 
             // ceContent
@@ -176,8 +201,14 @@ namespace TerrainMapGUILibrary.Controls
             cePanel.ResumeLayout(false);
             cePanel.PerformLayout();
 
-            if (InnerItems.Count > 0) { SelectedIndex = 0; }
-            else { SelectedIndex = -1; }
+            if (InnerItems.Count > 0)
+            {
+                SelectedIndex = 0;
+            }
+            else
+            {
+                SelectedIndex = -1;
+            }
         }
 
         private void ChangeSelect()
@@ -203,14 +234,27 @@ namespace TerrainMapGUILibrary.Controls
             }
 
             if (InnerItems.Count > 1 && selectedIndex >= 0 && selectedIndex < InnerItems.Count - 1)
-            { btnNext.Enabled = true; }
-            else { btnNext.Enabled = false; }
+            {
+                btnNext.Enabled = true;
+            }
+            else
+            {
+                btnNext.Enabled = false;
+            }
 
             if (InnerItems.Count > 1 && selectedIndex > 0 && selectedIndex < InnerItems.Count)
-            { btnBack.Enabled = true; }
-            else { btnBack.Enabled = false; }
+            {
+                btnBack.Enabled = true;
+            }
+            else
+            {
+                btnBack.Enabled = false;
+            }
 
-            if (SelectChanged != null) { SelectChanged.Invoke(this, new EventArgs()); }
+            if (SelectChanged != null)
+            {
+                SelectChanged.Invoke(this, new EventArgs());
+            }
         }
 
         [DefaultProperty("Header")]
@@ -232,8 +276,14 @@ namespace TerrainMapGUILibrary.Controls
             [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
             public string Header
             {
-                get { return HeaderLabel.Text; }
-                set { HeaderLabel.Text = value; }
+                get
+                {
+                    return HeaderLabel.Text;
+                }
+                set
+                {
+                    HeaderLabel.Text = value;
+                }
             }
 
             [Category("Function")]
@@ -243,8 +293,14 @@ namespace TerrainMapGUILibrary.Controls
             [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
             public string Description
             {
-                get { return DescriptionLabel.Text; }
-                set { DescriptionLabel.Text = value; }
+                get
+                {
+                    return DescriptionLabel.Text;
+                }
+                set
+                {
+                    DescriptionLabel.Text = value;
+                }
             }
 
             [Browsable(false)]
@@ -252,24 +308,42 @@ namespace TerrainMapGUILibrary.Controls
             [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
             public override bool AutoSize
             {
-                get { return base.AutoSize; }
-                set { base.AutoSize = value; }
+                get
+                {
+                    return base.AutoSize;
+                }
+                set
+                {
+                    base.AutoSize = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public override AnchorStyles Anchor
             {
-                get { return base.Anchor; }
-                set { base.Anchor = value; }
+                get
+                {
+                    return base.Anchor;
+                }
+                set
+                {
+                    base.Anchor = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public override DockStyle Dock
             {
-                get { return base.Dock; }
-                set { base.Dock = value; }
+                get
+                {
+                    return base.Dock;
+                }
+                set
+                {
+                    base.Dock = value;
+                }
             }
 
             [DefaultValue(typeof(Size), "0, 0")]
@@ -277,87 +351,150 @@ namespace TerrainMapGUILibrary.Controls
             [EditorBrowsable(EditorBrowsableState.Never)]
             public override Size MaximumSize
             {
-                get { return base.MaximumSize; }
-                set { base.MaximumSize = value; }
+                get
+                {
+                    return base.MaximumSize;
+                }
+                set
+                {
+                    base.MaximumSize = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public override Size MinimumSize
             {
-                get { return base.MinimumSize; }
-                set { base.MinimumSize = value; }
+                get
+                {
+                    return base.MinimumSize;
+                }
+                set
+                {
+                    base.MinimumSize = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new bool Enabled
             {
-                get { return base.Enabled; }
-                set { base.Enabled = value; }
+                get
+                {
+                    return base.Enabled;
+                }
+                set
+                {
+                    base.Enabled = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new Point Location
             {
-                get { return base.Location; }
-                set { base.Location = value; }
+                get
+                {
+                    return base.Location;
+                }
+                set
+                {
+                    base.Location = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new Size PreferredSize
             {
-                get { return base.PreferredSize; }
+                get
+                {
+                    return base.PreferredSize;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new bool Visible
             {
-                get { return base.Visible; }
-                set { base.Visible = value; }
+                get
+                {
+                    return base.Visible;
+                }
+                set
+                {
+                    base.Visible = value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new event EventHandler AutoSizeChanged
             {
-                add { base.AutoSizeChanged += value; }
-                remove { base.AutoSizeChanged -= value; }
+                add
+                {
+                    base.AutoSizeChanged += value;
+                }
+                remove
+                {
+                    base.AutoSizeChanged -= value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new event EventHandler DockChanged
             {
-                add { base.DockChanged += value; }
-                remove { base.DockChanged -= value; }
+                add
+                {
+                    base.DockChanged += value;
+                }
+                remove
+                {
+                    base.DockChanged -= value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new event EventHandler EnabledChanged
             {
-                add { base.EnabledChanged += value; }
-                remove { base.EnabledChanged -= value; }
+                add
+                {
+                    base.EnabledChanged += value;
+                }
+                remove
+                {
+                    base.EnabledChanged -= value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new event EventHandler LocationChanged
             {
-                add { base.LocationChanged += value; }
-                remove { base.LocationChanged -= value; }
+                add
+                {
+                    base.LocationChanged += value;
+                }
+                remove
+                {
+                    base.LocationChanged -= value;
+                }
             }
 
             [Browsable(false)]
             [EditorBrowsable(EditorBrowsableState.Never)]
             public new event EventHandler VisibleChanged
             {
-                add { base.VisibleChanged += value; }
-                remove { base.VisibleChanged -= value; }
+                add
+                {
+                    base.VisibleChanged += value;
+                }
+                remove
+                {
+                    base.VisibleChanged -= value;
+                }
             }
 
             public ProcessItem()
@@ -425,8 +562,7 @@ namespace TerrainMapGUILibrary.Controls
                 return base.CanConvertTo(context, destinationType);
             }
 
-            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
-                Type destinationType)
+            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
             {
                 if (value != null && destinationType != null)
                 {
@@ -437,8 +573,14 @@ namespace TerrainMapGUILibrary.Controls
                         var ci = typeof(ProcessItem).GetConstructor(new Type[] { typeof(string), typeof(string) });
                         if (ci != null)
                         {
-                            var instance = new InstanceDescriptor(ci,
-                                new object[] { source.Header, source.Description });
+                            var instance = new InstanceDescriptor(
+                                ci,
+                                new object[]
+                                    {
+                                        source.Header,
+                                        source.Description
+                                    }
+                            );
                             return instance;
                         }
                     }
@@ -453,41 +595,68 @@ namespace TerrainMapGUILibrary.Controls
         {
             object IList.this[int index]
             {
-                get { return Owner.InnerItems[index]; }
-                set { Owner.InnerItems[index] = value as ProcessItem; }
+                get
+                {
+                    return Owner.InnerItems[index];
+                }
+                set
+                {
+                    Owner.InnerItems[index] = value as ProcessItem;
+                }
             }
 
             bool IList.IsFixedSize
             {
-                get { return false; }
+                get
+                {
+                    return false;
+                }
             }
 
             object ICollection.SyncRoot
             {
-                get { return this; }
+                get
+                {
+                    return this;
+                }
             }
 
             bool ICollection.IsSynchronized
             {
-                get { return true; }
+                get
+                {
+                    return true;
+                }
             }
 
             internal ProcessControl Owner { get; set; }
 
             public ProcessItem this[int index]
             {
-                get { return Owner.InnerItems[index]; }
-                set { Owner.InnerItems[index] = value; }
+                get
+                {
+                    return Owner.InnerItems[index];
+                }
+                set
+                {
+                    Owner.InnerItems[index] = value;
+                }
             }
 
             public bool IsReadOnly
             {
-                get { return false; }
+                get
+                {
+                    return false;
+                }
             }
 
             public int Count
             {
-                get { return Owner.InnerItems.Count; }
+                get
+                {
+                    return Owner.InnerItems.Count;
+                }
             }
 
             public ProcessItemCollection()

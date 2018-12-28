@@ -25,8 +25,14 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string WatermarkText
         {
-            get { return txbPath.WatermarkText; }
-            set { txbPath.WatermarkText = value; }
+            get
+            {
+                return txbPath.WatermarkText;
+            }
+            set
+            {
+                txbPath.WatermarkText = value;
+            }
         }
 
         [Category("Function")]
@@ -36,8 +42,14 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string Path
         {
-            get { return txbPath.Text; }
-            set { txbPath.Text = value; }
+            get
+            {
+                return txbPath.Text;
+            }
+            set
+            {
+                txbPath.Text = value;
+            }
         }
 
         [Category("Function")]
@@ -60,8 +72,14 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public event EventHandler PathChanged
         {
-            add { txbPath.TextChanged += value; }
-            remove { txbPath.TextChanged -= value; }
+            add
+            {
+                txbPath.TextChanged += value;
+            }
+            remove
+            {
+                txbPath.TextChanged -= value;
+            }
         }
 
         [Category("Function")]
@@ -71,12 +89,17 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int StartTabIndex
         {
-            get { return txbPath.TabIndex; }
-            set { txbPath.TabIndex = value; }
+            get
+            {
+                return txbPath.TabIndex;
+            }
+            set
+            {
+                txbPath.TabIndex = value;
+            }
         }
 
         public InputPathComponent()
-           : base()
         {
             PathSelectType = PathType.FilePath;
             PathSelectFilter = "All File|*.*";
@@ -103,7 +126,10 @@ namespace TerrainMapGUILibrary.Components
             btnPath.Location = new Point(102, 0);
             btnPath.Size = new Size(24, 24);
             btnPath.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnPath.Click += (sender, e) => { SelectPath(); };
+            btnPath.Click += (sender, e) => 
+            {
+                SelectPath();
+            };
             Controls.Add(btnPath);
             // 
             // this
@@ -128,7 +154,9 @@ namespace TerrainMapGUILibrary.Components
                 };
 
                 if (dialog.ShowDialog() == DialogResult.OK)
-                { txbPath.Text = dialog.FileName; }
+                {
+                    txbPath.Text = dialog.FileName;
+                }
             }
             else if (PathSelectType == PathType.Directory)
             {
@@ -140,7 +168,9 @@ namespace TerrainMapGUILibrary.Components
                 };
 
                 if (dialog.ShowDialog() == DialogResult.OK)
-                { txbPath.Text = dialog.SelectedPath; }
+                {
+                    txbPath.Text = dialog.SelectedPath;
+                }
             }
         }
 

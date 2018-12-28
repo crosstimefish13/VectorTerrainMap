@@ -8,15 +8,18 @@ namespace TerrainMapLibrary.Utils.Sequence
             : base(sequence, comparer, counter)
         { }
 
-
         public override void Sort()
         {
             if (Counter != null)
-            { Counter.Reset(Convert.ToInt64(Sequence.Count * Math.Log(Sequence.Count, 2)), 0, "Sorting"); }
+            {
+                Counter.Reset(Convert.ToInt64(Sequence.Count * Math.Log(Sequence.Count, 2)), 0, "Sorting");
+            }
 
             // build max heap
             for (long index = Sequence.Count / 2 - 1; index >= 0; index--)
-            { Heapify(index, Sequence.Count - 1); }
+            {
+                Heapify(index, Sequence.Count - 1);
+            }
 
             long heapLength = Sequence.Count;
             while (heapLength > 1)
@@ -36,7 +39,10 @@ namespace TerrainMapLibrary.Utils.Sequence
 
             Sequence.Flush();
 
-            if (Counter != null) { Counter.Reset(Counter.StepLength, Counter.StepLength, "Sorting"); }
+            if (Counter != null)
+            {
+                Counter.Reset(Counter.StepLength, Counter.StepLength, "Sorting");
+            }
         }
 
         public override void InsertSort(ISequence<T> result)
@@ -44,10 +50,12 @@ namespace TerrainMapLibrary.Utils.Sequence
             throw new NotSupportedException();
         }
 
-
         private void Heapify(long topIndex, long heapLength)
         {
-            if (Counter != null) { Counter.AddStep(); }
+            if (Counter != null)
+            {
+                Counter.AddStep();
+            }
 
             // max element is top element
             var topElement = Sequence.GetElement(topIndex);

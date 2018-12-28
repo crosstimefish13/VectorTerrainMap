@@ -14,28 +14,40 @@ namespace TerrainMapLibrary.Mathematics
     {
         private List<List<double>> matrix;
 
-
         public int Width
         {
-            get { return matrix[0].Count; }
+            get
+            {
+                return matrix[0].Count;
+            }
         }
 
         public int Height
         {
-            get { return matrix.Count; }
+            get
+            {
+                return matrix.Count;
+            }
         }
 
         public double this[int row, int column]
         {
-            get { return matrix[row][column]; }
-            set { matrix[row][column] = value; }
+            get
+            {
+                return matrix[row][column];
+            }
+            set
+            {
+                matrix[row][column] = value;
+            }
         }
-
 
         public Matrix(int width = 1, int height = 1, double fill = 0)
         {
             if (width <= 0 || height <= 0)
-            { throw new Exception("matrix width and height must be more than or equal with 1."); }
+            {
+                throw new Exception("matrix width and height must be more than or equal with 1.");
+            }
 
             // initialize matrix
             matrix = new List<List<double>>();
@@ -49,14 +61,21 @@ namespace TerrainMapLibrary.Mathematics
             }
         }
 
-
         public static bool operator ==(Matrix left, Matrix right)
         {
-            // compare object reference
-            if (left is null && right is null) { return true; }
-            else if (left is null || right is null) { return false; }
-            // compare matrix size
-            else if (left.Width != right.Width || left.Height != right.Height) { return false; }
+            // compare object reference, then compare matrix size
+            if (left is null && right is null)
+            {
+                return true;
+            }
+            else if (left is null || right is null)
+            {
+                return false;
+            }
+            else if (left.Width != right.Width || left.Height != right.Height)
+            {
+                return false;
+            }
             else
             {
                 // compare each fields
@@ -65,7 +84,9 @@ namespace TerrainMapLibrary.Mathematics
                     for (int column = 0; column < left.Width; column++)
                     {
                         if (Common.DoubleCompare(left.matrix[row][column], right.matrix[row][column]) != 0)
-                        { return false; }
+                        {
+                            return false;
+                        }
                     }
                 }
 
@@ -75,7 +96,14 @@ namespace TerrainMapLibrary.Mathematics
 
         public static bool operator !=(Matrix left, Matrix right)
         {
-            return !(left == right);
+            if (left == right)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public static Matrix operator *(Matrix left, double right)
@@ -96,7 +124,9 @@ namespace TerrainMapLibrary.Mathematics
         public static Matrix operator +(Matrix left, Matrix right)
         {
             if (left.Width != right.Width || left.Height != right.Height)
-            { throw new Exception("the size of left matrix must be same with right."); }
+            {
+                throw new Exception("the size of left matrix must be same with right.");
+            }
 
             // add each fields one by one
             var result = new Matrix(left.Width, left.Height);
@@ -121,7 +151,9 @@ namespace TerrainMapLibrary.Mathematics
         {
             // left matrix height must be equal with right matrix width
             if (left.Height != right.Width)
-            { throw new Exception("the height of left matrix must be equal with width of right."); }
+            {
+                throw new Exception("the height of left matrix must be equal with width of right.");
+            }
 
             // if C = A * B, then C(ij) is row (i) of A multiply and add column (j) of B
             var result = new Matrix(right.Width, left.Height);
@@ -148,12 +180,16 @@ namespace TerrainMapLibrary.Mathematics
             return result;
         }
 
-
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Matrix)) { return false; }
-
-            return this == (obj as Matrix);
+            if (obj == null || (obj is Matrix) == false)
+            {
+                return false;
+            }
+            else
+            {
+                return this == (obj as Matrix);
+            }
         }
 
         public override int GetHashCode()
@@ -165,7 +201,6 @@ namespace TerrainMapLibrary.Mathematics
         {
             return $"{Width} * {Height}";
         }
-
 
         public Matrix Copy()
         {
@@ -200,7 +235,9 @@ namespace TerrainMapLibrary.Mathematics
         {
             // matrix must be a square matrix
             if (Width != Height)
-            { throw new Exception("the width of matrix must be equal with height."); }
+            {
+                throw new Exception("the width of matrix must be equal with height.");
+            }
 
             // the item values on diagonal from top left to right bottom are 1, other values are 0, like
             // 1 0 0
@@ -248,7 +285,9 @@ namespace TerrainMapLibrary.Mathematics
                     // does not find the non 0 value, that means this matrix cannot be transformed to a top triangle 
                     // matrix, so it cannot be inversed
                     if (validRow == -1)
-                    { throw new Exception("matrix cannot be inversed."); }
+                    {
+                        throw new Exception("matrix cannot be inversed.");
+                    }
 
                     // update current row
                     matrix1.RowAdd(row, validRow);
@@ -291,7 +330,6 @@ namespace TerrainMapLibrary.Mathematics
             // matrix1
             return matrix2;
         }
-
 
         private void RowSwitch(int row1, int row2)
         {

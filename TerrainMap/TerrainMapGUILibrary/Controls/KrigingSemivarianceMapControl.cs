@@ -53,7 +53,10 @@ namespace TerrainMapGUILibrary.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int MaxDecimalLength
         {
-            get { return ivcMinX.MaxDecimalLength; }
+            get
+            {
+                return ivcMinX.MaxDecimalLength;
+            }
             set
             {
                 ivcMinX.MaxDecimalLength = value;
@@ -104,7 +107,10 @@ namespace TerrainMapGUILibrary.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int StartTabIndex
         {
-            get { return ivcMinX.TabIndex; }
+            get
+            {
+                return ivcMinX.TabIndex;
+            }
             set
             {
                 ivcMinX.TabIndex = value;
@@ -129,8 +135,14 @@ namespace TerrainMapGUILibrary.Controls
 
         public void LoadData(SemivarianceMap map)
         {
-            if (map == null) { return; }
-            if (pcbImage.Image != null) { pcbImage.Image.Dispose(); }
+            if (map == null)
+            {
+                return;
+            }
+            if (pcbImage.Image != null)
+            {
+                pcbImage.Image.Dispose();
+            }
 
             chart = SemivarianceMapChart.Create(map, new KrigingSemivarianceMapTheme(Size.Width, Size.Height));
             pcbImage.Image = chart.DrawData();
@@ -242,7 +254,8 @@ namespace TerrainMapGUILibrary.Controls
             // cmbModel
             // 
             cmbModel.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbModel.Items.AddRange(typeof(Model).Assembly.GetTypes()
+            cmbModel.Items
+                .AddRange(typeof(Model).Assembly.GetTypes()
                 .Where(t => t.IsSubclassOf(typeof(Model)) && t.IsAbstract == false)
                 .Select(t => t.Name)
                 .ToArray());
@@ -290,19 +303,35 @@ namespace TerrainMapGUILibrary.Controls
 
         private void UpdateCurve(object sender = null, EventArgs e = null)
         {
-            if (chart == null || Value.IsValid() == false) { return; }
+            if (chart == null || Value.IsValid() == false)
+            {
+                return;
+            }
 
             // get drawing model
-            var modelType = typeof(Model).Assembly.GetTypes()
+            var modelType = typeof(Model)
+                .Assembly
+                .GetTypes()
                 .FirstOrDefault(t => t.Name == cmbModel.Items[cmbModel.SelectedIndex].ToString());
-            if (modelType == null) { return; }
+            if (modelType == null)
+            {
+                return;
+            }
+
             var model = Activator.CreateInstance(modelType, Value.MinX, Value.MinY, Value.MaxX, Value.MaxY) as Model;
 
             // draw curve
-            if (pcbImage.Image != null) { pcbImage.Image.Dispose(); }
+            if (pcbImage.Image != null)
+            {
+                pcbImage.Image.Dispose();
+            }
+
             pcbImage.Image = chart.DrawModelCurve(model);
 
-            if (ValueChanged != null) { ValueChanged.Invoke(this, new EventArgs()); }
+            if (ValueChanged != null)
+            {
+                ValueChanged.Invoke(this, new EventArgs());
+            }
         }
 
         [TypeConverter(typeof(MapValueConverter))]
@@ -326,37 +355,74 @@ namespace TerrainMapGUILibrary.Controls
 
             public bool IsValid()
             {
-                bool isInvalid = double.IsNaN(MinX) == true || double.IsInfinity(MinX) == true
-                    || double.IsNaN(MinY) == true || double.IsInfinity(MinY) == true
-                    || double.IsNaN(MaxX) == true || double.IsInfinity(MaxX) == true
-                    || double.IsNaN(MaxY) == true || double.IsInfinity(MaxY) == true;
+                bool isInvalid =
+                    double.IsNaN(MinX) == true ||
+                    double.IsInfinity(MinX) == true ||
+                    double.IsNaN(MinY) == true ||
+                    double.IsInfinity(MinY) == true ||
+                    double.IsNaN(MaxX) == true ||
+                    double.IsInfinity(MaxX) == true ||
+                    double.IsNaN(MaxY) == true ||
+                    double.IsInfinity(MaxY) == true;
 
                 return !isInvalid;
             }
 
             public static bool operator ==(MapValue left, MapValue right)
             {
-                // compare object reference
-                if (left is null && right is null) { return true; }
-                else if (left is null || right is null) { return false; }
-                // compare values
-                else if (Math.Abs(left.MinX - right.MinX) > double.Epsilon) { return false; }
-                else if (Math.Abs(left.MinY - right.MinY) > double.Epsilon) { return false; }
-                else if (Math.Abs(left.MaxX - right.MaxX) > double.Epsilon) { return false; }
-                else if (Math.Abs(left.MaxY - right.MaxY) > double.Epsilon) { return false; }
-                else { return true; }
+                // compare object reference, then compare values
+                if (left is null && right is null)
+                {
+                    return true;
+                }
+                else if (left is null || right is null)
+                {
+                    return false;
+                }
+                else if (Math.Abs(left.MinX - right.MinX) > double.Epsilon)
+                {
+                    return false;
+                }
+                else if (Math.Abs(left.MinY - right.MinY) > double.Epsilon)
+                {
+                    return false;
+                }
+                else if (Math.Abs(left.MaxX - right.MaxX) > double.Epsilon)
+                {
+                    return false;
+                }
+                else if (Math.Abs(left.MaxY - right.MaxY) > double.Epsilon)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
 
             public static bool operator !=(MapValue left, MapValue right)
             {
-                return !(left == right);
+                if (left == right)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
 
             public override bool Equals(object obj)
             {
-                if (obj == null || !(obj is MapValue)) { return false; }
-
-                return this == (obj as MapValue);
+                if (obj == null || (obj is MapValue) == false)
+                {
+                    return false;
+                }
+                else
+                {
+                    return this == (obj as MapValue);
+                }
             }
 
             public override int GetHashCode()
@@ -391,8 +457,14 @@ namespace TerrainMapGUILibrary.Controls
                     var maxX = propertyValues[propNames[2]];
                     var maxY = propertyValues[propNames[3]];
 
-                    if (minX != null && minY != null && maxX != null && maxY != null
-                        && minX is double && minY is double && maxX is double && maxY is double)
+                    if (minX != null &&
+                        minY != null &&
+                        maxX != null &&
+                        maxY != null &&
+                        minX is double &&
+                        minY is double &&
+                        maxX is double &&
+                        maxY is double)
                     {
                         var result = new MapValue((double)minX, (double)minY, (double)maxX, (double)maxY);
                         return result;
@@ -404,7 +476,10 @@ namespace TerrainMapGUILibrary.Controls
 
             public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
             {
-                if (sourceType == typeof(string)) { return true; }
+                if (sourceType == typeof(string))
+                {
+                    return true;
+                }
 
                 return base.CanConvertFrom(context, sourceType);
             }
@@ -414,17 +489,36 @@ namespace TerrainMapGUILibrary.Controls
                 if (value != null && value is string)
                 {
                     // convert from string to MapValue
-                    if (culture == null) { culture = CultureInfo.CurrentCulture; }
+                    if (culture == null)
+                    {
+                        culture = CultureInfo.CurrentCulture;
+                    }
+
                     char sep = culture.TextInfo.ListSeparator[0];
 
                     var parts = value.ToString().Split(new char[] { sep }, StringSplitOptions.RemoveEmptyEntries);
                     var result = new MapValue();
                     if (parts.Length >= 4)
                     {
-                        if (double.TryParse(parts[0].Trim(), out double minX) == true) { result.MinX = minX; }
-                        if (double.TryParse(parts[1].Trim(), out double minY) == true) { result.MinY = minY; }
-                        if (double.TryParse(parts[2].Trim(), out double maxX) == true) { result.MaxX = maxX; }
-                        if (double.TryParse(parts[3].Trim(), out double maxY) == true) { result.MaxY = maxY; }
+                        if (double.TryParse(parts[0].Trim(), out double minX) == true)
+                        {
+                            result.MinX = minX;
+                        }
+
+                        if (double.TryParse(parts[1].Trim(), out double minY) == true)
+                        {
+                            result.MinY = minY;
+                        }
+
+                        if (double.TryParse(parts[2].Trim(), out double maxX) == true)
+                        {
+                            result.MaxX = maxX;
+                        }
+
+                        if (double.TryParse(parts[3].Trim(), out double maxY) == true)
+                        {
+                            result.MaxY = maxY;
+                        }
                     }
 
                     return result;
@@ -435,13 +529,15 @@ namespace TerrainMapGUILibrary.Controls
 
             public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
             {
-                if (destinationType == typeof(InstanceDescriptor)) { return true; }
+                if (destinationType == typeof(InstanceDescriptor))
+                {
+                    return true;
+                }
 
                 return base.CanConvertTo(context, destinationType);
             }
 
-            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
-                Type destinationType)
+            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
             {
                 if (value != null && destinationType != null)
                 {
@@ -449,7 +545,11 @@ namespace TerrainMapGUILibrary.Controls
                     if (destinationType == typeof(string))
                     {
                         // convert from MapValue to string
-                        if (culture == null) { culture = CultureInfo.CurrentCulture; }
+                        if (culture == null)
+                        {
+                            culture = CultureInfo.CurrentCulture;
+                        }
+
                         char sep = culture.TextInfo.ListSeparator[0];
 
                         string result = $"{source.MinX}{sep} {source.MinY}{sep} {source.MaxX}{sep} {source.MaxY}";
@@ -458,12 +558,27 @@ namespace TerrainMapGUILibrary.Controls
                     else if (destinationType == typeof(InstanceDescriptor))
                     {
                         // convert from instance to MapValue
-                        var ci = typeof(MapValue).GetConstructor(new Type[]
-                            { typeof(double), typeof(double), typeof(double), typeof(double) });
+                        var ci = typeof(MapValue).GetConstructor(
+                            new Type[]
+                                {
+                                    typeof(double),
+                                    typeof(double),
+                                    typeof(double),
+                                    typeof(double)
+                                }
+                        );
                         if (ci != null)
                         {
-                            var instance = new InstanceDescriptor(ci,
-                                new object[] { source.MinX, source.MinY, source.MaxX, source.MaxY });
+                            var instance = new InstanceDescriptor(
+                                ci,
+                                new object[]
+                                    {
+                                        source.MinX,
+                                        source.MinY,
+                                        source.MaxX,
+                                        source.MaxY
+                                    }
+                            );
                             return instance;
                         }
                     }
@@ -477,8 +592,7 @@ namespace TerrainMapGUILibrary.Controls
                 return true;
             }
 
-            public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value,
-                Attribute[] attributes)
+            public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
             {
                 // get properties from MapValue
                 var propNames = typeof(MapValue).GetProperties().Select(p => p.Name).ToArray();

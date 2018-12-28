@@ -12,16 +12,28 @@ namespace TerrainMapGUILibrary.Extensions
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool TabStop
         {
-            get { return false; }
-            set { base.TabStop = false; }
+            get
+            {
+                return false;
+            }
+            set
+            {
+                base.TabStop = false;
+            }
         }
 
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new int TabIndex
         {
-            get { return 0; }
-            set { base.TabIndex = 0; }
+            get
+            {
+                return 0;
+            }
+            set
+            {
+                base.TabIndex = 0;
+            }
         }
 
         [Browsable(true)]
@@ -29,7 +41,6 @@ namespace TerrainMapGUILibrary.Extensions
         public new virtual bool ShowFocusCues { get; set; }
 
         public TrackBarExtension()
-            : base()
         {
             ShowFocusCues = false;
             Font = FontTheme.Normal();
@@ -46,7 +57,9 @@ namespace TerrainMapGUILibrary.Extensions
 
             // hide forus cues ifneeded
             if (ShowFocusCues == false)
-            { SendMessage(Handle, 0x0128, (1 << 16) | (0x1 & 0xffff), 0); }
+            {
+                SendMessage(Handle, 0x0128, (1 << 16) | (0x1 & 0xffff), 0);
+            }
         }
     }
 }
