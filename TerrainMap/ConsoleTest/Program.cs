@@ -77,18 +77,18 @@ namespace ConsoleTest
 
             var map = SemivarianceMap.Load(SemivarianceMap.GetALlLagBins()[2]);
             
-            var image = new Bitmap(1366, 768);
-            var g = Graphics.FromImage(image);
-            var chart = map.GetChart(image.Width, image.Height, 20f);
-            map.DrawData(g, chart);
+            //var image = new Bitmap(1366, 768);
+            //var g = Graphics.FromImage(image);
+            //var chart = map.GetChart(image.Width, image.Height, 20f);
+            //map.DrawData(g, chart);
 
-            var model = new ExponentialModel(0.0240, 11.5, 0.0425, 684.5);
-            map.DrawModelCurve(g, chart, model);
+            //var model = new ExponentialModel(0.0240, 11.5, 0.0425, 684.5);
+            //map.DrawModelCurve(g, chart, model);
 
-            g.Dispose();
-            map.Close();
-            image.Save(@"test.png", ImageFormat.Png);
-            image.Dispose();
+            //g.Dispose();
+            //map.Close();
+            //image.Save(@"test.png", ImageFormat.Png);
+            //image.Dispose();
         }
     }
 }

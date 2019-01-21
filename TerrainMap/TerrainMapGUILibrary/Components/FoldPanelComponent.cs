@@ -3,25 +3,31 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Extensions;
+using TerrainMapGUILibrary.Resources;
+using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("IsFoldedChanged")]
-    [DefaultProperty("Title")]
-    [DesignTimeVisible(false)]
-    [ToolboxItem(false)]
+    [DefaultProperty("IsFolded")]
+    [DesignTimeVisible(true)]
+    [ToolboxItem(true)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
-    public sealed class FoldPanelComponent : ControlExtension
+    public sealed class FoldPanelComponent : PanelExtension
     {
-        private Size minSize;
+        private Image upwardArrow;
 
-        private Size maxSize;
+        private Image downwardArrow;
+
+        private string title;
+
+        private Size fullSize;
 
         private bool isFolded;
 
         private LabelExtension lblTitle;
 
-        private LabelExtension lblArrow;
+        private PictureBoxExtension pcbTitleArrow;
 
         private ControlExtension conTitle;
 
@@ -34,67 +40,30 @@ namespace TerrainMapGUILibrary.Components
         {
             get
             {
-                return lblTitle.Text;
+                return title;
             }
             set
             {
-                lblTitle.Text = value;
+                title = value;
+                lblTitle.Text = FontTheme.Ellipsis(conTitle, title, lblTitle.Font, conTitle.Width - 20);
             }
         }
 
         [Category("Function")]
-        [Description("Size if folded.")]
-        [DefaultValue(typeof(Size), "100, 22")]
+        [Description("Full Size if panel is not folded.")]
+        [DefaultValue(typeof(Size), "100, 100")]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public Size MinSize
+        public Size FullSize
         {
             get
             {
-                return minSize;
+                return fullSize;
             }
             set
             {
-                // limit min size
-                minSize = value;
-                if (minSize.Width < 1)
-                {
-                    minSize.Width = 1;
-                }
-                if (minSize.Height < 22)
-                {
-                    minSize.Height = 22;
-                }
-
-                Invalidate();
-            }
-        }
-
-        [Category("Function")]
-        [Description("Size if not folded.")]
-        [DefaultValue(typeof(Size), "100, 102")]
-        [Browsable(true)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public Size MaxSize
-        {
-            get
-            {
-                return maxSize;
-            }
-            set
-            {
-                // limit max size
-                maxSize = value;
-                if (maxSize.Width < 1)
-                {
-                    maxSize.Width = 1;
-                }
-                if (maxSize.Height < 22)
-                {
-                    maxSize.Height = 22;
-                }
-
-                Invalidate();
+                fullSize = value;
+                UpdateSize();
             }
         }
 
@@ -111,28 +80,16 @@ namespace TerrainMapGUILibrary.Components
             }
             set
             {
-                bool isFoldedChanged = false;
-                if (isFolded != value)
+                bool isValueChanged = isFolded != value;
+                isFolded = value;
+                if (isValueChanged == true)
                 {
-                    // show arrow indicate text
-                    if (value == true)
-                    {
-                        Size = minSize;
-                        lblArrow.Text = "▼";
-                    }
-                    else
-                    {
-                        Size = maxSize;
-                        lblArrow.Text = "▲";
-                    }
-
-                    Invalidate();
-                    isFoldedChanged = true;
+                    // switch arrow indicate and size
+                    pcbTitleArrow.Image = value ? downwardArrow : upwardArrow;
+                    UpdateSize();
                 }
 
-                isFolded = value;
-
-                if (isFoldedChanged == true && IsFoldedChanged != null)
+                if (isValueChanged == true && IsFoldedChanged != null)
                 {
                     IsFoldedChanged.Invoke(this, new EventArgs());
                 }
@@ -147,11 +104,27 @@ namespace TerrainMapGUILibrary.Components
 
         public FoldPanelComponent()
         {
-            minSize = new Size(100, 22);
-            maxSize = new Size(100, 102);
+            upwardArrow = ResourceHelper.GetArrowUpward20();
+            downwardArrow = ResourceHelper.GetArrowDownward20();
+            title = "Title";
+            fullSize = new Size(100, 100);
             isFolded = false;
 
             InitializeComponent();
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+
+            // need to reset the fullSize here
+            fullSize.Width = Size.Width;
+            if (isFolded == false)
+            {
+                fullSize.Height = Size.Height;
+            }
+
+            UpdateSize();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -171,33 +144,33 @@ namespace TerrainMapGUILibrary.Components
         private void InitializeComponent()
         {
             lblTitle = new LabelExtension();
-            lblArrow = new LabelExtension();
+            pcbTitleArrow = new PictureBoxExtension();
             conTitle = new ControlExtension();
             SuspendLayout();
             // 
             // lblTitle
             // 
-            lblTitle.Text = "Title";
-            lblTitle.Location = new Point(1, 1);
+            lblTitle.Text = title;
+            lblTitle.Location = new Point(0, 0);
             lblTitle.AutoSize = true;
             lblTitle.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            lblTitle.Click += (sender, e) => 
+            lblTitle.Click += (sender, e) =>
             {
                 IsFolded = !IsFolded;
             };
             conTitle.Controls.Add(lblTitle);
             // 
-            // lblArrow
+            // pcbArrow
             // 
-            lblArrow.Text = "▲";
-            lblArrow.Location = new Point(80, 1);
-            lblArrow.Size = new Size(20, 19);
-            lblArrow.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            lblArrow.Click += (sender, e) => 
+            pcbTitleArrow.Location = new Point(78, 0);
+            pcbTitleArrow.Size = new Size(20, 20);
+            pcbTitleArrow.Image = upwardArrow;
+            pcbTitleArrow.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            pcbTitleArrow.Click += (sender, e) =>
             {
                 IsFolded = !IsFolded;
             };
-            conTitle.Controls.Add(lblArrow);
+            conTitle.Controls.Add(pcbTitleArrow);
             // 
             // conTitle
             // 
@@ -213,10 +186,52 @@ namespace TerrainMapGUILibrary.Components
             // 
             // this
             // 
-            Size = new Size(100, 102);
+            Size = new Size(100, 100);
             IsFoldedChanged = null;
             ResumeLayout(false);
             PerformLayout();
+        }
+
+        private void UpdateSize()
+        {
+            if (lblTitle != null)
+            {
+                lblTitle.Text = FontTheme.Ellipsis(conTitle, title, lblTitle.Font, conTitle.Width - 20);
+            }
+
+            var newSize = new Size(Size.Width, Size.Height);
+            if (isFolded == true)
+            {
+                // limit the width and fix the height if is folded
+                if (Size.Width < 22)
+                {
+                    newSize.Width = 22;
+                }
+
+                newSize.Height = 22;
+            }
+            else
+            {
+                // limit the width and height if is not folded
+                if (fullSize.Width < 22)
+                {
+                    fullSize.Width = 22;
+                }
+
+                if (fullSize.Height < 22)
+                {
+                    fullSize.Height = 22;
+                }
+
+                // the fullSize always be same with current size if is not folded
+                newSize = fullSize;
+            }
+
+            if (newSize.Width != Size.Width || newSize.Height != Size.Height)
+            {
+                // update current Size if needed
+                Size = newSize;
+            }
         }
     }
 }

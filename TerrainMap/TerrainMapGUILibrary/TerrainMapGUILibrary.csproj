@@ -94,6 +94,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\ResourceHelper.cs" />
     <Compile Include="Themes\FontTheme.cs" />
     <Compile Include="Themes\KrigingSemivarianceMapTheme.cs" />
   </ItemGroup>
@@ -102,6 +103,10 @@
       <Project>{b393fe35-8a81-49fb-ab16-2d2be38e5312}</Project>
       <Name>TerrainMapLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\arrow-downward-20.png" />
+    <EmbeddedResource Include="Resources\Icons\arrow-upward-20.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

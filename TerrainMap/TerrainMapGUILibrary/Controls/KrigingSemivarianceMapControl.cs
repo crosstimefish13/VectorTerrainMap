@@ -269,8 +269,8 @@ namespace TerrainMapGUILibrary.Controls
             // fpcContainer
             // 
             fpcContainer.Title = "Kriging Semivariance Map";
-            fpcContainer.MinSize = new Size(180, 22);
-            fpcContainer.MaxSize = new Size(613, 168);
+            //fpcContainer.MinSize = new Size(180, 22);
+            //fpcContainer.MaxSize = new Size(613, 168);
             fpcContainer.Location = new Point(12, 12);
             fpcContainer.Size = new Size(613, 168);
             fpcContainer.Anchor = AnchorStyles.Top | AnchorStyles.Left;
