@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\PanelCollection.cs" />
     <Compile Include="Components\InputPathComponent.cs">
       <SubType>Component</SubType>
     </Compile>

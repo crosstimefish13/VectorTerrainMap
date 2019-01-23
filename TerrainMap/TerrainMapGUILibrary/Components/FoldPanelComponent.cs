@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
 using System.Drawing;
-using System.Globalization;
-using System.Linq;
 using System.Windows.Forms;
+using TerrainMapGUILibrary.Collections;
 using TerrainMapGUILibrary.Extensions;
 using TerrainMapGUILibrary.Resources;
 using TerrainMapGUILibrary.Themes;
@@ -15,15 +11,15 @@ using TerrainMapGUILibrary.Themes;
 namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("IsFoldedChanged")]
-    [DefaultProperty("IsFolded")]
+    [DefaultProperty("Contents")]
     [DesignTimeVisible(true)]
     [ToolboxItem(true)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
-    public sealed class FoldPanelComponent : ControlExtension
+    public sealed class FoldPanelComponent : ControlExtension, PanelCollection.IOwner
     {
-        private Image upwardArrow;
+        private readonly Image upwardArrow;
 
-        private Image downwardArrow;
+        private readonly Image downwardArrow;
 
         private string title;
 
@@ -37,9 +33,9 @@ namespace TerrainMapGUILibrary.Components
 
         private ControlExtension conTitle;
 
-        private ControlExtension conContent;
+        private ObservableCollection<PanelCollection.Panel> pcpInnerContents;
 
-        internal ObservableCollection<PanelContent> InnerItems { get; private set; }
+        private ControlExtension conContent;
 
         [Category("Function")]
         [Description("Title for header bar.")]
@@ -94,9 +90,11 @@ namespace TerrainMapGUILibrary.Components
                 isFolded = value;
                 if (isValueChanged == true)
                 {
-                    // switch arrow indicate and size
+                    // switch arrow indicate, size and contents display
                     pcbTitleArrow.Image = value ? downwardArrow : upwardArrow;
                     UpdateSize();
+                    conContent.Enabled = !isFolded;
+                    conContent.Visible = !isFolded;
                 }
 
                 if (isValueChanged == true && IsFoldedChanged != null)
@@ -113,11 +111,11 @@ namespace TerrainMapGUILibrary.Components
         public event EventHandler IsFoldedChanged;
 
         [Category("Function")]
-        [Description("The process items.")]
+        [Description("The content list.")]
         [MergableProperty(false)]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public PanelContentCollection Items { get; private set; }
+        public PanelCollection Contents { get; private set; }
 
         public FoldPanelComponent()
         {
@@ -126,24 +124,7 @@ namespace TerrainMapGUILibrary.Components
             title = "Title";
             fullSize = new Size(100, 100);
             isFolded = false;
-            InnerItems = new ObservableCollection<PanelContent>();
-            InnerItems.CollectionChanged += (sender, e) =>
-            {
-                conContent.SuspendLayout();
-                conContent.Controls.Clear();
-                foreach (var item in InnerItems)
-                {
-                    conContent.Controls.Add(item);
-                }
-
-                conContent.ResumeLayout(false);
-                conContent.PerformLayout();
-            };
-            Items = new PanelContentCollection()
-            {
-                Owner = this
-            };
-
+            Contents = new PanelCollection(this);
             InitializeComponent();
         }
 
@@ -180,6 +161,7 @@ namespace TerrainMapGUILibrary.Components
             lblTitle = new LabelExtension();
             pcbTitleArrow = new PictureBoxExtension();
             conTitle = new ControlExtension();
+            pcpInnerContents = new ObservableCollection<PanelCollection.Panel>();
             conContent = new ControlExtension();
             SuspendLayout();
             // 
@@ -218,6 +200,13 @@ namespace TerrainMapGUILibrary.Components
                 IsFolded = !IsFolded;
             };
             Controls.Add(conTitle);
+            // 
+            // pcpInnerContents
+            // 
+            pcpInnerContents.CollectionChanged += (sender, e) =>
+            {
+                RefreshContents();
+            };
             // 
             // conContent
             // 
@@ -276,445 +265,23 @@ namespace TerrainMapGUILibrary.Components
             }
         }
 
-        [DefaultProperty("Name")]
-        [DesignTimeVisible(false)]
-        [ToolboxItem(false)]
-        [TypeConverter(typeof(PanelContentConverter))]
-        public sealed class PanelContent : PanelExtension
+        private void RefreshContents()
         {
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-            public override bool AutoSize
+            // clear all old content panels, then add new panels to content
+            conContent.SuspendLayout();
+            conContent.Controls.Clear();
+            foreach (var innerContents in pcpInnerContents)
             {
-                get
-                {
-                    return base.AutoSize;
-                }
-                set
-                {
-                    base.AutoSize = value;
-                }
+                conContent.Controls.Add(innerContents);
             }
 
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public override AnchorStyles Anchor
-            {
-                get
-                {
-                    return base.Anchor;
-                }
-                set
-                {
-                    base.Anchor = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public override DockStyle Dock
-            {
-                get
-                {
-                    return base.Dock;
-                }
-                set
-                {
-                    base.Dock = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new Padding Margin
-            {
-                get
-                {
-                    return base.Margin;
-                }
-                set
-                {
-                    base.Margin = value;
-                }
-            }
-
-            [DefaultValue(typeof(Size), "0, 0")]
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public override Size MaximumSize
-            {
-                get
-                {
-                    return base.MaximumSize;
-                }
-                set
-                {
-                    base.MaximumSize = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public override Size MinimumSize
-            {
-                get
-                {
-                    return base.MinimumSize;
-                }
-                set
-                {
-                    base.MinimumSize = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new Point Location
-            {
-                get
-                {
-                    return base.Location;
-                }
-                set
-                {
-                    base.Location = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new Padding Padding
-            {
-                get
-                {
-                    return base.Padding;
-                }
-                set
-                {
-                    base.Padding = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new Size PreferredSize
-            {
-                get
-                {
-                    return base.PreferredSize;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new Size Size
-            {
-                get
-                {
-                    return base.Size;
-                }
-                set
-                {
-                    base.Size = value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler AutoSizeChanged
-            {
-                add
-                {
-                    base.AutoSizeChanged += value;
-                }
-                remove
-                {
-                    base.AutoSizeChanged -= value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler DockChanged
-            {
-                add
-                {
-                    base.DockChanged += value;
-                }
-                remove
-                {
-                    base.DockChanged -= value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler LocationChanged
-            {
-                add
-                {
-                    base.LocationChanged += value;
-                }
-                remove
-                {
-                    base.LocationChanged -= value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler MarginChanged
-            {
-                add
-                {
-                    base.MarginChanged += value;
-                }
-                remove
-                {
-                    base.MarginChanged -= value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler PaddingChanged
-            {
-                add
-                {
-                    base.PaddingChanged += value;
-                }
-                remove
-                {
-                    base.PaddingChanged -= value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler Resize
-            {
-                add
-                {
-                    base.Resize += value;
-                }
-                remove
-                {
-                    base.Resize -= value;
-                }
-            }
-
-            [Browsable(false)]
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            public new event EventHandler SizeChanged
-            {
-                add
-                {
-                    base.SizeChanged += value;
-                }
-                remove
-                {
-                    base.SizeChanged -= value;
-                }
-            }
-
-            public PanelContent()
-            {
-                Dock = DockStyle.Fill;
-            }
-
-            public override string ToString()
-            {
-                return GetType().Name;
-            }
+            conContent.ResumeLayout(false);
+            conContent.PerformLayout();
         }
 
-        public sealed class PanelContentConverter : ExpandableObjectConverter
+        ObservableCollection<PanelCollection.Panel> PanelCollection.IOwner.GetItems()
         {
-            public PanelContentConverter()
-            { }
-
-            public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-            {
-                if (destinationType == typeof(InstanceDescriptor))
-                {
-                    return true;
-                }
-
-                return base.CanConvertTo(context, destinationType);
-            }
-
-            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-            {
-                if (value != null && destinationType != null)
-                {
-                    if (value is PanelContent && destinationType == typeof(InstanceDescriptor))
-                    {
-                        // convert from instance PanelContent
-                        var source = value as PanelContent;
-                        var ci = typeof(PanelContent).GetConstructor(new Type[] { });
-                        if (ci != null)
-                        {
-                            var instance = new InstanceDescriptor(ci, new object[] { });
-                            return instance;
-                        }
-                    }
-                }
-
-                return base.ConvertTo(context, culture, value, destinationType);
-            }
-        }
-
-        [ListBindable(false)]
-        public sealed class PanelContentCollection : IList, ICollection, IEnumerable
-        {
-            internal FoldPanelComponent Owner { get; set; }
-
-            public PanelContent this[int index]
-            {
-                get
-                {
-                    return Owner.InnerItems[index];
-                }
-                set
-                {
-                    Owner.InnerItems[index] = value;
-                }
-            }
-
-            public bool IsReadOnly
-            {
-                get
-                {
-                    return false;
-                }
-            }
-
-            public int Count
-            {
-                get
-                {
-                    return Owner.InnerItems.Count;
-                }
-            }
-
-            public PanelContentCollection()
-            {
-                Owner = null;
-            }
-
-            public int Add(PanelContent value)
-            {
-                Owner.InnerItems.Add(value);
-                return Owner.InnerItems.Count - 1;
-            }
-
-            public void Clear()
-            {
-                Owner.InnerItems.Clear();
-            }
-
-            public bool Contains(PanelContent value)
-            {
-                return Owner.InnerItems.Contains(value);
-            }
-
-            public void CopyTo(IEnumerable<PanelContent> array, int index)
-            {
-                Owner.InnerItems.CopyTo(array.ToArray(), index);
-            }
-
-            public IEnumerator GetEnumerator()
-            {
-                return Owner.InnerItems.Cast<PanelContent>().GetEnumerator();
-            }
-
-            public int IndexOf(PanelContent value)
-            {
-                return Owner.InnerItems.IndexOf(value);
-            }
-
-            public void Insert(int index, PanelContent value)
-            {
-                Owner.InnerItems.Insert(index, value);
-            }
-
-            public void Remove(PanelContent value)
-            {
-                Owner.InnerItems.Remove(value);
-            }
-
-            public void RemoveAt(int index)
-            {
-                Owner.InnerItems.RemoveAt(index);
-            }
-
-            object IList.this[int index]
-            {
-                get
-                {
-                    return Owner.InnerItems[index];
-                }
-                set
-                {
-                    Owner.InnerItems[index] = value as PanelContent;
-                }
-            }
-
-            bool IList.IsFixedSize
-            {
-                get
-                {
-                    return false;
-                }
-            }
-
-            object ICollection.SyncRoot
-            {
-                get
-                {
-                    return this;
-                }
-            }
-
-            bool ICollection.IsSynchronized
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            int IList.Add(object value)
-            {
-                Owner.InnerItems.Add(value as PanelContent);
-                return Owner.InnerItems.Count - 1;
-            }
-
-            bool IList.Contains(object value)
-            {
-                return Owner.InnerItems.Contains(value);
-            }
-
-            void ICollection.CopyTo(Array array, int index)
-            {
-                Owner.InnerItems.CopyTo(array.Cast<PanelContent>().ToArray(), index);
-            }
-
-            int IList.IndexOf(object value)
-            {
-                return Owner.InnerItems.IndexOf(value as PanelContent);
-            }
-
-            void IList.Insert(int index, object value)
-            {
-                Owner.InnerItems.Insert(index, value as PanelContent);
-            }
-
-            void IList.Remove(object value)
-            {
-                Owner.InnerItems.Remove(value as PanelContent);
-            }
+            return pcpInnerContents;
         }
     }
 }
