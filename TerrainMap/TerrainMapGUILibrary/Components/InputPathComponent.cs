@@ -8,15 +8,35 @@ using TerrainMapGUILibrary.Extensions;
 namespace TerrainMapGUILibrary.Components
 {
     [DefaultEvent("PathChanged")]
-    [DefaultProperty("Path")]
-    [DesignTimeVisible(false)]
-    [ToolboxItem(false)]
+    [DefaultProperty("PrefixText")]
+    [DesignTimeVisible(true)]
+    [ToolboxItem(true)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
     public sealed class InputPathComponent : ControlExtension
     {
+        private LabelExtension lblPrefix;
+
         private TextBoxExtension txbPath;
 
         private ButtonExtension btnPath;
+
+        [Category("Function")]
+        [Description("Prefix text for value input.")]
+        [DefaultValue("")]
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public string PrefixText
+        {
+            get
+            {
+                return lblPrefix.Text;
+            }
+            set
+            {
+                lblPrefix.Text = value;
+                RefreshControls();
+            }
+        }
 
         [Category("Function")]
         [Description("Watermark text for value input.")]
@@ -107,26 +127,72 @@ namespace TerrainMapGUILibrary.Components
             InitializeComponent();
         }
 
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+
+            var newSize = new Size(Size.Width, Size.Height);
+
+            // limit the width and height
+            if (Size.Width < 28)
+            {
+                newSize.Width = 28;
+            }
+
+            if (Size.Height != 24)
+            {
+                newSize.Height = 24;
+            }
+
+            // 
+            // btnPath
+            // 
+            if (btnPath != null)
+            {
+                btnPath.Location = new Point(ClientRectangle.Right - btnPath.Width, 0);
+            }
+
+            // 
+            // txbPath
+            // 
+            if (txbPath != null)
+            {
+                txbPath.Size = new Size(btnPath.Bounds.Left - 1 - txbPath.Bounds.Left, 22);
+            }
+
+            if (newSize.Width != Size.Width || newSize.Height != Size.Height)
+            {
+                // update current Size if needed
+                Size = newSize;
+            }
+        }
+
         private void InitializeComponent()
         {
+            lblPrefix = new LabelExtension();
             txbPath = new TextBoxExtension();
             btnPath = new ButtonExtension();
             SuspendLayout();
             // 
+            // txbPrefix
+            // 
+            lblPrefix.AutoSize = true;
+            lblPrefix.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            // 
             // txbPath
             // 
-            txbPath.Location = new Point(1, 1);
-            txbPath.Size = new Size(100, 22);
-            txbPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbPath.Location = new Point(0, 1);
+            txbPath.Size = new Size(71, 22);
+            txbPath.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             Controls.Add(txbPath);
             // 
             // btnPath
             // 
             btnPath.Text = "...";
-            btnPath.Location = new Point(102, 0);
-            btnPath.Size = new Size(24, 24);
-            btnPath.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnPath.Click += (sender, e) => 
+            btnPath.Location = new Point(72, 0);
+            btnPath.Size = new Size(28, 24);
+            btnPath.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnPath.Click += (sender, e) =>
             {
                 SelectPath();
             };
@@ -134,7 +200,7 @@ namespace TerrainMapGUILibrary.Components
             // 
             // this
             // 
-            Size = new Size(127, 24);
+            Size = new Size(100, 24);
             StartTabIndex = 0;
             ResumeLayout(false);
             PerformLayout();
@@ -171,6 +237,57 @@ namespace TerrainMapGUILibrary.Components
                 {
                     txbPath.Text = dialog.SelectedPath;
                 }
+            }
+        }
+
+        private void RefreshControls()
+        {
+            var fixedLocation = new Point(Location.X + txbPath.Location.X, Location.Y);
+
+            if (string.IsNullOrEmpty(lblPrefix.Text))
+            {
+                // 
+                // txbPrefix
+                // 
+                Controls.Remove(lblPrefix);
+                // 
+                // txbPath
+                // 
+                txbPath.Location = new Point(0, 1);
+                // 
+                // btnPath
+                // 
+                btnPath.Location = new Point(txbPath.Bounds.Right + 1, 0);
+                // 
+                // this
+                // 
+                Location = new Point(fixedLocation.X, fixedLocation.Y);
+                Size = new Size(btnPath.Bounds.Right, 24);
+            }
+            else
+            {
+                // 
+                // txbPrefix
+                // 
+                if (Controls.Contains(lblPrefix) == false)
+                {
+                    lblPrefix.Location = new Point(0, 3);
+                    Controls.Add(lblPrefix);
+                }
+
+                // 
+                // txbPath
+                // 
+                txbPath.Location = new Point(lblPrefix.Bounds.Right, 1);
+                // 
+                // btnPath
+                // 
+                btnPath.Location = new Point(txbPath.Bounds.Right + 1, 0);
+                // 
+                // this
+                // 
+                Location = new Point(fixedLocation.X - lblPrefix.Width, fixedLocation.Y);
+                Size = new Size(btnPath.Bounds.Right, 24);
             }
         }
 
