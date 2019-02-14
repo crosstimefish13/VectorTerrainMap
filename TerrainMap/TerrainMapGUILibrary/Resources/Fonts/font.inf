@@ -1,0 +1,15 @@
+[Regular]
+File="arial.ttf"
+Size="13"
+
+[Bold]
+File="arialbd.ttf"
+Size="13"
+
+[Italic]
+File="ariali.ttf"
+Size="13"
+
+[BoldItalic]
+File="arialbi.ttf"
+Size="13"
