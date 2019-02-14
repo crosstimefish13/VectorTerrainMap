@@ -95,7 +95,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources\ResourceHelper.cs" />
+    <Compile Include="Resources\Fonts\FontHelper.cs" />
+    <Compile Include="Resources\Images\ImageHelper.cs" />
     <Compile Include="Themes\FontTheme.cs" />
     <Compile Include="Themes\KrigingSemivarianceMapTheme.cs" />
   </ItemGroup>
@@ -123,10 +124,10 @@
     <Content Include="Resources\Fonts\font.inf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Icons\arrow-downward-72.png">
+    <Content Include="Resources\Images\arrow-downward-72.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Icons\arrow-upward-72.png">
+    <Content Include="Resources\Images\arrow-upward-72.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

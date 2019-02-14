@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using TerrainMapGUILibrary.Themes;
+using TerrainMapGUILibrary.Resources.Fonts;
 using TerrainMapLibrary.Mathematics;
 
 namespace TerrainMapGUILibrary.Extensions
@@ -168,9 +168,9 @@ namespace TerrainMapGUILibrary.Extensions
             maxDecimalLength = 8;
             numberInput = false;
             watermarkText = "";
-            watermarkFont = FontTheme.NormalItalic();
+            watermarkFont = FontHelper.GetFont(FontStyle.Italic);
             watermarkColor = SystemColors.GrayText;
-            Font = FontTheme.Normal();
+            Font = FontHelper.GetFont();
             TabStop = true;
             TabIndex = 0;
         }

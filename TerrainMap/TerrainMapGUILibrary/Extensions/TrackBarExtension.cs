@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using TerrainMapGUILibrary.Themes;
+using TerrainMapGUILibrary.Resources.Fonts;
 
 namespace TerrainMapGUILibrary.Extensions
 {
@@ -43,7 +43,7 @@ namespace TerrainMapGUILibrary.Extensions
         public TrackBarExtension()
         {
             ShowFocusCues = false;
-            Font = FontTheme.Normal();
+            Font = FontHelper.GetFont();
             TabStop = false;
             TabIndex = 0;
         }

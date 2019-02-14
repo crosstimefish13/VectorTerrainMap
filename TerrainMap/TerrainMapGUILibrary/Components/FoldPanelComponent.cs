@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using TerrainMapGUILibrary.Collections;
 using TerrainMapGUILibrary.Extensions;
 using TerrainMapGUILibrary.Resources;
+using TerrainMapGUILibrary.Resources.Images;
 using TerrainMapGUILibrary.Themes;
 
 namespace TerrainMapGUILibrary.Components
@@ -119,8 +120,8 @@ namespace TerrainMapGUILibrary.Components
 
         public FoldPanelComponent()
         {
-            upwardArrow = ResourceHelper.GetArrowUpward20();
-            downwardArrow = ResourceHelper.GetArrowDownward20();
+            upwardArrow = ImageHelper.GetArrowUpward(20);
+            downwardArrow = ImageHelper.GetArrowDownward(20);
             title = "Title";
             fullSize = new Size(100, 100);
             isFolded = false;

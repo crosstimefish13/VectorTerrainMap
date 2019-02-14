@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
-using TerrainMapGUILibrary.Themes;
+using TerrainMapGUILibrary.Resources.Fonts;
 
 namespace TerrainMapGUILibrary.Extensions
 {
@@ -8,7 +8,7 @@ namespace TerrainMapGUILibrary.Extensions
     {
         public GroupBoxExtension()
         {
-            Font = FontTheme.Normal();
+            Font = FontHelper.GetFont();
         }
 
         protected override void OnPaint(PaintEventArgs e)

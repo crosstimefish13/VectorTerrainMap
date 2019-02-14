@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
-using TerrainMapGUILibrary.Themes;
+using TerrainMapGUILibrary.Resources.Fonts;
 
 namespace TerrainMapGUILibrary.Extensions
 {
@@ -36,7 +36,7 @@ namespace TerrainMapGUILibrary.Extensions
 
         public LabelExtension()
         {
-            Font = FontTheme.Normal();
+            Font = FontHelper.GetFont();
             TabStop = false;
             TabIndex = 0;
         }

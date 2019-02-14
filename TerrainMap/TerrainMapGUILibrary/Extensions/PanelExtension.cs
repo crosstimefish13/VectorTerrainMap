@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using TerrainMapGUILibrary.Themes;
+using TerrainMapGUILibrary.Resources.Fonts;
 
 namespace TerrainMapGUILibrary.Extensions
 {
@@ -98,19 +98,6 @@ namespace TerrainMapGUILibrary.Extensions
             set
             {
                 base.BackColor = value;
-            }
-        }
-
-        [DefaultValue(typeof(Font), FontTheme.NormalString)]
-        public override Font Font
-        {
-            get
-            {
-                return base.Font;
-            }
-            set
-            {
-                base.Font = value;
             }
         }
 
@@ -340,7 +327,7 @@ namespace TerrainMapGUILibrary.Extensions
 
         public PanelExtension()
         {
-            Font = FontTheme.Normal();
+            Font = FontHelper.GetFont();
             Size = new Size(100, 100);
             BackColor = Color.White;
             TabStop = false;
