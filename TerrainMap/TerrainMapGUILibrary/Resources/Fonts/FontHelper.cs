@@ -3,49 +3,47 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace TerrainMapGUILibrary.Resources.Fonts
 {
     internal static class FontHelper
     {
+        private static PrivateFontCollection privateFontCollection;
+
         public static Font GetFont(FontStyle style = FontStyle.Regular)
-        {
-            // font type and styles
-            bool isBold = (style & FontStyle.Bold) == FontStyle.Bold;
-            bool isItalic = (style & FontStyle.Italic) == FontStyle.Italic;
-            bool isUnderline = (style & FontStyle.Underline) == FontStyle.Underline;
-            bool isStrikeout = (style & FontStyle.Strikeout) == FontStyle.Strikeout;
-
-            string fontType = "Regular";
-            if (isBold == true && isItalic == true)
-            {
-                fontType = "BoldItalic";
-            }
-            else if (isBold == true)
-            {
-                fontType = "Bold";
-            }
-            else if (isItalic == true)
-            {
-                fontType = "Italic";
-            }
-
-            var font = GetFont(fontType, isUnderline, isStrikeout);
-            return font;
-        }
-
-        private static Font GetFont(string fontType, bool isUnderline, bool isStrikeout)
         {
             Font font = null;
 
             try
             {
-                // font file path, size and style
-                var fontInformation = LoadInformationFile();
-                string filePath = $@"Resources\Fonts\{fontInformation[fontType]["File"]}";
-                int fontSize = Convert.ToInt32(fontInformation[fontType]["Size"]);
+                // parse style
+                bool isBold = (style & FontStyle.Bold) == FontStyle.Bold;
+                bool isItalic = (style & FontStyle.Italic) == FontStyle.Italic;
+                bool isUnderline = (style & FontStyle.Underline) == FontStyle.Underline;
+                bool isStrikeout = (style & FontStyle.Strikeout) == FontStyle.Strikeout;
 
+                // fontFamily
+                var privateFontCollection = GetPrivateFontCollection();
+                var fontFamily = privateFontCollection.Families[0];
+                if (isBold == true && isItalic == true)
+                {
+                    fontFamily = privateFontCollection.Families[3];
+                }
+                else if (isBold == true)
+                {
+                    fontFamily = privateFontCollection.Families[1];
+                }
+                else if (isItalic == true)
+                {
+                    fontFamily = privateFontCollection.Families[2];
+                }
+
+                // fontSize
+                float fontSize = Convert.ToSingle(Resource.FontSize);
+
+                // fontStyle
                 var fontStyle = FontStyle.Regular;
                 if (isUnderline == true)
                 {
@@ -57,18 +55,43 @@ namespace TerrainMapGUILibrary.Resources.Fonts
                     fontStyle = fontStyle | FontStyle.Strikeout;
                 }
 
-                // create font
-                var privateFontCollection = new PrivateFontCollection();
-                privateFontCollection.AddFontFile(filePath);
-                font = new Font(privateFontCollection.Families[0], fontSize, fontStyle, GraphicsUnit.Pixel);
-                privateFontCollection.Dispose();
-
+                font = new Font(fontFamily, fontSize, fontStyle, GraphicsUnit.Pixel);
                 return font;
             }
             catch
             {
                 return font;
             }
+        }
+
+        private static PrivateFontCollection GetPrivateFontCollection()
+        {
+            if (privateFontCollection == null)
+            {
+                privateFontCollection = new PrivateFontCollection();
+
+                // regular font
+                var memory = Marshal.AllocCoTaskMem(Resource.FontRegular.Length);
+                Marshal.Copy(Resource.FontRegular, 0, memory, Resource.FontRegular.Length);
+                privateFontCollection.AddMemoryFont(memory, Resource.FontRegular.Length);
+
+                // bold font
+                memory = Marshal.AllocCoTaskMem(Resource.FontBold.Length);
+                Marshal.Copy(Resource.FontRegular, 0, memory, Resource.FontBold.Length);
+                privateFontCollection.AddMemoryFont(memory, Resource.FontBold.Length);
+
+                // italic font
+                memory = Marshal.AllocCoTaskMem(Resource.FontItalic.Length);
+                Marshal.Copy(Resource.FontRegular, 0, memory, Resource.FontItalic.Length);
+                privateFontCollection.AddMemoryFont(memory, Resource.FontItalic.Length);
+
+                // bold italic font
+                memory = Marshal.AllocCoTaskMem(Resource.FontBoldItalic.Length);
+                Marshal.Copy(Resource.FontRegular, 0, memory, Resource.FontBoldItalic.Length);
+                privateFontCollection.AddMemoryFont(memory, Resource.FontBoldItalic.Length);
+            }
+
+            return privateFontCollection;
         }
 
         private static Dictionary<string, Dictionary<string, string>> LoadInformationFile()

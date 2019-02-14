@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using TerrainMapGUILibrary.Resources;
 
 namespace TerrainMapGUILibrary.Resources.Images
 {
@@ -6,33 +7,35 @@ namespace TerrainMapGUILibrary.Resources.Images
     {
         public static Image GetArrowDownward(int size)
         {
-            string filePath = @"Resources\Images\arrow-downward-72.png";
-            var image = GetIconImage(filePath, size);
-            return image;
+            var original = Resource.ImageArrowDownward72;
+            var resultImage = GetImage(original, size);
+            original.Dispose();
+
+            return resultImage;
         }
 
         public static Image GetArrowUpward(int size)
         {
-            string filePath = @"Resources\Images\arrow-upward-72.png";
-            var image = GetIconImage(filePath, size);
-            return image;
+            var original = Resource.ImageArrowUpward72;
+            var resultImage = GetImage(original, size);
+            original.Dispose();
+
+            return resultImage;
         }
 
-        private static Image GetIconImage(string filePath, int size)
+        private static Image GetImage(Bitmap original, int size)
         {
             Bitmap resultImage = null;
-            Bitmap originalImage = null;
             Graphics graphics = null;
 
             try
             {
                 resultImage = new Bitmap(size, size);
-                originalImage = new Bitmap(filePath);
                 graphics = Graphics.FromImage(resultImage);
                 graphics.DrawImage(
-                    originalImage,
+                    original,
                     new Rectangle(0, 0, resultImage.Width, resultImage.Height),
-                    new Rectangle(0, 0, originalImage.Width, originalImage.Height),
+                    new Rectangle(0, 0, original.Width, original.Height),
                     GraphicsUnit.Pixel
                 );
                 return resultImage;
@@ -42,11 +45,6 @@ namespace TerrainMapGUILibrary.Resources.Images
                 if (graphics != null)
                 {
                     graphics.Dispose();
-                }
-
-                if (originalImage != null)
-                {
-                    originalImage.Dispose();
                 }
 
                 if (resultImage != null)
