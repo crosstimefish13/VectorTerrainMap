@@ -42,7 +42,7 @@ namespace TerrainMapGUILibrary.Controls
 
         private ComboBoxExtension cmbModel;
 
-        private FoldPanelComponent fpcContainer;
+        private FoldPanel fpcContainer;
 
         private PictureBoxExtension pcbImage;
 
@@ -167,7 +167,7 @@ namespace TerrainMapGUILibrary.Controls
             ivcMaxY = new InputValueComponent();
             lblModel = new LabelExtension();
             cmbModel = new ComboBoxExtension();
-            fpcContainer = new FoldPanelComponent();
+            fpcContainer = new FoldPanel();
             pcbImage = new PictureBoxExtension();
             SuspendLayout();
             // 

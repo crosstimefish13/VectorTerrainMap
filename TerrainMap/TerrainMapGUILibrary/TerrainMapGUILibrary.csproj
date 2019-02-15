@@ -46,7 +46,7 @@
     <Compile Include="Components\InputPathComponent.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Components\FoldPanelComponent.cs">
+    <Compile Include="Components\FoldPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Components\InputValueComponent.cs">
@@ -124,8 +124,8 @@
     <None Include="Resources\Fonts\FontRegular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Images\ImageArrowDownward72.png" />
-    <None Include="Resources\Images\ImageArrowUpward72.png" />
+    <None Include="Resources\Images\ImageArrowDownward96.png" />
+    <None Include="Resources\Images\ImageArrowUpward96.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

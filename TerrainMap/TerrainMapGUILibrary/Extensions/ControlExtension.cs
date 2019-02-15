@@ -102,6 +102,21 @@ namespace TerrainMapGUILibrary.Extensions
         }
 
         [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public override Font Font
+        {
+            get
+            {
+                return base.Font;
+            }
+            set
+            {
+                base.Font = value;
+            }
+        }
+
+        [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool CausesValidation
         {
@@ -277,6 +292,21 @@ namespace TerrainMapGUILibrary.Extensions
             remove
             {
                 base.DragOver -= value;
+            }
+        }
+
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new event EventHandler FontChanged
+        {
+            add
+            {
+                base.FontChanged += value;
+            }
+            remove
+            {
+                base.FontChanged -= value;
             }
         }
 

@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using TerrainMapGUILibrary.Collections;
 using TerrainMapGUILibrary.Extensions;
-using TerrainMapGUILibrary.Resources;
+using TerrainMapGUILibrary.Resources.Fonts;
 using TerrainMapGUILibrary.Resources.Images;
 using TerrainMapGUILibrary.Themes;
 
@@ -16,11 +16,9 @@ namespace TerrainMapGUILibrary.Components
     [DesignTimeVisible(true)]
     [ToolboxItem(true)]
     [ToolboxItemFilter("TerrainMapGUILibrary.Components")]
-    public sealed class FoldPanelComponent : ControlExtension, PanelCollection.IOwner
+    public sealed class FoldPanel : ControlExtension, PanelCollection.IOwner
     {
-        private readonly Image upwardArrow;
-
-        private readonly Image downwardArrow;
+        private readonly int borderWidth;
 
         private string title;
 
@@ -92,7 +90,7 @@ namespace TerrainMapGUILibrary.Components
                 if (isValueChanged == true)
                 {
                     // switch arrow indicate, size and contents display
-                    pcbTitleArrow.Image = value ? downwardArrow : upwardArrow;
+                    pcbTitleArrow.Image = value ? pcbTitleArrow.PendingImages[1] : pcbTitleArrow.PendingImages[0];
                     UpdateSize();
                     conContent.Enabled = !isFolded;
                     conContent.Visible = !isFolded;
@@ -118,10 +116,9 @@ namespace TerrainMapGUILibrary.Components
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public PanelCollection Contents { get; private set; }
 
-        public FoldPanelComponent()
+        public FoldPanel()
         {
-            upwardArrow = ImageHelper.GetArrowUpward(20);
-            downwardArrow = ImageHelper.GetArrowDownward(20);
+            borderWidth = 1;
             title = "Title";
             fullSize = new Size(100, 100);
             isFolded = false;
@@ -148,12 +145,28 @@ namespace TerrainMapGUILibrary.Components
             base.OnPaint(e);
 
             // draw border
-            var pen = new Pen(SystemColors.ControlText, 1f);
-            e.Graphics.DrawRectangle(
-                pen,
-                ClientRectangle.Left, ClientRectangle.Top,
-                ClientRectangle.Width - 0.5f, ClientRectangle.Height - 0.5f
-            );
+            float bofderWidthF = Convert.ToSingle(borderWidth);
+            var pen = new Pen(ForeColor, bofderWidthF);
+            if (borderWidth == 1)
+            {
+                e.Graphics.DrawRectangle(
+                    pen,
+                    ClientRectangle.Left,
+                    ClientRectangle.Top,
+                    ClientRectangle.Width - bofderWidthF / 2f,
+                    ClientRectangle.Height - bofderWidthF / 2f
+                );
+            }
+            else
+            {
+                e.Graphics.DrawRectangle(
+                    pen,
+                    ClientRectangle.Left + bofderWidthF / 2f,
+                    ClientRectangle.Top + bofderWidthF / 2f,
+                    ClientRectangle.Width - bofderWidthF,
+                    ClientRectangle.Height - bofderWidthF
+                );
+            }
             pen.Dispose();
         }
 
@@ -180,9 +193,11 @@ namespace TerrainMapGUILibrary.Components
             // 
             // pcbArrow
             // 
-            pcbTitleArrow.Location = new Point(78, 0);
-            pcbTitleArrow.Size = new Size(20, 20);
-            pcbTitleArrow.Image = upwardArrow;
+            pcbTitleArrow.Location = new Point(fullSize.Width - borderWidth * 2 - lblTitle.Height, 0);
+            pcbTitleArrow.Size = new Size(lblTitle.Height, lblTitle.Height);
+            pcbTitleArrow.PendingImages.Add(ImageHelper.GetArrowUpward(lblTitle.Height));
+            pcbTitleArrow.PendingImages.Add(ImageHelper.GetArrowDownward(lblTitle.Height));
+            pcbTitleArrow.Image = pcbTitleArrow.PendingImages[0];
             pcbTitleArrow.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pcbTitleArrow.Click += (sender, e) =>
             {
@@ -193,8 +208,8 @@ namespace TerrainMapGUILibrary.Components
             // conTitle
             // 
             conTitle.Cursor = Cursors.Hand;
-            conTitle.Location = new Point(1, 1);
-            conTitle.Size = new Size(98, 20);
+            conTitle.Location = new Point(borderWidth, borderWidth);
+            conTitle.Size = new Size(fullSize.Width - borderWidth * 2, lblTitle.Height);
             conTitle.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             conTitle.Click += (sender, e) =>
             {
@@ -211,14 +226,17 @@ namespace TerrainMapGUILibrary.Components
             // 
             // conContent
             // 
-            conContent.Location = new Point(1, 21);
-            conContent.Size = new Size(98, 77);
+            conContent.Location = new Point(borderWidth, borderWidth + lblTitle.Height);
+            conContent.Size = new Size(
+                fullSize.Width - borderWidth * 2,
+                fullSize.Height - borderWidth * 2 - lblTitle.Height
+            );
             conContent.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
             Controls.Add(conContent);
             // 
             // this
             // 
-            Size = new Size(100, 100);
+            Size = new Size(fullSize.Width, fullSize.Height);
             IsFoldedChanged = null;
             ResumeLayout(false);
             PerformLayout();
@@ -226,33 +244,35 @@ namespace TerrainMapGUILibrary.Components
 
         private void UpdateSize()
         {
-            if (lblTitle != null)
+            if (lblTitle == null)
             {
-                lblTitle.Text = FontTheme.Ellipsis(conTitle, title, lblTitle.Font, conTitle.Width - 20);
+                return;
             }
+
+            lblTitle.Text = FontHelper.Ellipsis(lblTitle, lblTitle.Font, conTitle.Width - pcbTitleArrow.Width, title);
 
             var newSize = new Size(Size.Width, Size.Height);
             if (isFolded == true)
             {
                 // limit the width and fix the height if is folded
-                if (Size.Width < 22)
+                if (Size.Width < pcbTitleArrow.Width + borderWidth * 2)
                 {
-                    newSize.Width = 22;
+                    newSize.Width = pcbTitleArrow.Width + borderWidth * 2;
                 }
 
-                newSize.Height = 22;
+                newSize.Height = pcbTitleArrow.Height + borderWidth * 2;
             }
             else
             {
                 // limit the width and height if is not folded
-                if (fullSize.Width < 22)
+                if (fullSize.Width < pcbTitleArrow.Width + borderWidth * 2)
                 {
-                    fullSize.Width = 22;
+                    fullSize.Width = pcbTitleArrow.Width + borderWidth * 2;
                 }
 
-                if (fullSize.Height < 22)
+                if (fullSize.Height < pcbTitleArrow.Height + borderWidth * 2)
                 {
-                    fullSize.Height = 22;
+                    fullSize.Height = pcbTitleArrow.Height + borderWidth * 2;
                 }
 
                 // the fullSize always be same with current size if is not folded

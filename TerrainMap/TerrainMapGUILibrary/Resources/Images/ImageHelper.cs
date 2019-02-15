@@ -7,7 +7,7 @@ namespace TerrainMapGUILibrary.Resources.Images
     {
         public static Image GetArrowDownward(int size)
         {
-            var original = Resource.ImageArrowDownward72;
+            var original = Resource.ImageArrowDownward96;
             var resultImage = GetImage(original, size);
             original.Dispose();
 
@@ -16,7 +16,7 @@ namespace TerrainMapGUILibrary.Resources.Images
 
         public static Image GetArrowUpward(int size)
         {
-            var original = Resource.ImageArrowUpward72;
+            var original = Resource.ImageArrowUpward96;
             var resultImage = GetImage(original, size);
             original.Dispose();
 

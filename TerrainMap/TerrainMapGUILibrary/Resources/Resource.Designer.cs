@@ -101,7 +101,7 @@ namespace TerrainMapGUILibrary.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 13.
+        ///   Looks up a localized string similar to 14.
         /// </summary>
         internal static string FontSize {
             get {
@@ -112,9 +112,9 @@ namespace TerrainMapGUILibrary.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ImageArrowDownward72 {
+        internal static System.Drawing.Bitmap ImageArrowDownward96 {
             get {
-                object obj = ResourceManager.GetObject("ImageArrowDownward72", resourceCulture);
+                object obj = ResourceManager.GetObject("ImageArrowDownward96", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -122,9 +122,9 @@ namespace TerrainMapGUILibrary.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ImageArrowUpward72 {
+        internal static System.Drawing.Bitmap ImageArrowUpward96 {
             get {
-                object obj = ResourceManager.GetObject("ImageArrowUpward72", resourceCulture);
+                object obj = ResourceManager.GetObject("ImageArrowUpward96", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

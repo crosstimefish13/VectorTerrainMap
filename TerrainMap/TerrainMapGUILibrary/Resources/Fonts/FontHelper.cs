@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace TerrainMapGUILibrary.Resources.Fonts
 {
@@ -62,6 +64,55 @@ namespace TerrainMapGUILibrary.Resources.Fonts
             {
                 return font;
             }
+        }
+
+        public static Size MeasureString(Control owner, Font font, string text)
+        {
+            var graphics = owner.CreateGraphics();
+            var sizeF = graphics.MeasureString(text, font);
+            graphics.Dispose();
+
+            var resultSize = new Size(
+                Convert.ToInt32(Math.Ceiling(sizeF.Width)),
+                Convert.ToInt32(Math.Ceiling(sizeF.Height))
+            );
+            return resultSize;
+        }
+
+        public static string Ellipsis(Control owner, Font font, int width, string text)
+        {
+            string resultText = text;
+            var graphics = owner.CreateGraphics();
+            float textWidth = graphics.MeasureString(text, font).Width;
+            if (textWidth >= width)
+            {
+                float testWidth = graphics.MeasureString("...", font).Width;
+                if (testWidth >= width)
+                {
+                    resultText = string.Empty;
+                }
+                else
+                {
+                    resultText = "...";
+                    var textParts = text.Split(new char[] { (char)32 }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < textParts.Length - 1; i++)
+                    {
+                        string testText = $"{string.Join(" ", textParts.Take(i + 1))} ...";
+                        testWidth = graphics.MeasureString(testText, font).Width;
+                        if (testWidth >= width)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            resultText = testText;
+                        }
+                    }
+                }
+            }
+
+            graphics.Dispose();
+            return resultText;
         }
 
         private static PrivateFontCollection GetPrivateFontCollection()
